@@ -1,0 +1,72 @@
+{
+  "cost_overrun_classification": {
+    "baseline_logistic_regression_roc_auc": 0.785,
+    "baseline_logistic_regression_f1": 0.568,
+    "catboost_roc_auc": 0.994,
+    "catboost_pr_auc": 0.991,
+    "catboost_f1": 0.956,
+    "top_features": [
+      [
+        "cost_escalation_pct",
+        42.127165005689115
+      ],
+      [
+        "sector_name",
+        16.20947727106031
+      ],
+      [
+        "ministry_name",
+        6.130729548239255
+      ],
+      [
+        "state_name",
+        5.330279834003255
+      ],
+      [
+        "expenditure_pct",
+        5.273155790261089
+      ]
+    ]
+  },
+  "final_cost_regression": {
+    "baseline_ridge_mae_cr": 2608.52,
+    "baseline_ridge_r2": 0.0,
+    "catboost_mae_cr": 1766.45,
+    "catboost_rmse_cr": 3892.14,
+    "catboost_r2": 0.618
+  },
+  "schedule_overrun_classification": {
+    "baseline_logistic_regression_roc_auc": 0.937,
+    "catboost_roc_auc": 0.992,
+    "catboost_pr_auc": 0.999,
+    "catboost_f1": 0.975,
+    "top_features": [
+      [
+        "schedule_slippage_months",
+        32.710884569215835
+      ],
+      [
+        "sector_name",
+        14.479550721620022
+      ],
+      [
+        "progress_deviation",
+        8.374049497187896
+      ],
+      [
+        "time_elapsed_pct",
+        7.493185920450008
+      ],
+      [
+        "state_name",
+        7.228126227119987
+      ]
+    ]
+  },
+  "delay_duration_regression": {
+    "baseline_ridge_mae_months": 6.1,
+    "catboost_mae_months": 8.33,
+    "catboost_rmse_months": 11.44,
+    "catboost_r2": 0.846
+  }
+}

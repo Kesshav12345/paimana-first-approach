@@ -1,0 +1,73 @@
+{
+  "summary": {
+    "pass": 7,
+    "fail": 0,
+    "warning": 1
+  },
+  "checks": [
+    {
+      "check_id": "VAL_STRUCT_01",
+      "category": "Entity Integrity",
+      "description": "Primary key uniqueness on dim_project(project_id)",
+      "status": "PASS",
+      "observed_value": "3977 rows, 3977 distinct",
+      "severity": "CRITICAL"
+    },
+    {
+      "check_id": "VAL_STRUCT_02",
+      "category": "Grain Integrity",
+      "description": "Composite grain uniqueness on fact_project_month(project_id, reporting_month)",
+      "status": "PASS",
+      "observed_value": "23724 facts, 23724 distinct grain pairs",
+      "severity": "CRITICAL"
+    },
+    {
+      "check_id": "VAL_REF_01",
+      "category": "Referential Integrity",
+      "description": "Zero orphan facts in fact_project_month without matching dim_project",
+      "status": "PASS",
+      "observed_value": "0 orphan records",
+      "severity": "CRITICAL"
+    },
+    {
+      "check_id": "VAL_NUM_01",
+      "category": "Numeric Validity",
+      "description": "Physical progress percentage strictly bounded in [0.0, 100.0]",
+      "status": "PASS",
+      "observed_value": "0 out-of-bounds records",
+      "severity": "HIGH"
+    },
+    {
+      "check_id": "VAL_NUM_02",
+      "category": "Numeric Validity",
+      "description": "Zero negative monetary values in costs or cumulative expenditure",
+      "status": "PASS",
+      "observed_value": "0 negative records",
+      "severity": "HIGH"
+    },
+    {
+      "check_id": "VAL_TEMP_01",
+      "category": "Temporal Consistency",
+      "description": "Sanction/Approval Date precedes Original Date of Commissioning",
+      "status": "WARNING",
+      "observed_value": "20 chronological inconsistencies",
+      "severity": "MEDIUM"
+    },
+    {
+      "check_id": "VAL_MATH_01",
+      "category": "Deterministic Arithmetic",
+      "description": "Cost escalation matches exact difference between revised and original cost",
+      "status": "PASS",
+      "observed_value": "0 arithmetic discrepancies",
+      "severity": "CRITICAL"
+    },
+    {
+      "check_id": "VAL_RISK_01",
+      "category": "Risk Engine Integrity",
+      "description": "Composite risk scores strictly bounded within [0.0, 100.0]",
+      "status": "PASS",
+      "observed_value": "0 out-of-bounds risk scores",
+      "severity": "HIGH"
+    }
+  ]
+}

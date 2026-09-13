@@ -1,0 +1,94 @@
+{
+  "timestamp": "2026-09-13T13:16:09.860009",
+  "summary_counts": {
+    "canonical_projects": 3977,
+    "fact_project_month_observations": 23724,
+    "quarantine_audit_records": 9792,
+    "early_warning_alerts_materialized": 57402,
+    "ml_snapshots_total": 23724,
+    "ml_snapshots_uncensored_training": 18256
+  },
+  "missingness_profile": {
+    "project_id": {
+      "valid_records": 23724,
+      "missing_records": 0,
+      "missing_rate_pct": 0.0
+    },
+    "reporting_month": {
+      "valid_records": 23724,
+      "missing_records": 0,
+      "missing_rate_pct": 0.0
+    },
+    "sector_name": {
+      "valid_records": 23724,
+      "missing_records": 0,
+      "missing_rate_pct": 0.0
+    },
+    "ministry_name": {
+      "valid_records": 23724,
+      "missing_records": 0,
+      "missing_rate_pct": 0.0
+    },
+    "agency_name": {
+      "valid_records": 23724,
+      "missing_records": 0,
+      "missing_rate_pct": 0.0
+    },
+    "state_name": {
+      "valid_records": 23724,
+      "missing_records": 0,
+      "missing_rate_pct": 0.0
+    },
+    "original_cost_cr": {
+      "valid_records": 22634,
+      "missing_records": 1090,
+      "missing_rate_pct": 4.59
+    },
+    "revised_cost_cr": {
+      "valid_records": 23721,
+      "missing_records": 3,
+      "missing_rate_pct": 0.01
+    },
+    "anticipated_cost_cr": {
+      "valid_records": 23721,
+      "missing_records": 3,
+      "missing_rate_pct": 0.01
+    },
+    "cumulative_expenditure_cr": {
+      "valid_records": 23722,
+      "missing_records": 2,
+      "missing_rate_pct": 0.01
+    },
+    "physical_progress_pct": {
+      "valid_records": 23724,
+      "missing_records": 0,
+      "missing_rate_pct": 0.0
+    },
+    "approval_date": {
+      "valid_records": 23676,
+      "missing_records": 48,
+      "missing_rate_pct": 0.2
+    },
+    "original_doc": {
+      "valid_records": 23453,
+      "missing_records": 271,
+      "missing_rate_pct": 1.14
+    },
+    "anticipated_doc": {
+      "valid_records": 22990,
+      "missing_records": 734,
+      "missing_rate_pct": 3.09
+    }
+  },
+  "observation_frequency_distribution": {
+    "1 month": 82,
+    "2 to 5 months": 1978,
+    "6 to 11 months": 1288,
+    "12 to 16 months (High Persistence)": 629
+  },
+  "outlier_profile": {
+    "progress_exceeds_100_raw": 9792,
+    "cost_escalation_exceeds_200_pct": 251,
+    "severe_schedule_stalls": 617
+  }
+}
