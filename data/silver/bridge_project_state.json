@@ -12139,7 +12139,7 @@
   },
   {
     "project_id": "611047",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 861.37
@@ -13252,28 +13252,28 @@
   },
   {
     "project_id": "602525",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 8112.12
   },
   {
     "project_id": "602532",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 4287.59
   },
   {
     "project_id": "602535",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 5281.94
   },
   {
     "project_id": "605155",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 4526.12
@@ -13497,7 +13497,7 @@
   },
   {
     "project_id": "617179",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 218.6
@@ -13868,7 +13868,7 @@
   },
   {
     "project_id": "707229",
-    "state_name": "Andaman &",
+    "state_name": "Andaman and Nicobar Islands",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 209.88
@@ -14099,7 +14099,7 @@
   },
   {
     "project_id": "702355",
-    "state_name": "Dadra & Nagar",
+    "state_name": "Dadra and Nagar Haveli and Daman and Diu",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 210.0
@@ -14337,7 +14337,7 @@
   },
   {
     "project_id": "602098",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 424.93
@@ -14841,7 +14841,7 @@
   },
   {
     "project_id": "709773",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 538.0
@@ -15086,49 +15086,49 @@
   },
   {
     "project_id": "400119",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 3190.69
   },
   {
     "project_id": "616950",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1486.4
   },
   {
     "project_id": "619314",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 6175.0
   },
   {
     "project_id": "709839",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 4144.41
   },
   {
     "project_id": "709848",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 2329.45
   },
   {
     "project_id": "709849",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 2379.84
   },
   {
     "project_id": "709851",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 6183.79
@@ -15338,7 +15338,7 @@
   },
   {
     "project_id": "701167",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1828.0
@@ -17186,14 +17186,14 @@
   },
   {
     "project_id": "705362",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 819.0
   },
   {
     "project_id": "705298",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 274.39
@@ -18768,84 +18768,84 @@
   },
   {
     "project_id": "618494",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 2714.95
   },
   {
     "project_id": "618495",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 2894.74
   },
   {
     "project_id": "618496",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1821.72
   },
   {
     "project_id": "618497",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 975.38
   },
   {
     "project_id": "618541",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 2919.96
   },
   {
     "project_id": "618543",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1912.17
   },
   {
     "project_id": "618544",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1401.87
   },
   {
     "project_id": "618545",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 614.48
   },
   {
     "project_id": "618547",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 961.0
   },
   {
     "project_id": "618549",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 242.65
   },
   {
     "project_id": "618550",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 855.74
   },
   {
     "project_id": "618967",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 295.06
@@ -21764,35 +21764,35 @@
   },
   {
     "project_id": "400013",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 26316.0
   },
   {
     "project_id": "701593",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 28466.0
   },
   {
     "project_id": "706775",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 61109.0
   },
   {
     "project_id": "709856",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 645.13
   },
   {
     "project_id": "709857",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 24544.55
@@ -22282,7 +22282,7 @@
   },
   {
     "project_id": "608302",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 318.12
@@ -22464,7 +22464,7 @@
   },
   {
     "project_id": "400235",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 676.89
@@ -22947,7 +22947,7 @@
   },
   {
     "project_id": "709858",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 810.99
@@ -22989,7 +22989,7 @@
   },
   {
     "project_id": "611142",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 177.0
@@ -23017,14 +23017,14 @@
   },
   {
     "project_id": "618546",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 442.14
   },
   {
     "project_id": "618548",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 2023.88
@@ -23241,7 +23241,7 @@
   },
   {
     "project_id": "611980",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 492.83
@@ -23262,7 +23262,7 @@
   },
   {
     "project_id": "709855",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 239.6
@@ -23395,14 +23395,14 @@
   },
   {
     "project_id": "707051",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 325.0
   },
   {
     "project_id": "707052",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 325.0
@@ -23556,7 +23556,7 @@
   },
   {
     "project_id": "618542",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 827.98
@@ -23682,119 +23682,119 @@
   },
   {
     "project_id": "108841",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 3742.0
   },
   {
     "project_id": "124199",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 837.0
   },
   {
     "project_id": "171218",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1245.0
   },
   {
     "project_id": "175860",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 4943.0
   },
   {
     "project_id": "210914",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1674.0
   },
   {
     "project_id": "240484",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 832.0
   },
   {
     "project_id": "317725",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1713.0
   },
   {
     "project_id": "437130",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1621.0
   },
   {
     "project_id": "462136",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 768.0
   },
   {
     "project_id": "476006",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1292.0
   },
   {
     "project_id": "547243",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 22174.56
   },
   {
     "project_id": "660056",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 765.0
   },
   {
     "project_id": "665021",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1821.0
   },
   {
     "project_id": "914467",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1550.0
   },
   {
     "project_id": "938832",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 2839.0
   },
   {
     "project_id": "946208",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 160.0
   },
   {
     "project_id": "976009",
-    "state_name": "PAN India",
+    "state_name": "Multi-State",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 1168.0
@@ -23843,7 +23843,7 @@
   },
   {
     "project_id": "612239",
-    "state_name": "Jammu and",
+    "state_name": "Jammu and Kashmir",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 131.05
@@ -23892,7 +23892,7 @@
   },
   {
     "project_id": "617321",
-    "state_name": "Multi-State",
+    "state_name": "Offshore",
     "association_type": "PRIMARY",
     "allocated_pct": 100.0,
     "allocated_cost_cr": 150000.0

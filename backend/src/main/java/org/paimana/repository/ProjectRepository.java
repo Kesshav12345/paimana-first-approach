@@ -147,11 +147,11 @@ public class ProjectRepository {
             params.add(state.trim());
         }
         if (riskBand != null && !riskBand.trim().isEmpty() && !"ALL".equalsIgnoreCase(riskBand)) {
-            sql.append(" AND risk_band = ?");
+            sql.append(" AND UPPER(risk_band) = ?");
             params.add(riskBand.trim().toUpperCase());
         }
         if (trajectory != null && !trajectory.trim().isEmpty() && !"ALL".equalsIgnoreCase(trajectory)) {
-            sql.append(" AND risk_trajectory = ?");
+            sql.append(" AND UPPER(risk_trajectory) = ?");
             params.add(trajectory.trim().toUpperCase());
         }
         if ("ESCALATED".equalsIgnoreCase(costFilter)) {

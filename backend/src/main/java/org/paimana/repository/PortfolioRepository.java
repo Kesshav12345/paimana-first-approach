@@ -74,7 +74,7 @@ public class PortfolioRepository {
         String recentSql = """
             SELECT project_id, project_name, sector_name, risk_band, risk_trajectory, overall_risk_score, active_warning_count
             FROM gold_project_current
-            WHERE risk_band IN ('CRITICAL', 'HIGH')
+            WHERE UPPER(risk_band) IN ('CRITICAL', 'HIGH')
             ORDER BY overall_risk_score DESC
             LIMIT 6
         """;

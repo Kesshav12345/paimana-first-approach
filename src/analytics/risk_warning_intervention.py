@@ -223,7 +223,7 @@ def run_risk_warning_pipeline(workspace_dir: str):
             s.sector_name,
             m.ministry_name,
             a.agency_name,
-            st.state_name,
+            COALESCE(st.state_name, 'Multi-State') AS state_name,
             p.is_multi_state,
             f.original_cost_cr,
             f.revised_cost_cr AS latest_revised_cost_cr,

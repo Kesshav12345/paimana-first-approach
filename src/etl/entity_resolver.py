@@ -16,8 +16,32 @@ INDIAN_STATES = [
     "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
     "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
     "Delhi", "Jammu and Kashmir", "Ladakh", "Puducherry", "Offshore",
-    "Andaman and Nicobar Islands"
+    "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
+    "Multi-State"
 ]
+
+def normalize_state_string(raw_state: str) -> str:
+    if not raw_state or str(raw_state).strip() in ['Unknown', '', 'None']:
+        return 'Unknown'
+    s = str(raw_state).strip()
+    su = s.upper()
+    if su in ['MULTI-STATES', 'MULTI STATE', 'MULTI-STATE', 'PAN INDIA', 'ALL INDIA', 'NATIONAL']:
+        return 'Multi-State'
+    if 'MULTI' in su:
+        return 'Multi-State'
+    if su in ['OFFSHORE', 'MUMBAI HIGH']:
+        return 'Offshore'
+    if su.startswith('JAMMU') or su in ['JAMMU AND', 'JAMMU & KASHMIR', 'J&K']:
+        return 'Jammu and Kashmir'
+    if su.startswith('ANDAMAN') or 'NICOBAR' in su:
+        return 'Andaman and Nicobar Islands'
+    if su.startswith('DADRA') or 'DAMAN' in su or 'DIU' in su or 'NAGAR HAVELI' in su:
+        return 'Dadra and Nagar Haveli and Daman and Diu'
+    for st in INDIAN_STATES:
+        if st.lower() == s.lower():
+            return st
+    return s.title()
+
 
 # Comprehensive geography keywords -> canonical state
 STATE_KEYWORDS = {
@@ -286,7 +310,9 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
         canonical_agency = agency[0][0] if agency else first_obs['agency_name']
         all_agencies.add(canonical_agency)
         
-        state_counter = Counter([o['state_name'] for o in obs_sorted if o['state_name'] not in ['Unknown', '']]).most_common(1)
+        norm_states = [normalize_state_string(o['state_name']) for o in obs_sorted if o.get('state_name')]
+        valid_states = [st for st in norm_states if st not in ['Unknown', '']]
+        state_counter = Counter(valid_states).most_common(1)
         canonical_state_str = state_counter[0][0] if state_counter else 'Unknown'
         
         # Fallback: resolve from project name / agency
@@ -294,18 +320,15 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
             unknown_state_count += 1
             resolved = resolve_state_from_name(canonical_name, canonical_agency)
             if resolved != 'Unknown':
-                canonical_state_str = resolved
+                canonical_state_str = normalize_state_string(resolved)
                 resolved_by_name += 1
                 
         # Final fallback: mark as Multi-State for national programs
         if canonical_state_str in ['Unknown', '']:
             canonical_state_str = 'Multi-State'
             
-        is_multi = 1 if 'MULTI' in canonical_state_str.upper() or 'OFFSHORE' in canonical_state_str.upper() else 0
-        
-        # Normalize state string so it matches the bridge_project_state entry exactly
-        if is_multi:
-            canonical_state_str = "Multi-State" if 'OFFSHORE' not in canonical_state_str.upper() else "Offshore"
+        canonical_state_str = normalize_state_string(canonical_state_str)
+        is_multi = 1 if canonical_state_str in ['Multi-State', 'Offshore'] else 0
         
         # Original dates & baselines from earliest valid observation
         app_date = None
@@ -353,30 +376,15 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
         }
         dim_projects.append(proj_rec)
         
-        # Handle state decomposition for Multi-State projects
-        if is_multi:
-            bridge_states.append({
-                "project_id": pid,
-                "state_name": "Multi-State",
-                "association_type": "PRIMARY",
-                "allocated_pct": 100.0,
-                "allocated_cost_cr": orig_cost
-            })
-        else:
-            clean_s = canonical_state_str.strip()
-            matched_s = clean_s
-            for ks in INDIAN_STATES:
-                if ks.lower() == clean_s.lower():
-                    matched_s = ks
-                    break
-            all_states.add(matched_s)
-            bridge_states.append({
-                "project_id": pid,
-                "state_name": matched_s,
-                "association_type": "PRIMARY",
-                "allocated_pct": 100.0,
-                "allocated_cost_cr": orig_cost
-            })
+        # Bridge state decomposition
+        bridge_states.append({
+            "project_id": pid,
+            "state_name": canonical_state_str,
+            "association_type": "PRIMARY",
+            "allocated_pct": 100.0,
+            "allocated_cost_cr": orig_cost
+        })
+        all_states.add(canonical_state_str)
             
         # Project identity mapping entry
         identity_map.append({

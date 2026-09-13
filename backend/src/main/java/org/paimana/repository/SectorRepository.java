@@ -148,7 +148,7 @@ public class SectorRepository {
                 state_name, COUNT(*) as project_count,
                 ROUND(SUM(latest_revised_cost_cr), 2) as total_revised_cost_cr,
                 ROUND(AVG(physical_progress_pct), 1) as avg_progress_pct,
-                SUM(CASE WHEN risk_band IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) as high_risk_count
+                SUM(CASE WHEN UPPER(risk_band) IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) as high_risk_count
             FROM gold_project_current
             WHERE sector_name = ?
             GROUP BY state_name

@@ -68,7 +68,7 @@ def build_portfolio_rollups(workspace_dir: str):
             ROUND((SUM(cumulative_expenditure_cr) / SUM(latest_revised_cost_cr)) * 100.0, 2) AS weighted_expenditure_pct,
             ROUND(AVG(physical_progress_pct), 2) AS avg_physical_progress_pct,
             ROUND(AVG(schedule_slippage_months), 1) AS avg_delay_months,
-            SUM(CASE WHEN risk_band IN ('High', 'Critical') THEN 1 ELSE 0 END) AS projects_requiring_attention,
+            SUM(CASE WHEN UPPER(risk_band) IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) AS projects_requiring_attention,
             SUM(active_warning_count) AS total_warnings
         FROM gold_project_current
         GROUP BY ministry_name
@@ -79,18 +79,18 @@ def build_portfolio_rollups(workspace_dir: str):
     cur.execute("""
         CREATE TABLE gold_state_summary AS
         SELECT 
-            COALESCE(st.state_name, 'Multi-States') AS state_name,
+            COALESCE(st.state_name, c.state_name, 'Multi-State') AS state_name,
             COUNT(DISTINCT c.project_id) AS project_count,
             ROUND(SUM(COALESCE(b.allocated_cost_cr, c.original_cost_cr)), 2) AS allocated_cost_cr,
             ROUND(SUM(c.latest_revised_cost_cr), 2) AS total_project_value_cr,
             ROUND(SUM(c.cumulative_expenditure_cr), 2) AS total_expenditure_cr,
             ROUND(AVG(c.physical_progress_pct), 2) AS avg_physical_progress_pct,
-            SUM(CASE WHEN c.risk_band IN ('High', 'Critical') THEN 1 ELSE 0 END) AS projects_requiring_attention,
+            SUM(CASE WHEN UPPER(c.risk_band) IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) AS projects_requiring_attention,
             SUM(c.active_warning_count) AS total_warnings
         FROM gold_project_current c
         LEFT JOIN bridge_project_state b ON c.project_id = b.project_id
         LEFT JOIN dim_state st ON b.state_id = st.state_id
-        GROUP BY COALESCE(st.state_name, 'Multi-States')
+        GROUP BY COALESCE(st.state_name, c.state_name, 'Multi-State')
         ORDER BY allocated_cost_cr DESC
     """)
     

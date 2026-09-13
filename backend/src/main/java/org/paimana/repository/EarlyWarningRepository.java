@@ -33,7 +33,7 @@ public class EarlyWarningRepository {
 
         List<Object> params = new ArrayList<>();
         if (severity != null && !severity.trim().isEmpty() && !"ALL".equalsIgnoreCase(severity)) {
-            sql.append(" AND w.severity = ?");
+            sql.append(" AND UPPER(w.severity) = ?");
             params.add(severity.trim().toUpperCase());
         }
         if (sector != null && !sector.trim().isEmpty() && !"ALL".equalsIgnoreCase(sector)) {
@@ -95,7 +95,7 @@ public class EarlyWarningRepository {
 
         List<Object> params = new ArrayList<>();
         if (severity != null && !severity.trim().isEmpty() && !"ALL".equalsIgnoreCase(severity)) {
-            sql.append(" AND w.severity = ?");
+            sql.append(" AND UPPER(w.severity) = ?");
             params.add(severity.trim().toUpperCase());
         }
         if (sector != null && !sector.trim().isEmpty() && !"ALL".equalsIgnoreCase(sector)) {
