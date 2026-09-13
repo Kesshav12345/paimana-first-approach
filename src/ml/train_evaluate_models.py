@@ -197,6 +197,15 @@ def train_and_evaluate(workspace_dir: str):
     
     logger.info(f"[Target 4: Delay Duration] Ridge MAE: {ridge_del_mae:.2f} months | CatBoost MAE: {cb_del_mae:.2f} months (RMSE: {cb_del_rmse:.2f}, R2: {cb_del_r2:.3f})")
     
+    # Save Trained Model Artifacts for Inference Service
+    models_dir = "models"
+    os.makedirs(models_dir, exist_ok=True)
+    cb_cost_cls.save_model(os.path.join(models_dir, "cb_cost_cls.cbm"))
+    cb_cost_reg.save_model(os.path.join(models_dir, "cb_final_cost_reg.cbm"))
+    cb_sched_cls.save_model(os.path.join(models_dir, "cb_sched_cls.cbm"))
+    cb_delay_reg.save_model(os.path.join(models_dir, "cb_delay_reg.cbm"))
+    logger.info(f"Saved 4 production CatBoost model artifacts to {models_dir}/")
+    
     # Feature Importances from CatBoost
     feat_names = features_num + features_cat
     cost_importances = sorted(zip(feat_names, cb_cost_cls.get_feature_importance()), key=lambda x: x[1], reverse=True)

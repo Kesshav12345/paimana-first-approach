@@ -15,8 +15,217 @@ INDIAN_STATES = [
     "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
     "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
     "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-    "Delhi", "Jammu and Kashmir", "Ladakh", "Puducherry", "Offshore"
+    "Delhi", "Jammu and Kashmir", "Ladakh", "Puducherry", "Offshore",
+    "Andaman and Nicobar Islands"
 ]
+
+# Comprehensive geography keywords -> canonical state
+STATE_KEYWORDS = {
+    "West Bengal": [
+        "WEST BENGAL", "BENGAL", "KOLKATA", "HOWRAH", "DURGAPUR", "ASANSOL",
+        "SILIGURI", "DANKUNI", "HALDIA", "BARANAGAR", "BARRACKPORE", "DAKSHINESHWAR",
+        "RANIGANJ", "SARPI", "SHYAMSUNDARPUR", "IISCO", "DSP", "BURNPUR",
+    ],
+    "Gujarat": [
+        "GUJARAT", "AHMEDABAD", "SURAT", "VADODARA", "BARODA", "RAJKOT",
+        "BHAVNAGAR", "JAMNAGAR", "GANDHINAGAR", "LIMBDI", "MESANKA", "RADHANPUR",
+        "BHIMASAR", "ANJAR", "BHUJ", "HAZIRA", "MUNDRA", "KANDLA", "DAHEJ",
+        "PALANPUR", "MEHSANA", "ANAND", "SURENDRANAGAR", "KESHOD", "DHOLERA",
+        "SAMAKHIALI", "VIRAMGAM", "ZANKA", "NUNHERA",
+    ],
+    "Rajasthan": [
+        "RAJASTHAN", "JAIPUR", "JODHPUR", "KOTA", "BIKANER", "AJMER",
+        "UDAIPUR", "TONK", "SAWAI MADHOPUR", "SAWAIMADHOPUR", "DAUSA",
+        "KARAULI", "BHENSARA", "SAMBHU KI BHURJ", "SHAMBHU KI BHURJ",
+        "JAISALMER", "BARMER", "NAGAUR", "HANUMANGARH", "SANCHORE", "SANTALPUR",
+        "PALI", "SIKAR", "ALWAR", "BHARATPUR", "CHURU", "JHUNJHUNU",
+    ],
+    "Maharashtra": [
+        "MAHARASHTRA", "MUMBAI", "PUNE", "NAGPUR", "NASHIK", "AURANGABAD",
+        "SAMBHAJI NAGAR", "THANE", "BHOKARDAN", "KUMBHARI FATA", "TIRORA",
+        "GONDIA", "PIMPLNER", "SATANA", "AJANTHA", "BULDHANA", "GOSIKHURD",
+        "YEKONA", "UKNI", "WARDHA", "CHANDRAPUR", "BILOLI", "JALNA",
+        "NIMBAL", "KOLHAPUR", "SOLAPUR", "AMRAVATI", "AKOLA", "NANDED",
+        "SH-335", "NH-752G", "NH- 752G", "WCL", "VIDARBHA", "MARATHWADA",
+        "BALAGHAT", "BHANDARA", "WASHIM", "RAIGAD", "RATNAGIRI", "SINDHUDURG",
+        "SATARA", "SANGLI", "LATUR",
+    ],
+    "Bihar": [
+        "BIHAR", "PATNA", "GAYA", "BHAGALPUR", "MUZAFFARPUR", "BUXAR",
+        "NABINAGAR", "BARH", "BODH GAYA", "KARMALICHAK", "NAWADA",
+        "DARBHANGA", "PURNEA", "SAMASTIPUR", "BEGUSARAI", "SIWAN",
+        "HAJIPUR", "CHHAPRA", "BETTIAH", "MADHUBANI",
+    ],
+    "Jharkhand": [
+        "JHARKHAND", "RANCHI", "DHANBAD", "BOKARO", "KODERMA", "DEOGHAR",
+        "HAZARIBAGH", "ISM DHANBAD", "BCCL", "CCL", "ECL", "GIRIDIH",
+        "GODDA", "PAKUR", "DUMKA", "PALAMU", "GUMLA", "CHAIBASA",
+    ],
+    "Tamil Nadu": [
+        "TAMIL NADU", "TAMILNADU", "CHENNAI", "COIMBATORE", "MADURAI",
+        "TRICHY", "TIRUCHIRAPPALLI", "SALEM", "HOSUR", "PERALAM", "KAYATHAR",
+        "TUTICORIN", "VELLORE", "ERODE", "TIRUNELVELI", "CUDDALORE",
+        "ENNORE", "KATTUPALLI", "KAMARAJAR", "CHENGALPATTU",
+    ],
+    "Puducherry": [
+        "PUDUCHERRY", "PONDICHERRY", "KARAIKAL",
+    ],
+    "Andhra Pradesh": [
+        "ANDHRA PRADESH", "VIJAYAWADA", "VISAKHAPATNAM", "VIZAG", "KADAPA",
+        "RAJAHMUNDRY", "KURNOOL", "TIRUPATI", "NELLORE", "GUNTUR",
+        "VANKARAKUNTA", "ODULAPALLE", "NALLACHERUVUPALLI", "ONGOLE",
+        "BHEEMUNIPATNAM", "KRISHNAPATNAM", "GANGAVARAM", "KAKINADA",
+        "ELURU", "ANANTAPUR", "CHITTOOR",
+    ],
+    "Telangana": [
+        "TELANGANA", "HYDERABAD", "WARANGAL", "RAMAGUNDAM", "ZAHEERABAD",
+        "SCCL", "MANCHERIAL", "KARIMNAGAR", "NIZAMABAD", "KHAMMAM",
+        "NALGONDA", "MAHBUBNAGAR", "ADILABAD",
+    ],
+    "Karnataka": [
+        "KARNATAKA", "BENGALURU", "BANGALORE", "MYSORE", "MYSURU",
+        "HUBBALLI", "DHARWAD", "MANGALURU", "MANGALORE", "DAVANAGERE",
+        "YESHVANTHPUR", "BAIYYAPPANAHALLI", "CHANNASANDRA", "IISC",
+        "BELLARY", "TUMKUR", "BELAGAVI", "BIDAR", "VIJAYAPURA",
+        "KALABURAGI", "CHITRADURGA", "BAGALKOT", "GADAG", "HAVERI",
+        "HASSAN", "SHIVAMOGGA", "KOPPAL", "RAICHUR", "YADGIR",
+        "UDUPI", "CHIKKAMAGALURU", "BANAVARA", "BETTADAHALLI", "AURAD",
+    ],
+    "Kerala": [
+        "KERALA", "KOCHI", "COCHIN", "TRIVANDRUM", "THIRUVANANTHAPURAM",
+        "KOZHIKODE", "CALICUT", "THRISSUR", "KOLLAM", "PALAKKAD",
+        "ALAPPUZHA", "MALAPPURAM", "KANNUR", "KASARAGOD",
+    ],
+    "Madhya Pradesh": [
+        "MADHYA PRADESH", "BHOPAL", "INDORE", "GWALIOR", "JABALPUR",
+        "UJJAIN", "SINGRAULI", "REWA", "SECL", "SATNA", "SAGAR",
+        "DAMOH", "KATNI", "CHHINDWARA", "SEONI", "MANDLA", "BALAGHAT",
+    ],
+    "Chhattisgarh": [
+        "CHHATTISGARH", "RAIPUR", "BHILAI", "BILASPUR", "KORBA",
+        "GEVRA", "KIRANDUL", "BSP", "DURG", "RAJNANDGAON", "RAIGARH",
+        "SURGUJA", "AMBIKAPUR", "KOREA", "JASHPUR",
+    ],
+    "Odisha": [
+        "ODISHA", "ORISSA", "BHUBANESWAR", "ROURKELA", "PURI", "CUTTACK",
+        "BERHAMPUR", "BALANGIR", "PANGAM", "POTTERU", "KONGURUKONDA",
+        "RSP", "MCL", "TALCHER", "ANGUL", "SAMBALPUR", "JHARSUGUDA",
+        "BOLANGIR", "KALAHANDI", "KORAPUT", "RAYAGADA", "GANJAM",
+        "KENDRAPARA", "KENDUJHAR", "KEONJHAR", "PARADIP", "DHAMARA",
+    ],
+    "Punjab": [
+        "PUNJAB", "LUDHIANA", "AMRITSAR", "JALANDHAR", "PATIALA",
+        "KILA RAIPUR", "LDH-JHL", "MOHALI", "BATHINDA", "GURDASPUR",
+        "FEROZEPUR", "MOGA", "BARNALA", "SANGRUR",
+    ],
+    "Haryana": [
+        "HARYANA", "GURUGRAM", "GURGAON", "FARIDABAD", "PANIPAT",
+        "AMBALA", "ROHTAK", "KARNAL", "REWARI", "HISAR", "BHIWANI",
+        "MAHENDRAGARH", "PALWAL", "BAHADURGARH", "SONIPAT",
+    ],
+    "Uttar Pradesh": [
+        "UTTAR PRADESH", "LUCKNOW", "KANPUR", "AGRA", "VARANASI",
+        "MEERUT", "PRAYAGRAJ", "ALLAHABAD", "NOIDA", "GORAKHPUR",
+        "JAUNPUR", "ZAFFARABAD", "CHANDAULI", "MEJA", "MATHURA",
+        "FIROZABAD", "MORADABAD", "BAREILLY", "ALIGARH", "SAHARANPUR",
+        "MUZAFFARNAGAR", "GHAZIABAD", "BULANDSHAHR", "ETAWAH",
+        "MAINPURI", "FATEHPUR", "CHITRAKOOT", "MIRZAPUR", "SONBHADRA",
+        "VARANASI", "AZAMGARH", "MAU", "DEORIA", "BASTI",
+    ],
+    "Uttarakhand": [
+        "UTTARAKHAND", "DEHRADUN", "HARIDWAR", "RISHIKESH", "ROORKEE",
+        "TEHRI", "VISHNUGAD PIPALKOTI", "SUNNI DAM", "NAINITAL",
+        "ALMORA", "PITHORAGARH", "CHAMOLI", "RUDRAPRAYAG", "PAURI",
+        "KOTDWAR", "KASHIPUR", "HALDWANI", "UDHAM SINGH NAGAR",
+    ],
+    "Himachal Pradesh": [
+        "HIMACHAL PRADESH", "SHIMLA", "DHARAMSHALA", "KULLU", "MANALI",
+        "MANDI", "SOLAN", "KANGRA", "CHAMBA", "BILASPUR", "HAMIRPUR",
+        "NAHAN", "UNA", "SIRMAUR",
+    ],
+    "Jammu and Kashmir": [
+        "JAMMU", "KASHMIR", "SRINAGAR", "UDHAMPUR", "BARAMULLA",
+        "SAMBA", "VIJAYPUR", "KATRA", "BANIHAL", "SOPORE",
+        "ANANTNAG", "PULWAMA", "KUPWARA", "BANDIPORA", "GANDERBAL",
+        "REASI", "RAMBAN", "KISHTWAR", "DODA", "POONCH", "RAJOURI",
+    ],
+    "Ladakh": [
+        "LADAKH", "LEH", "KARGIL",
+    ],
+    "Assam": [
+        "ASSAM", "GUWAHATI", "SILCHAR", "DIBRUGARH", "NUMALIGARH",
+        "AGTHORI", "KAMAKHYA", "SARAIGHAT", "JORHAT", "TEZPUR",
+        "GOLAGHAT", "NAGAON", "BONGAIGAON", "DHUBRI", "KOKRAJHAR",
+        "TINSUKIA", "SIBSAGAR",
+    ],
+    "Arunachal Pradesh": [
+        "ARUNACHAL", "ITANAGAR", "DIBANG", "SUBANSIRI",
+        "TAWANG", "NAHARLAGUN", "ZIRO", "PASIGHAT",
+    ],
+    "Manipur": [
+        "MANIPUR", "IMPHAL", "UKHRUL", "JIRIBAM", "TOLOI", "TADUBI",
+        "JESSAMI", "BISHNUPUR", "THOUBAL", "SENAPATI", "TAMENGLONG",
+        "CHANDEL", "CHURACHANDPUR",
+    ],
+    "Meghalaya": [
+        "MEGHALAYA", "SHILLONG", "TURA", "NONGPOH", "JOWAI",
+        "NONGSTOIN", "BAGHMARA",
+    ],
+    "Mizoram": [
+        "MIZORAM", "AIZAWL", "LUNGLEI", "SERCHHIP", "CHAMPHAI",
+    ],
+    "Nagaland": [
+        "NAGALAND", "KOHIMA", "DIMAPUR", "MOKOKCHUNG", "UNGER",
+        "YESEMYONG", "TUENSANG", "WOKHA", "ZUNHEBOTO", "PHEK",
+    ],
+    "Sikkim": [
+        "SIKKIM", "GANGTOK", "PAKYONG", "YANGANG", "RANGIT",
+        "NAMCHI", "JORETHANG",
+    ],
+    "Tripura": [
+        "TRIPURA", "AGARTALA", "UDAIPUR", "DHARMANAGAR", "KAILASHAHAR",
+    ],
+    "Andaman and Nicobar Islands": [
+        "ANDAMAN", "NICOBAR", "PORT BLAIR", "AUSTIN CREEK",
+        "NIMBUTALA", "MIDDLE STRAIT CREEK", "PORTBLAIR",
+    ],
+    "Delhi": [
+        "DELHI", "NEW DELHI", "DWARKA", "LODHI ROAD", "LUTYENS",
+        "SAKET", "LAJPAT NAGAR", "CONNAUGHT PLACE",
+    ],
+    "Goa": [
+        "GOA", "PANAJI", "VASCO", "MARGAO", "MADGAON",
+    ],
+    "Multi-State": [
+        "MULTI-STATES", "MULTI STATE", "BHARATNET",
+        "DELHI VADODARA", "DELHI MUMBAI", "FOUR STATES",
+        "ASPIRATIONAL DISTRICT SCHEME", "AMENDED BHARATNET",
+        "MULTIPLE STATES", "ALL INDIA", "NATIONAL",
+    ],
+    "Offshore": [
+        "OFFSHORE", "MUMBAI HIGH", "ONSHORE OFFSHORE",
+        "BOMBAY OFFSHORE", "DEEP WATER", "OIL FIELDS OFFSHORE",
+    ],
+}
+
+def resolve_state_from_name(name: str, agency: str = "") -> str:
+    """Resolve state from project name and agency using keyword matching."""
+    combined = (name + " " + agency).upper()
+    
+    # Check Multi-State first (broad scope projects)
+    for kw in STATE_KEYWORDS["Multi-State"]:
+        if kw in combined:
+            return "Multi-State"
+            
+    # Single state keywords
+    for state, kws in STATE_KEYWORDS.items():
+        if state == "Multi-State":
+            continue
+        for kw in kws:
+            if kw in combined:
+                return state
+    
+    return "Unknown"
 
 def normalize_name(name: str) -> str:
     s = name.lower()
@@ -50,6 +259,9 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
     all_agencies = set()
     all_states = set(INDIAN_STATES)
     
+    unknown_state_count = 0
+    resolved_by_name = 0
+    
     for pid, obs_list in by_project.items():
         # Sort chronologically by reporting_month
         obs_sorted = sorted(obs_list, key=lambda x: x['reporting_month'])
@@ -62,22 +274,38 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
         norm_name = normalize_name(canonical_name)
         
         # Majority voting for organizational dimensions
-        sector = Counter([o['sector_name'] for o in obs_sorted if o['sector_name'] != 'Unknown']).most_common(1)
+        sector = Counter([o['sector_name'] for o in obs_sorted if o['sector_name'] not in ['Unknown', '']]).most_common(1)
         canonical_sector = sector[0][0] if sector else first_obs['sector_name']
         all_sectors.add(canonical_sector)
         
-        ministry = Counter([o['ministry_name'] for o in obs_sorted if o['ministry_name'] != 'Unknown']).most_common(1)
+        ministry = Counter([o['ministry_name'] for o in obs_sorted if o['ministry_name'] not in ['Unknown', '']]).most_common(1)
         canonical_ministry = ministry[0][0] if ministry else first_obs['ministry_name']
         all_ministries.add(canonical_ministry)
         
-        agency = Counter([o['agency_name'] for o in obs_sorted if o['agency_name'] != 'Unknown']).most_common(1)
+        agency = Counter([o['agency_name'] for o in obs_sorted if o['agency_name'] not in ['Unknown', 'Implementing Agency']]).most_common(1)
         canonical_agency = agency[0][0] if agency else first_obs['agency_name']
         all_agencies.add(canonical_agency)
         
-        state_counter = Counter([o['state_name'] for o in obs_sorted if o['state_name'] != 'Unknown']).most_common(1)
-        canonical_state_str = state_counter[0][0] if state_counter else first_obs['state_name']
+        state_counter = Counter([o['state_name'] for o in obs_sorted if o['state_name'] not in ['Unknown', '']]).most_common(1)
+        canonical_state_str = state_counter[0][0] if state_counter else 'Unknown'
         
-        is_multi = 1 if 'MULTI-STATES' in canonical_state_str.upper() else 0
+        # Fallback: resolve from project name / agency
+        if canonical_state_str in ['Unknown', '']:
+            unknown_state_count += 1
+            resolved = resolve_state_from_name(canonical_name, canonical_agency)
+            if resolved != 'Unknown':
+                canonical_state_str = resolved
+                resolved_by_name += 1
+                
+        # Final fallback: mark as Multi-State for national programs
+        if canonical_state_str in ['Unknown', '']:
+            canonical_state_str = 'Multi-State'
+            
+        is_multi = 1 if 'MULTI' in canonical_state_str.upper() or 'OFFSHORE' in canonical_state_str.upper() else 0
+        
+        # Normalize state string so it matches the bridge_project_state entry exactly
+        if is_multi:
+            canonical_state_str = "Multi-State" if 'OFFSHORE' not in canonical_state_str.upper() else "Offshore"
         
         # Original dates & baselines from earliest valid observation
         app_date = None
@@ -127,30 +355,15 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
         
         # Handle state decomposition for Multi-State projects
         if is_multi:
-            # Parse constituent states inside parentheses
-            m_states = re.findall(r'[A-Za-z\s]+', canonical_state_str.replace('Multi-States', ''))
-            extracted_states = []
-            for st in m_states:
-                st_clean = st.strip()
-                for known_s in INDIAN_STATES:
-                    if known_s.lower() == st_clean.lower() or known_s.lower() in st_clean.lower():
-                        if known_s not in extracted_states:
-                            extracted_states.append(known_s)
-                            
-            if not extracted_states:
-                extracted_states = ["Multi-States"]
-                
-            for st in extracted_states:
-                bridge_states.append({
-                    "project_id": pid,
-                    "state_name": st,
-                    "association_type": "PARTICIPATING",
-                    "allocated_pct": round(100.0 / len(extracted_states), 2) if len(extracted_states) > 0 else 100.0,
-                    "allocated_cost_cr": round(orig_cost / len(extracted_states), 2) if orig_cost and len(extracted_states) > 0 else None
-                })
+            bridge_states.append({
+                "project_id": pid,
+                "state_name": "Multi-State",
+                "association_type": "PRIMARY",
+                "allocated_pct": 100.0,
+                "allocated_cost_cr": orig_cost
+            })
         else:
             clean_s = canonical_state_str.strip()
-            # Match with known states
             matched_s = clean_s
             for ks in INDIAN_STATES:
                 if ks.lower() == clean_s.lower():
@@ -190,6 +403,7 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
         
     # Save identity map CSV
     id_map_csv = r"c:\Users\kessh\OneDrive\Documents\paimana first approach\artifacts\project_identity_map.csv"
+    os.makedirs(os.path.dirname(id_map_csv), exist_ok=True)
     with open(id_map_csv, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=list(identity_map[0].keys()))
         writer.writeheader()
@@ -197,6 +411,7 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
         
     logger.info(f"Resolved {len(dim_projects)} unique canonical projects.")
     logger.info(f"Generated {len(bridge_states)} project-state bridge entries.")
+    logger.info(f"Of {unknown_state_count} Unknown states: resolved {resolved_by_name} by name/agency lookup, rest marked Multi-State.")
     logger.info(f"Saved project identity map to {id_map_csv}")
     
     return dim_projects, bridge_states

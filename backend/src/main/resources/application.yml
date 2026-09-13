@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: paimana-backend
+  datasource:
+    url: ${DATABASE_URL:jdbc:sqlite:../paimana_canonical.db}
+    driver-class-name: ${DATABASE_DRIVER:org.sqlite.JDBC}
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+python:
+  service:
+    url: ${PYTHON_SERVICE_URL:http://localhost:8000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    root: INFO
+    org.paimana: INFO

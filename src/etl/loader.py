@@ -45,28 +45,47 @@ def load_canonical_database(workspace_dir: str):
         conn.commit()
         logger.info("Loaded source_documents into SQLite.")
         
-    # 2. Load Dimensions
+    # 2. Load Dimensions (idempotent - delete all and repopulate cleanly)
     with open(os.path.join(silver_dir, "dim_project.json"), 'r', encoding='utf-8') as f:
         dim_projects = json.load(f)
-        
-    sectors = sorted(list(set([p['sector_name'] for p in dim_projects if p['sector_name']])))
-    for s in sectors:
-        cur.execute("INSERT OR IGNORE INTO dim_sector (sector_name) VALUES (?)", (s,))
-        
-    ministries = sorted(list(set([p['ministry_name'] for p in dim_projects if p['ministry_name']])))
-    for m in ministries:
-        cur.execute("INSERT OR IGNORE INTO dim_ministry (ministry_name) VALUES (?)", (m,))
-        
-    agencies = sorted(list(set([p['agency_name'] for p in dim_projects if p['agency_name']])))
-    for a in agencies:
-        cur.execute("INSERT OR IGNORE INTO dim_agency (agency_name) VALUES (?)", (a,))
-        
+    
     with open(os.path.join(silver_dir, "bridge_project_state.json"), 'r', encoding='utf-8') as f:
         bridge_states = json.load(f)
         
+    # Clear all downstream tables before repopulating to avoid stale data
+    # Order matters due to FK constraints
+    cur.executescript("""
+        DELETE FROM gold_project_current;
+        DELETE FROM gold_intervention_priority;
+        DELETE FROM gold_warning_alerts;
+        DELETE FROM gold_risk_engine_outputs;
+        DELETE FROM gold_project_monthly_metrics;
+        DELETE FROM fact_sector_performance;
+        DELETE FROM bridge_project_state;
+        DELETE FROM fact_project_month;
+        DELETE FROM dim_project;
+        DELETE FROM dim_agency;
+        DELETE FROM dim_state;
+        DELETE FROM dim_ministry;
+        DELETE FROM dim_sector;
+    """)
+    conn.commit()
+        
+    sectors = sorted(list(set([p['sector_name'] for p in dim_projects if p['sector_name']])))
+    for s in sectors:
+        cur.execute("INSERT INTO dim_sector (sector_name) VALUES (?)", (s,))
+        
+    ministries = sorted(list(set([p['ministry_name'] for p in dim_projects if p['ministry_name']])))
+    for m in ministries:
+        cur.execute("INSERT INTO dim_ministry (ministry_name) VALUES (?)", (m,))
+        
+    agencies = sorted(list(set([p['agency_name'] for p in dim_projects if p['agency_name']])))
+    for a in agencies:
+        cur.execute("INSERT INTO dim_agency (agency_name) VALUES (?)", (a,))
+        
     states = sorted(list(set([b['state_name'] for b in bridge_states if b['state_name']])))
     for st in states:
-        cur.execute("INSERT OR IGNORE INTO dim_state (state_name) VALUES (?)", (st,))
+        cur.execute("INSERT INTO dim_state (state_name) VALUES (?)", (st,))
         
     conn.commit()
     

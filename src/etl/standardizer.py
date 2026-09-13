@@ -10,29 +10,91 @@ logger = logging.getLogger("standardizer")
 
 # Canonical Sectors
 SECTOR_MAP = {
+    # Civil Aviation
     "AVIATION & AVIATION INFRASTRUCTURE": "Civil Aviation",
     "CIVIL AVIATION": "Civil Aviation",
+    "AVIATION": "Civil Aviation",
+    
+    # Coal
     "COAL": "Coal",
+    
+    # Power / Energy
     "POWER": "Power",
+    "ENERGY": "Power",
+    "NEW AND RENEWABLE ENERGY": "Power",
+    "ATOMIC ENERGY": "Power",
+    "ENERGY STORAGE": "Power",
+    
+    # Railways
     "RAILWAYS": "Railways",
-    "ROAD TRANSPORT AND HIGHWAYS": "Road Transport and Highways",
-    "ROADS & BRIDGES": "Road Transport and Highways",
-    "PETROLEUM": "Petroleum and Natural Gas",
-    "OIL & GAS": "Petroleum and Natural Gas",
-    "PETROLEUM & NATURAL GAS": "Petroleum and Natural Gas",
+    "RAILWAY": "Railways",
+    
+    # Road Transport (canonical: "Road Transport & Highways")
+    "ROAD TRANSPORT AND HIGHWAYS": "Road Transport & Highways",
+    "ROAD TRANSPORT & HIGHWAYS": "Road Transport & Highways",
+    "ROADS & HIGHWAYS": "Road Transport & Highways",
+    "ROADS & BRIDGES": "Road Transport & Highways",
+    "ROADS AND HIGHWAYS": "Road Transport & Highways",
+    "ROAD AND HIGHWAY": "Road Transport & Highways",
+    "MORTH": "Road Transport & Highways",
+    "NATIONAL HIGHWAYS": "Road Transport & Highways",
+    
+    # Petroleum
+    "PETROLEUM": "Petroleum & Natural Gas",
+    "OIL & GAS": "Petroleum & Natural Gas",
+    "PETROLEUM & NATURAL GAS": "Petroleum & Natural Gas",
+    "PETROLEUM AND NATURAL GAS": "Petroleum & Natural Gas",
+    
+    # Steel / Metals
     "STEEL": "Steel",
-    "SHIPPING AND PORTS": "Shipping and Ports",
-    "PORTS, SHIPPING & WATERWAYS": "Shipping and Ports",
+    "METALS & MINING": "Steel",
+    
+    # Shipping / Ports / Waterways
+    "SHIPPING AND PORTS": "Shipping & Ports",
+    "SHIPPING & PORTS": "Shipping & Ports",
+    "PORTS, SHIPPING & WATERWAYS": "Shipping & Ports",
+    "INLAND WATERWAYS": "Shipping & Ports",
+    
+    # Telecommunications
     "TELECOMMUNICATIONS": "Telecommunications",
     "TELECOMMUNICATION": "Telecommunications",
+    
+    # Water Resources
     "WATER RESOURCES": "Water Resources",
     "WASTE & WATER": "Water Resources",
-    "HEALTH AND FAMILY WELFARE": "Health and Family Welfare",
-    "MINES": "Mines",
-    "ATOMIC ENERGY": "Atomic Energy",
-    "FERTILIZERS": "Chemicals and Fertilizers",
+    "IRRIGATION": "Water Resources",
+    
+    # Health
+    "HEALTH AND FAMILY WELFARE": "Health & Family Welfare",
+    "HEALTH & FAMILY WELFARE": "Health & Family Welfare",
+    "HEALTHCARE": "Health & Family Welfare",
+    
+    # Education
+    "DEPARTMENT OF HIGHER EDUCATION": "Education",
+    "EDUCATION": "Education",
+    "HIGHER EDUCATION": "Education",
+    
+    # Urban / Construction
     "REAL ESTATE": "Urban Development",
-    "TOURISM, HOSPITALITY & WELLNESS": "Tourism"
+    "URBAN DEVELOPMENT": "Urban Development",
+    "CONSTRUCTION": "Urban Development",
+    
+    # Logistics
+    "LOGISTICS INFRASTRUCTURE": "Logistics Infrastructure",
+    
+    # Mines
+    "MINES": "Coal",
+    
+    # Others
+    "FERTILIZERS": "Chemicals & Fertilizers",
+    "TOURISM, HOSPITALITY & WELLNESS": "Tourism",
+    "TOURISM": "Tourism",
+    "FOOD AND CONSUMER AFFAIRS": "Consumer Affairs",
+    "DPIIT": "Industrial Development",
+    "SOCIAL JUSTICE": "Social Development",
+    "FINANCE": "Finance",
+    "HOME AFFAIRS": "Home Affairs",
+    "MSME": "Industrial Development",
 }
 
 # Source Priority: FlashReport > QPISR
@@ -135,24 +197,28 @@ def standardize_records(raw_observations_path: str, output_silver_path: str, qua
             pass
         elif norm_sector == 'Civil Aviation':
             norm_min = 'Ministry of Civil Aviation'
-        elif norm_sector in ['Road Transport and Highways']:
-            norm_min = 'Ministry of Road Transport and Highways'
+        elif norm_sector in ['Road Transport & Highways']:
+            norm_min = 'Ministry of Road Transport & Highways'
         elif norm_sector == 'Power':
             norm_min = 'Ministry of Power'
         elif norm_sector == 'Railways':
             norm_min = 'Ministry of Railways'
-        elif norm_sector in ['Petroleum and Natural Gas']:
-            norm_min = 'Ministry of Petroleum and Natural Gas'
+        elif norm_sector in ['Petroleum & Natural Gas']:
+            norm_min = 'Ministry of Petroleum & Natural Gas'
         elif norm_sector == 'Coal':
             norm_min = 'Ministry of Coal'
-        elif norm_sector == 'Shipping and Ports':
-            norm_min = 'Ministry of Ports, Shipping and Waterways'
+        elif norm_sector in ['Shipping & Ports']:
+            norm_min = 'Ministry of Ports, Shipping & Waterways'
         elif norm_sector == 'Water Resources':
             norm_min = 'Department of Water Resources, River Development & GR'
         elif norm_sector == 'Steel':
             norm_min = 'Ministry of Steel'
         elif norm_sector == 'Telecommunications':
             norm_min = 'Department of Telecommunications'
+        elif norm_sector in ['Health & Family Welfare']:
+            norm_min = 'Ministry of Health & Family Welfare'
+        elif norm_sector == 'Education':
+            norm_min = 'Department of Higher Education'
             
         # Standardize State
         raw_state = (r.get('state_name') or 'Unknown').strip()
