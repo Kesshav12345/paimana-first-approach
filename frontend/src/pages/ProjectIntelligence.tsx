@@ -19,7 +19,10 @@ import {
   Sliders,
   CheckCircle,
   UserCheck,
-  FileText
+  FileText,
+  Globe,
+  Database,
+  BookOpen
 } from 'lucide-react';
 import { 
   LineChart, 
@@ -131,6 +134,48 @@ export const ProjectIntelligence: React.FC = () => {
             <span className="text-xs text-slate-400">Cycle: <strong className="text-slate-200">{detail.latestReportingMonth}</strong></span>
           </div>
         </div>
+
+        {/* Evidence Verification & Provenance Badge */}
+        {detail.researchSummary ? (
+          <div className="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`px-2.5 py-1 rounded text-[11px] font-bold tracking-wide flex items-center gap-1.5 ${
+                detail.researchSummary.status === 'COMPLETED' 
+                  ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60' 
+                  : 'bg-amber-950/80 text-amber-300 border border-amber-700/60'
+              }`}>
+                <Globe className="w-3.5 h-3.5" />
+                DEEP-DIVE EVIDENCE: {detail.researchSummary.status} ({Math.round(detail.researchSummary.completenessScore)}% COMPLETE)
+              </span>
+              <span className="text-[11px] text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                Confidence: <strong className="text-emerald-400 font-semibold">{detail.researchSummary.causalConfidence}</strong>
+              </span>
+              <span className="text-[11px] text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                Verified Sources: <strong className="text-slate-200 font-semibold">{detail.researchSummary.sourceCount}</strong>
+              </span>
+              <span className="text-[11px] text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                Causal Factors: <strong className="text-amber-300 font-semibold">{detail.researchSummary.causalFactorCount}</strong>
+              </span>
+            </div>
+
+            <button
+              onClick={() => setActiveModalComponent('evidence_dossier')}
+              className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-blue-950/50 transition-all cursor-pointer"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Evidence Dossier & Non-CUF Provenance</span>
+              <ExternalLink className="w-3 h-3" />
+            </button>
+          </div>
+        ) : (
+          <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800/70 text-slate-400 border border-slate-700">
+                Quantitative Baseline Telemetry (Evidence Research Queued)
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 2 & 3. Current Status & Health Summary */}
@@ -604,9 +649,21 @@ export const ProjectIntelligence: React.FC = () => {
             {detail.flaggingReasons.map((f, idx) => (
               <div key={idx} className="p-2.5 rounded bg-slate-950/70 border border-slate-800 text-xs">
                 <span className="font-semibold text-amber-400 block">{f.signal_type}</span>
-                <p className="text-[11px] text-slate-300 mt-0.5 leading-relaxed">{f.detail}</p>
+                <p className="text-[11px] text-slate-300 mt-1 leading-relaxed whitespace-pre-line">{f.detail}</p>
               </div>
             ))}
+
+            {detail.researchSummary && (
+              <div className="pt-2 border-t border-slate-800/80 flex justify-end">
+                <button
+                  onClick={() => setActiveModalComponent('evidence_dossier')}
+                  className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold cursor-pointer"
+                >
+                  <span>View Court Orders & Official Documents in Dossier</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -938,16 +995,27 @@ const EvaluationModal: React.FC<EvaluationModalProps> = ({
       onClick={onClose}
     >
       <div 
-        className="bg-slate-900 border border-slate-700/80 rounded-xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-slate-900 border border-slate-700/80 rounded-xl max-w-4xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
           <div className="flex items-center gap-2">
-            <Calculator className="w-4 h-4 text-blue-400" />
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Technical Evaluation & Methodological Deep-Dive
-            </span>
+            {componentKey === 'evidence_dossier' ? (
+              <>
+                <Globe className="w-4 h-4 text-emerald-400" />
+                <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+                  Project Evidence Dossier & Non-CUF Provenance
+                </span>
+              </>
+            ) : (
+              <>
+                <Calculator className="w-4 h-4 text-blue-400" />
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Technical Evaluation & Methodological Deep-Dive
+                </span>
+              </>
+            )}
           </div>
           <button 
             onClick={onClose}
@@ -1753,6 +1821,299 @@ function renderEvaluationDetails(
             <span>Open Early Warning Dashboard to Manage Interventions</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
+        </div>
+      );
+
+    case 'evidence_dossier':
+      return (
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <Globe className="w-5 h-5 text-emerald-400" />
+              Project Evidence Dossier & Non-CUF Provenance
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">
+              Multi-source empirical investigation integrating central telemetry, court records, parliamentary disclosures, and gazette notifications.
+            </p>
+          </div>
+
+          {!detail.researchSummary ? (
+            <div className="bg-slate-950 p-6 rounded-lg border border-slate-800 text-center space-y-3">
+              <Database className="w-8 h-8 text-slate-500 mx-auto" />
+              <h4 className="text-sm font-bold text-slate-200">Quantitative Baseline Only</h4>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                This project is currently queued in the continuous batch processing pipeline. Quantitative telemetry and ML predictions are authoritative, and empirical web deep-dive enrichment will attach upon batch completion.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Section A: Investigation Metadata & Confidence Decomposition */}
+              <div className="space-y-3">
+                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5" />
+                  A. Investigation Metadata & 3-Way Confidence Decomposition
+                </span>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                  <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                    <span className="text-slate-400">Research Status</span>
+                    <div className="mt-1">
+                      <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
+                        detail.researchSummary.status === 'COMPLETED' 
+                          ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' 
+                          : 'bg-amber-950 text-amber-300 border border-amber-800'
+                      }`}>
+                        {detail.researchSummary.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                    <span className="text-slate-400">Completeness Score</span>
+                    <div className="text-sm font-bold text-slate-100 mt-1 flex items-center gap-2">
+                      <span>{Math.round(detail.researchSummary.completenessScore)}%</span>
+                      <div className="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-emerald-500 rounded-full" 
+                          style={{ width: `${detail.researchSummary.completenessScore}%` }} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                    <span className="text-slate-400">Model Engine</span>
+                    <div className="text-xs font-mono font-semibold text-blue-400 mt-1">
+                      {detail.researchSummary.modelUsed || 'Gemini-3.8-Flash-High'}
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                    <span className="text-slate-400">Evidence Depth</span>
+                    <div className="text-xs text-slate-300 mt-1">
+                      <strong>{detail.researchSummary.sourceCount}</strong> Sources • <strong>{detail.researchSummary.causalFactorCount}</strong> Root Causes
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3-Way Confidence Decomposition */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div className="bg-slate-950/80 p-2.5 rounded border border-slate-800/80 flex items-center justify-between">
+                    <span className="text-slate-400">Data Confidence (Primary Telemetry):</span>
+                    <span className="font-bold text-blue-400 bg-blue-950/60 px-2 py-0.5 rounded border border-blue-900/60">
+                      {detail.researchSummary.dataConfidence}
+                    </span>
+                  </div>
+                  <div className="bg-slate-950/80 p-2.5 rounded border border-slate-800/80 flex items-center justify-between">
+                    <span className="text-slate-400">External Evidence Confidence:</span>
+                    <span className="font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-900/60">
+                      {detail.researchSummary.researchConfidence}
+                    </span>
+                  </div>
+                  <div className="bg-slate-950/80 p-2.5 rounded border border-slate-800/80 flex items-center justify-between">
+                    <span className="text-slate-400">Causal Attribution Confidence:</span>
+                    <span className="font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-900/60">
+                      {detail.researchSummary.causalConfidence}
+                    </span>
+                  </div>
+                </div>
+
+                {detail.researchSummary.notes && (
+                  <div className="p-3 bg-slate-950/90 rounded border border-slate-800 text-xs">
+                    <span className="font-semibold text-slate-300 block mb-0.5">Methodological Research Notes:</span>
+                    <p className="text-slate-400 leading-relaxed">{detail.researchSummary.notes}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Section B: Evidence-Adjusted Outlook & Qualitative Interpretation */}
+              {detail.evidenceOutlook && (
+                <div className="space-y-3 pt-2 border-t border-slate-800">
+                  <span className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <TrendingUp className="w-3.5 h-3.5" />
+                    B. Evidence-Adjusted Outlook & Qualitative Interpretation
+                  </span>
+
+                  <div className="p-3.5 bg-slate-950 rounded-lg border border-slate-800 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-slate-300">Forecast Alignment Status:</span>
+                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-800">
+                        {detail.evidenceOutlook.forecastConcern.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+                    <p className="text-xs leading-relaxed text-slate-300">
+                      {detail.evidenceOutlook.evidenceInterpretation}
+                    </p>
+
+                    {detail.evidenceOutlook.unresolvedRisks && detail.evidenceOutlook.unresolvedRisks.length > 0 && (
+                      <div className="mt-2 pt-2 border-t border-slate-800/80">
+                        <span className="text-[11px] font-bold text-rose-400 block mb-1">Active Critical Path Bottlenecks:</span>
+                        <ul className="list-disc list-inside space-y-1 text-xs text-rose-300/90">
+                          {detail.evidenceOutlook.unresolvedRisks.map((risk, rIdx) => (
+                            <li key={rIdx} className="leading-relaxed">{risk}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Section C: Empirical Causal Attribution Ledger */}
+              {detail.causalFactors && detail.causalFactors.length > 0 && (
+                <div className="space-y-3 pt-2 border-t border-slate-800">
+                  <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <ShieldAlert className="w-3.5 h-3.5" />
+                    C. Empirical Causal Attribution Ledger ({detail.causalFactors.length} Factors)
+                  </span>
+
+                  <div className="space-y-3">
+                    {detail.causalFactors.map((factor, fIdx) => (
+                      <div key={fIdx} className="p-3.5 bg-slate-950 rounded-lg border border-slate-800 text-xs space-y-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-amber-300 uppercase tracking-wider">
+                              {factor.category}
+                            </span>
+                            <span className="font-bold text-white text-xs">{factor.factorTitle}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              factor.status === 'UNRESOLVED' 
+                                ? 'bg-rose-950 text-rose-400 border border-rose-800' 
+                                : 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                            }`}>
+                              {factor.status}
+                            </span>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950 text-blue-300 border border-blue-800">
+                              Confidence: {factor.causalConfidence}
+                            </span>
+                          </div>
+                        </div>
+
+                        <p className="text-slate-300 leading-relaxed">{factor.factorDescription}</p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px] text-slate-400 bg-slate-900/60 p-2 rounded">
+                          <div>
+                            <strong>Quantitative Impact:</strong> <span className="text-slate-200">{factor.quantitativeConsequence || 'Schedule & cost divergence'}</span>
+                          </div>
+                          <div>
+                            <strong>Temporal Period:</strong> <span className="text-slate-200">{factor.startDate || 'Active'} {factor.endDate ? `to ${factor.endDate}` : '(Ongoing)'}</span>
+                          </div>
+                          {factor.affectedPackages && (
+                            <div>
+                              <strong>Affected Packages:</strong> <span className="text-slate-200">{factor.affectedPackages}</span>
+                            </div>
+                          )}
+                          {factor.unresolvedDetail && (
+                            <div className="sm:col-span-2 text-amber-300/90">
+                              <strong>Unresolved Condition:</strong> {factor.unresolvedDetail}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Section D: Claim-Level Provenance & Source Ledger */}
+              {detail.evidenceClaims && detail.evidenceClaims.length > 0 && (
+                <div className="space-y-3 pt-2 border-t border-slate-800">
+                  <span className="text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5" />
+                    D. Claim-Level Provenance & Authoritative Document Ledger ({detail.evidenceClaims.length} Claims)
+                  </span>
+
+                  <div className="space-y-3">
+                    {detail.evidenceClaims.map((claim, cIdx) => (
+                      <div key={cIdx} className="p-3.5 bg-slate-950 rounded-lg border border-slate-800 text-xs space-y-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-semibold text-slate-200 leading-snug">
+                            "{claim.claimText}"
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                              {claim.evidenceStrength}
+                            </span>
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-950 text-purple-300 border border-purple-800">
+                              Component {claim.targetComponent}
+                            </span>
+                          </div>
+                        </div>
+
+                        {claim.quantitativeSignal && (
+                          <div className="text-[11px] text-slate-400">
+                            <strong>Corroborates Quantitative Telemetry:</strong> <span className="text-amber-300">{claim.quantitativeSignal}</span>
+                          </div>
+                        )}
+
+                        {claim.source && (
+                          <div className="mt-2 p-2.5 bg-slate-900/80 rounded border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div className="space-y-0.5">
+                              <div className="font-semibold text-slate-200 flex items-center gap-1.5">
+                                <BookOpen className="w-3 h-3 text-blue-400" />
+                                {claim.source.title}
+                              </div>
+                              <div className="text-[11px] text-slate-400">
+                                Publisher: <strong className="text-slate-300">{claim.source.publisher}</strong> • Type: <strong className="text-slate-300">{claim.source.sourceType}</strong> • Quality: <strong className="text-emerald-400">{claim.source.sourceQuality.toFixed(2)}</strong>
+                              </div>
+                            </div>
+
+                            <a
+                              href={claim.source.canonicalUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-600/80 hover:bg-blue-600 text-white text-[11px] font-medium transition-colors shrink-0"
+                            >
+                              <span>Inspect Source</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                        )}
+
+                        {claim.limitations && (
+                          <div className="text-[10px] text-slate-500 italic">
+                            Known Limitations: {claim.limitations}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Section E: Non-CUF Secondary Datasets Enriched */}
+              {detail.nonCufDatasets && detail.nonCufDatasets.length > 0 && (
+                <div className="space-y-3 pt-2 border-t border-slate-800">
+                  <span className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Database className="w-3.5 h-3.5" />
+                    E. Non-CUF Secondary Datasets Actually Enriched ({detail.nonCufDatasets.length} Datasets)
+                  </span>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {detail.nonCufDatasets.map((ds, dsIdx) => (
+                      <div key={dsIdx} className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-white text-xs">{ds.datasetName}</span>
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-blue-300">
+                            {ds.category}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 leading-relaxed">
+                          <strong>Evidence Basis:</strong> {ds.whyRelevant}
+                        </p>
+                        <div className="flex items-center justify-between pt-1 text-[10px] text-slate-400 border-t border-slate-800/60">
+                          <span>Window: <strong>{ds.observationPeriod}</strong></span>
+                          <span>Target: <strong>{ds.componentAffected}</strong></span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       );
 

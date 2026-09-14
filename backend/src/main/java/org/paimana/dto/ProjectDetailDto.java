@@ -227,4 +227,26 @@ public class ProjectDetailDto {
 
     public List<ProjectCostRevisionDto> getCostRevisions() { return costRevisions; }
     public void setCostRevisions(List<ProjectCostRevisionDto> costRevisions) { this.costRevisions = costRevisions; }
+
+    // Project-Level Internet Evidence & Causal Attribution Layer
+    private ProjectResearchSummaryDto researchSummary;
+    private List<ProjectCausalFactorDto> causalFactors;
+    private List<ProjectEvidenceClaimDto> evidenceClaims;
+    private ProjectEvidenceOutlookDto evidenceOutlook;
+    private List<ProjectNonCufDatasetDto> nonCufDatasets;
+
+    public ProjectResearchSummaryDto getResearchSummary() { return researchSummary; }
+    public void setResearchSummary(ProjectResearchSummaryDto researchSummary) { this.researchSummary = researchSummary; }
+
+    public List<ProjectCausalFactorDto> getCausalFactors() { return causalFactors; }
+    public void setCausalFactors(List<ProjectCausalFactorDto> causalFactors) { this.causalFactors = causalFactors; }
+
+    public List<ProjectEvidenceClaimDto> getEvidenceClaims() { return evidenceClaims; }
+    public void setEvidenceClaims(List<ProjectEvidenceClaimDto> evidenceClaims) { this.evidenceClaims = evidenceClaims; }
+
+    public ProjectEvidenceOutlookDto getEvidenceOutlook() { return evidenceOutlook; }
+    public void setEvidenceOutlook(ProjectEvidenceOutlookDto evidenceOutlook) { this.evidenceOutlook = evidenceOutlook; }
+
+    public List<ProjectNonCufDatasetDto> getNonCufDatasets() { return nonCufDatasets; }
+    public void setNonCufDatasets(List<ProjectNonCufDatasetDto> nonCufDatasets) { this.nonCufDatasets = nonCufDatasets; }
 }

@@ -211,6 +211,92 @@ export interface ProjectDetail {
   }>;
   interventions: Intervention[];
   interventionEffectivenessStatus: string;
+
+  // Project-Level Internet Evidence & Causal Attribution Layer
+  researchSummary?: ProjectResearchSummary;
+  causalFactors?: ProjectCausalFactor[];
+  evidenceClaims?: ProjectEvidenceClaim[];
+  evidenceOutlook?: ProjectEvidenceOutlook;
+  nonCufDatasets?: ProjectNonCufDataset[];
+}
+
+export interface ProjectResearchSummary {
+  runId?: number;
+  projectId: string;
+  startedAt?: string;
+  completedAt?: string;
+  status: 'PENDING' | 'COMPLETED' | 'COMPLETED_WITH_LIMITATIONS' | 'REQUIRES_REVIEW' | 'FAILED_RESEARCH';
+  modelUsed?: string;
+  searchCount: number;
+  sourceCount: number;
+  evidenceCount: number;
+  causalFactorCount: number;
+  completenessScore: number;
+  researchConfidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  causalConfidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  dataConfidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  notes?: string;
+  errorMessage?: string;
+}
+
+export interface ProjectCausalFactor {
+  factorId?: number;
+  projectId: string;
+  category: string;
+  factorTitle: string;
+  factorDescription: string;
+  startDate?: string;
+  endDate?: string;
+  status: 'UNRESOLVED' | 'RESOLVED' | 'PARTIALLY_RESOLVED';
+  causalConfidence: 'DIRECT' | 'STRONG_INDIRECT' | 'ASSOCIATIVE' | 'SPECULATIVE';
+  affectedPackages?: string;
+  quantitativeConsequence?: string;
+  unresolvedDetail?: string;
+  evidenceCount: number;
+}
+
+export interface ProjectExternalSource {
+  sourceId?: number;
+  canonicalUrl: string;
+  title: string;
+  publisher?: string;
+  publicationDate?: string;
+  sourceType: string;
+  sourceQuality: number;
+  retrievedDate?: string;
+}
+
+export interface ProjectEvidenceClaim {
+  evidenceId?: number;
+  projectId: string;
+  sourceId?: number;
+  source?: ProjectExternalSource;
+  claimText: string;
+  eventDate?: string;
+  publicationDate?: string;
+  evidenceStrength: 'DIRECT' | 'STRONG_INDIRECT' | 'ASSOCIATIVE' | 'SPECULATIVE';
+  causalConfidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  targetComponent: number;
+  quantitativeSignal?: string;
+  supportingMetric?: string;
+  limitations?: string;
+}
+
+export interface ProjectEvidenceOutlook {
+  forecastConcern: 'SUPPORTS_EXISTING_FORECAST' | 'MAY_INCREASE_DOWNSIDE_RISK' | 'LITTLE_EVIDENCE_OF_MATERIAL_IMPACT' | 'INSUFFICIENT_EVIDENCE';
+  evidenceInterpretation: string;
+  unresolvedRisks: string[];
+  evidenceConfidence: 'HIGH' | 'MEDIUM' | 'LOW';
+}
+
+export interface ProjectNonCufDataset {
+  datasetName: string;
+  category: string;
+  isRelevant: boolean;
+  whyRelevant: string;
+  observationPeriod: string;
+  sourceCitation: string;
+  componentAffected: string;
 }
 
 export interface SectorSummary {
