@@ -33,13 +33,13 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo [1/4] Starting Python ML Service on http://127.0.0.1:8000 ...
-start "PAIMANA - ML Service (Port 8000)" cmd /k "title PAIMANA ML Service && color 0B && cd /d "%~dp0" && python -m uvicorn main:app --app-dir ml-service --port 8000 --host 127.0.0.1"
+start "PAIMANA - ML Service (Port 8000)" /D "%~dp0." cmd /k "title PAIMANA ML Service && color 0B && python -m uvicorn main:app --app-dir ml-service --port 8000 --host 127.0.0.1"
 
 echo [2/4] Starting Java Backend on http://127.0.0.1:8080 ...
-start "PAIMANA - Java Backend (Port 8080)" cmd /k "title PAIMANA Java Backend && color 0E && cd /d "%~dp0" && java -jar backend/target/paimana-backend-1.0.0.jar"
+start "PAIMANA - Java Backend (Port 8080)" /D "%~dp0." cmd /k "title PAIMANA Java Backend && color 0E && java -jar backend/target/paimana-backend-1.0.0.jar"
 
 echo [3/4] Starting React Frontend on http://127.0.0.1:5173 ...
-start "PAIMANA - Frontend (Port 5173)" cmd /k "title PAIMANA Frontend && color 0D && cd /d "%~dp0frontend" && npm run dev -- --host 127.0.0.1"
+start "PAIMANA - Frontend (Port 5173)" /D "%~dp0frontend" cmd /k "title PAIMANA Frontend && color 0D && npm run dev -- --host 127.0.0.1"
 
 echo [4/4] Waiting for services to initialize...
 powershell -NoProfile -Command "Start-Sleep -Seconds 5"
