@@ -261,26 +261,45 @@ def predict_project_outcomes(req: PredictRequest):
         ]
         
     else:
-        # Active Construction (< 95%) - Supervised CatBoost Inference
+        # Active Construction (< 95%) - Supervised CatBoost Inference with Physical Lower-Bounds
+        cur_slip = float(req.schedule_slippage_months or 0.0)
+        phys_prog = float(req.physical_progress_pct or 0.0)
+        rem_prog = max(0.0, 100.0 - phys_prog)
+        
         prob_cost = float(models.cost_cls.predict_proba(df_feat)[0, 1])
         raw_cost_pred = float(models.final_cost_reg.predict(df_feat)[0])
-        pred_final_cost = round(max(base_cost, raw_cost_pred), 2)
+        exp_spent = float(req.expenditure_pct and req.original_cost_cr * req.expenditure_pct / 100.0 or 0.0)
+        
+        # Lower bound: Final cost cannot be less than already spent or approved
+        pred_final_cost = round(max(base_cost, exp_spent, raw_cost_pred), 2)
         overrun_amount = round(max(0.0, pred_final_cost - req.original_cost_cr), 2)
         overrun_pct = round((overrun_amount / req.original_cost_cr * 100.0) if req.original_cost_cr > 0 else 0.0, 2)
         
         prob_sched = float(models.sched_cls.predict_proba(df_feat)[0, 1])
-        pred_delay = float(models.delay_reg.predict(df_feat)[0])
-        pred_delay = round(max(0.0, pred_delay), 1)
+        raw_delay_pred = float(models.delay_reg.predict(df_feat)[0])
         
+        # Lower bound: Total delay cannot be less than current slippage
+        # In addition, unfinished projects require residual calendar time to complete remaining works
+        residual_estimate = round(min(48.0, rem_prog * 0.7), 1) if rem_prog > 5.0 else 0.0
+        pred_delay = round(max(cur_slip + residual_estimate, raw_delay_pred, cur_slip), 1)
+        
+        # Future-anchored completion date projection
         pred_completion_date = None
-        if req.original_doc and len(req.original_doc) >= 7:
+        current_baseline = pd.Timestamp("2026-09-01")
+        
+        if req.original_doc and len(str(req.original_doc)) >= 7:
             try:
-                from datetime import timedelta
                 orig_dt = pd.to_datetime(req.original_doc)
-                comp_dt = orig_dt + pd.DateOffset(months=int(round(pred_delay)))
-                pred_completion_date = comp_dt.strftime("%Y-%m-%d")
+                dt_from_orig = orig_dt + pd.DateOffset(months=int(round(pred_delay)))
+                if dt_from_orig >= current_baseline:
+                    pred_completion_date = dt_from_orig.strftime("%B %Y")
             except Exception:
-                pred_completion_date = None
+                pass
+                
+        if not pred_completion_date:
+            # Anchor to current time plus remaining execution duration
+            future_months = max(6, int(round(residual_estimate))) if rem_prog > 5.0 else 3
+            pred_completion_date = (current_baseline + pd.DateOffset(months=future_months)).strftime("%B %Y")
                 
         drivers = []
         importances = models.cost_cls.get_feature_importance()

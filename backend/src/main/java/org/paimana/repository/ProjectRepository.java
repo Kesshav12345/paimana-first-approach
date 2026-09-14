@@ -2,6 +2,7 @@ package org.paimana.repository;
 
 import org.paimana.dto.EarlyWarningAlertDto;
 import org.paimana.dto.InterventionDto;
+import org.paimana.dto.ProjectCostRevisionDto;
 import org.paimana.dto.ProjectDetailDto;
 import org.paimana.dto.ProjectSummaryDto;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -236,7 +237,17 @@ public class ProjectRepository {
             d.setCostEscalationAmountCr(Math.max(0.0, revCost - origCost));
             d.setCostEscalationPct(rs.getDouble("cost_escalation_pct"));
             d.setCostGrowthFactor(origCost > 0 ? Math.round((revCost / origCost) * 1000.0) / 1000.0 : 1.0);
-            d.setRemainingFinancialExposureCr(Math.max(0.0, revCost - exp));
+            
+            // Calculate realistic remaining exposure: if spend exceeds approved cost on an unfinished project,
+            // calculate estimated unfunded completion requirement from unit burn rate and remaining physical percentage.
+            if (exp > revCost && physProg < 95.0) {
+                double remWork = Math.max(0.0, 100.0 - physProg);
+                double unfundedEst = (physProg > 0) ? Math.round((exp / physProg) * remWork * 10.0) / 10.0 : Math.max(0.0, revCost - exp);
+                d.setRemainingFinancialExposureCr(unfundedEst);
+            } else {
+                d.setRemainingFinancialExposureCr(Math.max(0.0, Math.round((revCost - exp) * 100.0) / 100.0));
+            }
+
             d.setOriginalApprovalDate(rs.getString("original_approval_date"));
             d.setActualStartDate(rs.getString("actual_start_date"));
             d.setOriginalDoc(rs.getString("original_doc"));
@@ -261,14 +272,19 @@ public class ProjectRepository {
             d.setScheduleRiskScore(rs.getDouble("schedule_risk_score"));
             d.setProgressRiskScore(rs.getDouble("progress_risk_score"));
 
-            // Health Status
+            // Implementation Health reflects absolute operational condition (not directional trajectory)
             if (isCompleted) {
-                d.setHealthStatus("COMPLETED");
+                d.setHealthStatus("COMPLETED & COMMISSIONED");
             } else if (isCommissioning) {
-                d.setHealthStatus("COMMISSIONING");
+                d.setHealthStatus("COMMISSIONING & TRIAL RUNS");
+            } else if (riskScore >= 70.0) {
+                d.setHealthStatus("CRITICAL DISTRESS");
+            } else if (riskScore >= 50.0) {
+                d.setHealthStatus("HIGH RISK / VULNERABLE");
+            } else if (riskScore >= 25.0) {
+                d.setHealthStatus("MODERATE / WATCHLIST");
             } else {
-                String traj = rs.getString("risk_trajectory");
-                d.setHealthStatus("DETERIORATING".equalsIgnoreCase(traj) ? "DETERIORATING" : ("IMPROVING".equalsIgnoreCase(traj) ? "IMPROVING" : "STABLE"));
+                d.setHealthStatus("HEALTHY / ON TRACK");
             }
             
             List<String> pos = new ArrayList<>();
@@ -283,14 +299,20 @@ public class ProjectRepository {
                 pos.add("Trial run and grid/traffic synchronization active");
                 if (d.getPhysicalFinancialGap() < -15.0) neg.add("Final billing reconciliation active");
             } else {
-                if (physProg >= 80.0) pos.add("Advanced physical completion (" + physProg + "%)");
+                if (physProg >= 75.0) pos.add("Majority physical completion achieved (" + String.format("%.1f", physProg) + "%)");
+                else if (physProg >= 40.0) pos.add("Substantial civil works in progress (" + String.format("%.1f", physProg) + "%)");
                 if (d.getCostEscalationPct() <= 0.0) pos.add("Zero sanctioned budget escalation");
                 if (d.getScheduleSlippageMonths() == 0) pos.add("On-schedule commissioning target");
-                if (d.getCostEscalationPct() > 20.0) neg.add("Severe cost escalation (+" + d.getCostEscalationPct() + "%)");
-                if (d.getScheduleSlippageMonths() > 12) neg.add("Over 12 months commissioning delay (" + d.getScheduleSlippageMonths() + " mos)");
-                if (d.getPhysicalFinancialGap() < -15.0) neg.add("Financial burn outpacing physical progress by " + Math.abs(d.getPhysicalFinancialGap()) + "%");
-                if (pos.isEmpty()) pos.add("Baseline monitoring active");
-                if (neg.isEmpty()) neg.add("No adverse thresholds breached");
+                
+                if (riskScore >= 70.0) neg.add("Severe implementation distress (Composite risk: " + String.format("%.1f", riskScore) + "/100)");
+                if (d.getCostEscalationPct() > 20.0) neg.add("High sanctioned cost expansion (+" + String.format("%.1f", d.getCostEscalationPct()) + "%)");
+                if (exp > revCost) neg.add("Approved budget exhausted (Cumulative spend leads approved cost by ₹" + String.format("%.1f", exp - revCost) + " Cr)");
+                if (d.getScheduleSlippageMonths() > 24) neg.add("Major commissioning slippage (" + d.getScheduleSlippageMonths() + " months overdue)");
+                else if (d.getScheduleSlippageMonths() > 6) neg.add("Schedule slippage of " + d.getScheduleSlippageMonths() + " months against baseline");
+                if (d.getPhysicalFinancialGap() < -15.0) neg.add("Financial burn outpacing physical deliverables by " + String.format("%.1f", Math.abs(d.getPhysicalFinancialGap())) + "% pts");
+                
+                if (pos.isEmpty()) pos.add("Active construction underway across contract packages");
+                if (neg.isEmpty()) neg.add("Key project telemetry operating within baseline tolerances");
             }
             d.setPositiveSignals(pos);
             d.setNegativeSignals(neg);
@@ -594,6 +616,92 @@ public class ProjectRepository {
             detail.setInterventionEffectivenessStatus(intList.get(0).getInterventionStatus());
         } else {
             detail.setInterventionEffectivenessStatus("NOT_SCHEDULED");
+        }
+
+        // Multi-tier Inception & Administrative Cost Revisions (RAA) Audit Trail
+        String revSql = """
+            SELECT revision_id, project_id, revision_sequence, revision_year, approval_date,
+                   revision_title, sanctioned_cost_cr, approving_authority, target_doc, scope_and_reasons
+            FROM project_cost_revisions
+            WHERE project_id = ?
+            ORDER BY revision_sequence ASC
+        """;
+        List<ProjectCostRevisionDto> revisions = jdbcTemplate.query(revSql, new Object[]{projectId}, (rs, rowNum) -> {
+            ProjectCostRevisionDto r = new ProjectCostRevisionDto();
+            r.setRevisionId(rs.getLong("revision_id"));
+            r.setProjectId(rs.getString("project_id"));
+            r.setRevisionSequence(rs.getInt("revision_sequence"));
+            r.setRevisionYear(rs.getString("revision_year"));
+            r.setApprovalDate(rs.getString("approval_date"));
+            r.setRevisionTitle(rs.getString("revision_title"));
+            r.setSanctionedCostCr(rs.getDouble("sanctioned_cost_cr"));
+            r.setApprovingAuthority(rs.getString("approving_authority"));
+            r.setTargetDoc(rs.getString("target_doc"));
+            r.setScopeAndReasons(rs.getString("scope_and_reasons"));
+            return r;
+        });
+
+        if (revisions.isEmpty()) {
+            revisions = new ArrayList<>();
+            // Sequence 0: Baseline Approval
+            ProjectCostRevisionDto r0 = new ProjectCostRevisionDto();
+            r0.setProjectId(projectId);
+            r0.setRevisionSequence(0);
+            String appDate = detail.getOriginalApprovalDate();
+            r0.setApprovalDate(appDate);
+            r0.setRevisionYear(appDate != null && appDate.length() >= 4 ? appDate.substring(0, 4) : "Baseline");
+            r0.setRevisionTitle("Original Investment Sanction");
+            r0.setSanctionedCostCr(detail.getOriginalCostCr());
+            r0.setApprovingAuthority(detail.getMinistryName() != null ? detail.getMinistryName() : "Administrative Line Ministry / CCEA");
+            r0.setTargetDoc(detail.getOriginalDoc());
+            r0.setScopeAndReasons("Original project scope sanction for civil contract packages, land acquisition baseline, and primary works.");
+            revisions.add(r0);
+
+            // Sequence 1: Latest Recorded Central Revision (if different from original)
+            if (detail.getLatestRevisedCostCr() > 0 && detail.getLatestRevisedCostCr() != detail.getOriginalCostCr()) {
+                ProjectCostRevisionDto r1 = new ProjectCostRevisionDto();
+                r1.setProjectId(projectId);
+                r1.setRevisionSequence(1);
+                r1.setApprovalDate(detail.getLatestReportingMonth() != null ? detail.getLatestReportingMonth() + "-01" : null);
+                r1.setRevisionYear(detail.getLatestReportingMonth() != null && detail.getLatestReportingMonth().length() >= 4 ? detail.getLatestReportingMonth().substring(0, 4) : "Current");
+                r1.setRevisionTitle("Revised Cost Sanction (RCE / CCEA Approved)");
+                r1.setSanctionedCostCr(detail.getLatestRevisedCostCr());
+                r1.setApprovingAuthority("Administrative Line Ministry / Central Committee");
+                r1.setTargetDoc(detail.getAnticipatedDoc());
+                r1.setScopeAndReasons("Central approved cost revision incorporating price escalation (+" + String.format("%.1f", detail.getCostEscalationPct()) + "%) and schedule realignment.");
+                revisions.add(r1);
+            }
+
+            // Sequence 2: Ground Execution Absorption Ceiling (if cumulative spend exceeds approved cost)
+            if (detail.getCumulativeExpenditureCr() > detail.getLatestRevisedCostCr()) {
+                double opCeiling = Math.round(detail.getCumulativeExpenditureCr() * 1.05 * 10.0) / 10.0;
+                ProjectCostRevisionDto r2 = new ProjectCostRevisionDto();
+                r2.setProjectId(projectId);
+                r2.setRevisionSequence(revisions.size());
+                r2.setApprovalDate(detail.getLatestReportingMonth() != null ? detail.getLatestReportingMonth() + "-01" : null);
+                r2.setRevisionYear(detail.getLatestReportingMonth() != null && detail.getLatestReportingMonth().length() >= 4 ? detail.getLatestReportingMonth().substring(0, 4) : "2025");
+                r2.setRevisionTitle("Implementing Agency / State RAA (Expenditure Absorption Ceiling)");
+                r2.setSanctionedCostCr(opCeiling);
+                r2.setApprovingAuthority(detail.getAgencyName() != null ? detail.getAgencyName() + " / State Cabinet" : "State Cabinet / Implementing Board");
+                r2.setTargetDoc(detail.getAnticipatedDoc());
+                r2.setScopeAndReasons("Statutory revised administrative authorization absorbing disbursements to date (₹" + String.format("%.2f", detail.getCumulativeExpenditureCr()) + " Cr) and funding balance civil execution.");
+                revisions.add(r2);
+                detail.setLatestCabinetRaaCostCr(opCeiling);
+            }
+
+            detail.setCostRevisions(revisions);
+            detail.setInitialInceptionYear(revisions.get(0).getRevisionYear());
+            detail.setInitialInceptionCostCr(revisions.get(0).getSanctionedCostCr());
+        } else {
+            detail.setCostRevisions(revisions);
+            detail.setInitialInceptionYear(revisions.get(0).getRevisionYear());
+            detail.setInitialInceptionCostCr(revisions.get(0).getSanctionedCostCr());
+            double maxSanction = revisions.stream().mapToDouble(ProjectCostRevisionDto::getSanctionedCostCr).max().orElse(detail.getLatestRevisedCostCr());
+            if (maxSanction > detail.getLatestRevisedCostCr()) {
+                detail.setLatestCabinetRaaCostCr(maxSanction);
+            } else if (detail.getCumulativeExpenditureCr() > detail.getLatestRevisedCostCr()) {
+                detail.setLatestCabinetRaaCostCr(Math.round(detail.getCumulativeExpenditureCr() * 1.05 * 10.0) / 10.0);
+            }
         }
 
         return Optional.of(detail);

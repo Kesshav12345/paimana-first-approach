@@ -104,6 +104,19 @@ export interface Intervention {
   latestActionNotes: string;
 }
 
+export interface ProjectCostRevision {
+  revisionId?: number;
+  projectId: string;
+  revisionSequence: number;
+  revisionYear: string;
+  approvalDate?: string;
+  revisionTitle: string;
+  sanctionedCostCr: number;
+  approvingAuthority: string;
+  targetDoc?: string;
+  scopeAndReasons: string;
+}
+
 export interface ProjectDetail {
   projectId: string;
   legacyOcmsCode?: string;
@@ -134,6 +147,12 @@ export interface ProjectDetail {
   scheduleSlippageMonths: number;
   timeElapsedPct: number;
   timeRemainingPct: number;
+
+  // Multi-tier Inception & Revision Audit Trail
+  initialInceptionYear?: string;
+  initialInceptionCostCr?: number;
+  latestCabinetRaaCostCr?: number;
+  costRevisions?: ProjectCostRevision[];
 
   overallRiskScore: number;
   riskBand: string;

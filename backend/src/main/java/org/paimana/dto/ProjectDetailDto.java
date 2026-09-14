@@ -209,4 +209,22 @@ public class ProjectDetailDto {
     public void setInterventions(List<InterventionDto> interventions) { this.interventions = interventions; }
     public String getInterventionEffectivenessStatus() { return interventionEffectivenessStatus; }
     public void setInterventionEffectivenessStatus(String interventionEffectivenessStatus) { this.interventionEffectivenessStatus = interventionEffectivenessStatus; }
+
+    // Multi-tier Inception & Revision Audit Trail
+    private String initialInceptionYear;
+    private Double initialInceptionCostCr;
+    private Double latestCabinetRaaCostCr;
+    private List<ProjectCostRevisionDto> costRevisions;
+
+    public String getInitialInceptionYear() { return initialInceptionYear; }
+    public void setInitialInceptionYear(String initialInceptionYear) { this.initialInceptionYear = initialInceptionYear; }
+
+    public Double getInitialInceptionCostCr() { return initialInceptionCostCr; }
+    public void setInitialInceptionCostCr(Double initialInceptionCostCr) { this.initialInceptionCostCr = initialInceptionCostCr; }
+
+    public Double getLatestCabinetRaaCostCr() { return latestCabinetRaaCostCr; }
+    public void setLatestCabinetRaaCostCr(Double latestCabinetRaaCostCr) { this.latestCabinetRaaCostCr = latestCabinetRaaCostCr; }
+
+    public List<ProjectCostRevisionDto> getCostRevisions() { return costRevisions; }
+    public void setCostRevisions(List<ProjectCostRevisionDto> costRevisions) { this.costRevisions = costRevisions; }
 }

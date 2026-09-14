@@ -153,15 +153,25 @@ def run_risk_warning_pipeline(workspace_dir: str):
         # Risk trajectory
         risk_change = round(overall_risk - prev_risk, 2) if prev_risk is not None else 0.0
         if is_completed:
-            trajectory = "Stable"
+            trajectory = "Completed"
         elif is_commissioning:
-            trajectory = "Improving" if risk_change <= 0 else "Stable"
-        elif risk_change > 3.0:
-            trajectory = "Deteriorating"
-        elif risk_change < -3.0:
-            trajectory = "Improving"
+            trajectory = "Improving" if risk_change <= 0 else "Commissioning"
+        elif overall_risk >= 70.0:
+            if risk_change > 1.5:
+                trajectory = "Deteriorating"
+            elif risk_change < -1.5:
+                trajectory = "Improving"
+            elif prog_vel is not None and prog_vel < 0.2 and (t_elapsed_pct and t_elapsed_pct > 25.0):
+                trajectory = "Chronic Stagnation"
+            else:
+                trajectory = "Static Distress"
         else:
-            trajectory = "Stable"
+            if risk_change > 2.0:
+                trajectory = "Deteriorating"
+            elif risk_change < -2.0:
+                trajectory = "Improving"
+            else:
+                trajectory = "Stable"
             
         risk_records.append((
             pid, rep_month, c_risk, s_risk, p_risk, overall_risk, band,

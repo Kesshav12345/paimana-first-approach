@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   AlertTriangle, 
+  AlertOctagon,
   TrendingUp, 
   Clock, 
   ShieldAlert, 
@@ -137,10 +138,27 @@ export const ProjectIntelligence: React.FC = () => {
         
         {/* 2. Current Project Status */}
         <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-lg p-5">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-1.5">
-            <Activity className="w-4 h-4 text-blue-400" />
-            2. Current Project Telemetry & Accounting
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <Activity className="w-4 h-4 text-blue-400" />
+              2. Current Project Telemetry & Accounting
+            </h2>
+            <div className="flex items-center gap-2">
+              {detail.costRevisions && detail.costRevisions.length > 0 && (
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800/80">
+                  {detail.costRevisions.length} Revisions Logged
+                </span>
+              )}
+              <button
+                onClick={() => setActiveModalComponent('telemetry_accounting')}
+                className="text-[10px] text-blue-400 hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+                title="Inspect Telemetry Ledger & Revision Audit Trail"
+              >
+                <span>Inspect</span>
+                <ExternalLink className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-slate-950/60 p-3 rounded border border-slate-800/80">
@@ -161,12 +179,36 @@ export const ProjectIntelligence: React.FC = () => {
               <span className="text-[11px] text-slate-400">Sanctioned vs Revised</span>
               <div className="text-xs font-bold text-slate-200 mt-1">₹{detail.originalCostCr.toLocaleString()} Cr</div>
               <div className="text-xs font-semibold text-amber-400 mt-0.5">Rev: ₹{detail.latestRevisedCostCr.toLocaleString()} Cr</div>
+              {detail.latestCabinetRaaCostCr && detail.latestCabinetRaaCostCr > detail.latestRevisedCostCr && (
+                <div className="text-[10px] text-indigo-300 font-semibold mt-0.5" title="Latest Approved Multi-Tier Revised Administrative Sanction (RAA)">
+                  {detail.costRevisions && detail.costRevisions.length > 0 && detail.costRevisions[detail.costRevisions.length - 1].revisionTitle.includes('RAA')
+                    ? detail.costRevisions[detail.costRevisions.length - 1].revisionTitle.replace(/\(.*\)/, '').trim()
+                    : 'Admin Ceiling'}: ₹{detail.latestCabinetRaaCostCr.toLocaleString()} Cr
+                </div>
+              )}
             </div>
 
             <div className="bg-slate-950/60 p-3 rounded border border-slate-800/80">
               <span className="text-[11px] text-slate-400">Cumulative Spend</span>
               <div className="text-lg font-bold text-emerald-400 mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
-              <span className="text-[10px] text-slate-400">Rem: ₹{detail.remainingFinancialExposureCr.toLocaleString()} Cr</span>
+              <div className="text-[10px] mt-0.5 truncate">
+                {detail.cumulativeExpenditureCr > detail.latestRevisedCostCr && detail.physicalProgressPct < 95.0 ? (
+                  <span className="text-rose-400 font-semibold" title={`Approved budget exceeded by ₹${(detail.cumulativeExpenditureCr - detail.latestRevisedCostCr).toFixed(1)} Cr. Estimated unfunded cost to complete: ₹${detail.remainingFinancialExposureCr.toLocaleString()} Cr`}>
+                    Exhausted • Unfunded: ₹{detail.remainingFinancialExposureCr.toLocaleString()} Cr
+                  </span>
+                ) : (
+                  <span className="text-slate-400">
+                    Remaining: ₹{detail.remainingFinancialExposureCr.toLocaleString()} Cr
+                  </span>
+                )}
+              </div>
+              {detail.latestCabinetRaaCostCr && detail.latestCabinetRaaCostCr > detail.latestRevisedCostCr && (
+                <span className="block text-[9px] text-slate-400 mt-0.5 font-mono">
+                  {((detail.cumulativeExpenditureCr / detail.latestCabinetRaaCostCr) * 100).toFixed(1)}% of {detail.costRevisions && detail.costRevisions.length > 0 && detail.costRevisions[detail.costRevisions.length - 1].revisionTitle.includes('RAA')
+                    ? detail.costRevisions[detail.costRevisions.length - 1].revisionTitle.replace(/\(.*\)/, '').trim()
+                    : 'Admin Ceiling'}
+                </span>
+              )}
             </div>
           </div>
 
@@ -174,6 +216,11 @@ export const ProjectIntelligence: React.FC = () => {
             <div>
               <span className="text-slate-500 block">Sanction Date</span>
               <span className="text-slate-300 font-mono">{detail.originalApprovalDate || 'N/A'}</span>
+              {detail.initialInceptionYear && detail.initialInceptionCostCr && (
+                <span className="block text-[9px] text-slate-400 font-mono mt-0.5" title="Initial State Inception Approval">
+                  Inception: {detail.initialInceptionYear} (₹{detail.initialInceptionCostCr.toLocaleString()} Cr)
+                </span>
+              )}
             </div>
             <div>
               <span className="text-slate-500 block">Original DOC</span>
@@ -214,23 +261,38 @@ export const ProjectIntelligence: React.FC = () => {
               <div>
                 <span className="text-[11px] text-slate-400">Implementation Health</span>
                 <div className={`text-sm font-bold flex items-center gap-1.5 mt-0.5 ${
-                  detail.healthStatus === 'DETERIORATING' ? 'text-rose-400' :
-                  detail.healthStatus === 'COMPLETED' ? 'text-emerald-400' :
-                  detail.healthStatus === 'COMMISSIONING' ? 'text-blue-400' :
-                  detail.healthStatus === 'IMPROVING' ? 'text-emerald-400' : 'text-slate-200'
+                  detail.healthStatus.includes('CRITICAL') ? 'text-rose-400' :
+                  detail.healthStatus.includes('HIGH RISK') ? 'text-amber-400' :
+                  detail.healthStatus.includes('MODERATE') ? 'text-yellow-300' :
+                  detail.healthStatus.includes('COMPLETED') ? 'text-emerald-400' :
+                  detail.healthStatus.includes('COMMISSIONING') ? 'text-blue-400' :
+                  detail.healthStatus.includes('HEALTHY') || detail.healthStatus === 'IMPROVING' ? 'text-emerald-400' : 'text-slate-200'
                 }`}>
-                  {detail.healthStatus === 'COMPLETED' ? (
+                  {detail.healthStatus.includes('COMPLETED') ? (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <span>COMPLETED & COMMISSIONED</span>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <span>{detail.healthStatus}</span>
                     </>
-                  ) : detail.healthStatus === 'COMMISSIONING' ? (
+                  ) : detail.healthStatus.includes('COMMISSIONING') ? (
                     <>
-                      <Activity className="w-4 h-4 text-blue-400" />
-                      <span>COMMISSIONING & TRIAL RUNS</span>
+                      <Activity className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                      <span>{detail.healthStatus}</span>
+                    </>
+                  ) : detail.healthStatus.includes('CRITICAL') ? (
+                    <>
+                      <AlertOctagon className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                      <span>{detail.healthStatus}</span>
+                    </>
+                  ) : detail.healthStatus.includes('HIGH RISK') ? (
+                    <>
+                      <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <span>{detail.healthStatus}</span>
                     </>
                   ) : (
-                    detail.healthStatus
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <span>{detail.healthStatus}</span>
+                    </>
                   )}
                 </div>
               </div>
@@ -351,6 +413,11 @@ export const ProjectIntelligence: React.FC = () => {
               </div>
               <span className="text-[10px] text-slate-400">
                 Est. Completion: <strong className="text-slate-200">{detail.predictedCompletionDate || 'Late 2027'}</strong>
+                {detail.scheduleSlippageMonths > 0 && (
+                  <span className="block text-[9px] text-slate-400 mt-0.5 font-mono">
+                    (Current Slip: {detail.scheduleSlippageMonths.toFixed(1)} mo • Est. Residual: +{Math.max(0, detail.predictedDelayMonths - detail.scheduleSlippageMonths).toFixed(1)} mo)
+                  </span>
+                )}
               </span>
             </div>
           </div>
@@ -920,6 +987,186 @@ function renderEvaluationDetails(
   onNavigateEarlyWarning: () => void
 ): React.ReactNode {
   switch (key) {
+    case 'telemetry_accounting':
+      return (
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <Activity className="w-5 h-5 text-blue-400" />
+              Dimension 2: Current Project Telemetry & Accounting Ledger
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">
+              Multi-source synthesis integrating Primary MoSPI / OCMS central baseline telemetry with ground-truth administrative approvals (RAA).
+            </p>
+          </div>
+
+          {/* Section A: Primary Dataset Telemetry Grid */}
+          <div className="space-y-3">
+            <span className="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5" />
+              A. Primary Central Telemetry Ledger (MoSPI / OCMS Baseline)
+            </span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                <span className="text-slate-400 block">Physical Progress</span>
+                <div className="text-base font-bold text-white mt-1">{detail.physicalProgressPct}%</div>
+                <span className="text-[10px] text-slate-500">Certified field deliverables</span>
+              </div>
+              <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                <span className="text-slate-400 block">Financial Progress</span>
+                <div className="text-base font-bold text-white mt-1">{detail.financialProgressPct}%</div>
+                <span className="text-[10px] text-slate-500">Expenditure / Rev. Cost</span>
+              </div>
+              <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                <span className="text-slate-400 block">Physical-Financial Gap</span>
+                <div className={`text-base font-bold mt-1 ${detail.physicalFinancialGap < -15 ? 'text-rose-400' : 'text-slate-200'}`}>
+                  {detail.physicalFinancialGap > 0 ? `+${detail.physicalFinancialGap}%` : `${detail.physicalFinancialGap}%`}
+                </div>
+                <span className="text-[10px] text-slate-500">Physical minus Financial</span>
+              </div>
+              <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                <span className="text-slate-400 block">Schedule Slippage</span>
+                <div className={`text-base font-bold mt-1 ${detail.scheduleSlippageMonths > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                  +{detail.scheduleSlippageMonths} Months
+                </div>
+                <span className="text-[10px] text-slate-500">Against original DOC</span>
+              </div>
+              <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                <span className="text-slate-400 block">Original Sanction</span>
+                <div className="text-sm font-bold text-slate-200 mt-1">₹{detail.originalCostCr.toLocaleString()} Cr</div>
+                <span className="text-[10px] text-slate-500 font-mono">Date: {detail.originalApprovalDate || 'N/A'}</span>
+              </div>
+              <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                <span className="text-slate-400 block">Latest Central Revised</span>
+                <div className="text-sm font-bold text-amber-400 mt-1">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</div>
+                <span className="text-[10px] text-slate-500 font-mono">Escalation: +{detail.costEscalationPct.toFixed(1)}%</span>
+              </div>
+              <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                <span className="text-slate-400 block">Cumulative Spend</span>
+                <div className="text-sm font-bold text-emerald-400 mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
+                <span className="text-[10px] text-slate-500 font-mono">Burn to date</span>
+              </div>
+              <div className="bg-slate-950 p-3 rounded border border-slate-800">
+                <span className="text-slate-400 block">Remaining / Unfunded</span>
+                <div className={`text-sm font-bold mt-1 ${detail.cumulativeExpenditureCr > detail.latestRevisedCostCr ? 'text-rose-400' : 'text-slate-200'}`}>
+                  ₹{detail.remainingFinancialExposureCr.toLocaleString()} Cr
+                </div>
+                <span className="text-[10px] text-slate-500 font-mono">
+                  {detail.cumulativeExpenditureCr > detail.latestRevisedCostCr ? 'Unfunded Completion' : 'Balance Sanction'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Section B: Inception & Multi-Tier Administrative Revisions Audit Trail */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5" />
+                B. Chronological Inception & Administrative Cost Revisions (RAA) Audit Trail
+              </span>
+              {detail.costRevisions && (
+                <span className="text-[11px] text-slate-400">
+                  {detail.costRevisions.length} Milestone Action{detail.costRevisions.length === 1 ? '' : 's'} Documented
+                </span>
+              )}
+            </div>
+
+            {detail.costRevisions && detail.costRevisions.length > 0 ? (
+              <div className="border border-slate-800 rounded-lg overflow-hidden">
+                <table className="w-full text-left text-xs text-slate-300">
+                  <thead className="bg-slate-950 border-b border-slate-800 uppercase text-[10px] font-semibold text-slate-400">
+                    <tr>
+                      <th className="px-3 py-2">Year / Date</th>
+                      <th className="px-3 py-2">Administrative Milestone</th>
+                      <th className="px-3 py-2 text-right">Sanctioned Cost</th>
+                      <th className="px-3 py-2">Approving Authority</th>
+                      <th className="px-3 py-2">Target DOC</th>
+                      <th className="px-3 py-2">Scope & Justification</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {detail.costRevisions.map((rev, idx) => (
+                      <tr key={idx} className="hover:bg-slate-800/30">
+                        <td className="px-3 py-2.5 font-mono text-slate-400 whitespace-nowrap">
+                          {rev.revisionYear}
+                          {rev.approvalDate && <span className="block text-[10px] text-slate-500">{rev.approvalDate}</span>}
+                        </td>
+                        <td className="px-3 py-2.5 font-semibold text-white">
+                          {rev.revisionTitle}
+                        </td>
+                        <td className="px-3 py-2.5 text-right font-mono font-bold text-amber-400 whitespace-nowrap">
+                          ₹{rev.sanctionedCostCr.toLocaleString()} Cr
+                        </td>
+                        <td className="px-3 py-2.5 text-slate-300 whitespace-nowrap">
+                          {rev.approvingAuthority}
+                        </td>
+                        <td className="px-3 py-2.5 font-mono text-slate-400 whitespace-nowrap">
+                          {rev.targetDoc || 'N/A'}
+                        </td>
+                        <td className="px-3 py-2.5 text-slate-400 leading-relaxed max-w-xs sm:max-w-md">
+                          {rev.scopeAndReasons}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 text-xs text-slate-400">
+                <p>Initial sanction approved on <strong className="text-slate-200">{detail.originalApprovalDate || 'N/A'}</strong> at <strong className="text-slate-200">₹{detail.originalCostCr.toLocaleString()} Cr</strong>. Current active sanction stands at <strong className="text-amber-400">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</strong>.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Section C: Dual-Baseline Accounting & Governance Reconciliation */}
+          <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-3">
+            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Calculator className="w-3.5 h-3.5" />
+              C. Dual-Lens Accounting & Governance Reconciliation
+            </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+              <div className="p-3 rounded bg-slate-900/80 border border-slate-800 space-y-1.5">
+                <div className="font-bold text-amber-400 flex items-center gap-1">
+                  <span>Lens 1: Central Ministry (MoSPI OCMS) Governance</span>
+                </div>
+                <p className="text-slate-400 leading-relaxed text-[11px]">
+                  Central statutory records benchmark against the approved central ceiling of <strong className="text-slate-200">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</strong>. With cumulative disbursements of <strong className="text-emerald-400">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</strong>, budget utilization is <strong className="text-rose-400">{detail.financialProgressPct}%</strong>.
+                </p>
+                <p className="text-slate-500 leading-relaxed text-[11px]">
+                  Until formal central Revised Cost Committee (RCC) ratification is gazetted, the surplus spend of ₹{(detail.cumulativeExpenditureCr - detail.latestRevisedCostCr).toFixed(1)} Cr is treated as central budget exhaustion with estimated unfunded completion exposure of ₹{detail.remainingFinancialExposureCr.toLocaleString()} Cr.
+                </p>
+              </div>
+
+              <div className="p-3 rounded bg-slate-900/80 border border-slate-800 space-y-1.5">
+                <div className="font-bold text-indigo-400 flex items-center gap-1">
+                  <span>Lens 2: Ground Execution & Administrative Ceiling (RAA / Multi-Tier Sanction)</span>
+                </div>
+                {detail.latestCabinetRaaCostCr && detail.latestCabinetRaaCostCr > detail.latestRevisedCostCr ? (
+                  <>
+                    <p className="text-slate-400 leading-relaxed text-[11px]">
+                      Statutory authorization has been accorded by <strong className="text-slate-200 font-semibold">{detail.costRevisions && detail.costRevisions.length > 0 ? detail.costRevisions[detail.costRevisions.length - 1].approvingAuthority : 'the Competent Administrative Authority'}</strong> up to <strong className="text-indigo-300 font-bold">₹{detail.latestCabinetRaaCostCr.toLocaleString()} Cr</strong> under {detail.costRevisions && detail.costRevisions.length > 0 ? detail.costRevisions[detail.costRevisions.length - 1].revisionTitle : 'Revised Administrative Approval (RAA)'}.
+                    </p>
+                    {detail.costRevisions && detail.costRevisions.length > 0 && detail.costRevisions[detail.costRevisions.length - 1].scopeAndReasons && (
+                      <p className="text-slate-400 leading-relaxed text-[11px] italic bg-slate-950/60 p-2 rounded border border-slate-800/80">
+                        "{detail.costRevisions[detail.costRevisions.length - 1].scopeAndReasons}"
+                      </p>
+                    )}
+                    <p className="text-slate-400 leading-relaxed text-[11px]">
+                      Against this comprehensive administrative ceiling, cumulative spend to date represents <strong className="text-emerald-400 font-bold">{((detail.cumulativeExpenditureCr / detail.latestCabinetRaaCostCr) * 100).toFixed(1)}% financial progress</strong>, aligning with <strong className="text-slate-200">{detail.physicalProgressPct}% physical progress</strong> and validating targeted commissioning by <strong className="text-slate-200">{detail.anticipatedDoc || 'scheduled completion date'}</strong>.
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-slate-400 leading-relaxed text-[11px]">
+                    Project physical deliverables ({detail.physicalProgressPct}%) and cumulative disbursements (₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr) are reconciled against the latest sanctioned administrative approval.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+
     case 'health_summary':
       return (
         <div className="space-y-4">
@@ -936,7 +1183,10 @@ function renderEvaluationDetails(
           <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-2">
             <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Evaluation Methodology</span>
             <p className="text-xs leading-relaxed text-slate-300">
-              Project Health assesses whether project trajectory is <strong className="text-emerald-400">IMPROVING</strong>, <strong className="text-slate-200">STABLE</strong>, or <strong className="text-rose-400">DETERIORATING</strong>. When a project suffers persistent schedule slippage or physical velocity drops while financial exposure continues to accumulate, health status degrades to DETERIORATING.
+              Implementation Health is evaluated independently of trajectory to reflect absolute distress severity: <strong className="text-rose-400">CRITICAL DISTRESS</strong> (Risk &ge; 70.0 or budget exhausted with physical milestones incomplete), <strong className="text-amber-400">HIGH RISK / VULNERABLE</strong> (50.0–69.9), <strong className="text-yellow-400">MODERATE / WATCHLIST</strong> (25.0–49.9), or <strong className="text-emerald-400">HEALTHY / ON TRACK</strong> (&lt; 25.0). Completed projects are tagged <strong className="text-emerald-300">COMPLETED & COMMISSIONED</strong>.
+            </p>
+            <p className="text-xs leading-relaxed text-slate-400 pt-1 border-t border-slate-900">
+              <strong className="text-slate-200">Risk Trajectory</strong> monitors momentum: projects stalled at high risk without progress are classified as <strong className="text-rose-300">Chronic Stagnation</strong>, preventing severe distress projects from erroneously appearing benign or "Stable".
             </p>
           </div>
 
