@@ -245,6 +245,7 @@ public class ProjectRepository {
             d.setRiskBand(riskBand);
             d.setRiskTrajectory(rs.getString("risk_trajectory"));
             d.setActiveWarningCount(rs.getInt("active_warning_count"));
+            d.setInterventionPriorityScore(rs.getDouble("intervention_priority_score"));
 
             // Risk decomposition
             d.setCostRiskScore(Math.min(100.0, Math.round(d.getCostEscalationPct() * 1.2)));
@@ -357,39 +358,164 @@ public class ProjectRepository {
             detail.setPeerBenchmark(bm);
         }
 
-        // 12. Official Attention Priorities
+        // 12. Official Attention Priorities (Evaluated by severity)
         List<Map<String, String>> official = new ArrayList<>();
-        official.add(Map.of("priority", "Priority 1", "area", "Schedule Recovery", "evidence", detail.getScheduleSlippageMonths() + " months delay recorded", "recommendation", "Review EPC contractor critical path milestones."));
-        if (detail.getCostEscalationPct() > 10) {
-            official.add(Map.of("priority", "Priority 2", "area", "Cost Oversight", "evidence", "Sanctioned escalation of " + detail.getCostEscalationPct() + "%", "recommendation", "Conduct revised cost committee audit."));
+        if (detail.getScheduleSlippageMonths() > 0) {
+            official.add(Map.of(
+                "priority", "Priority 1", 
+                "area", "Schedule Recovery", 
+                "evidence", detail.getScheduleSlippageMonths() + " months commissioning delay recorded", 
+                "recommendation", "Convene Joint Project Review to establish revised critical path milestone baseline."
+            ));
+        }
+        if (detail.getCostEscalationPct() > 0) {
+            official.add(Map.of(
+                "priority", official.isEmpty() ? "Priority 1" : "Priority 2", 
+                "area", "Cost Oversight", 
+                "evidence", "Sanctioned escalation of +" + String.format("%.1f", detail.getCostEscalationPct()) + "% (+Rs. " + String.format("%.1f", detail.getCostEscalationAmountCr()) + " Cr)", 
+                "recommendation", "Conduct revised cost committee audit and freeze non-essential variation orders."
+            ));
+        }
+        if (detail.getPhysicalFinancialGap() < -10) {
+            official.add(Map.of(
+                "priority", "Priority " + (official.size() + 1), 
+                "area", "Financial-Physical Alignment", 
+                "evidence", "Disbursement leads physical progress by " + String.format("%.1f", Math.abs(detail.getPhysicalFinancialGap())) + "% pts", 
+                "recommendation", "Enforce deliverable-linked disbursement controls and perform physical site verification."
+            ));
+        }
+        if (official.isEmpty()) {
+            official.add(Map.of(
+                "priority", "Routine Priority", 
+                "area", "Baseline Tracking", 
+                "evidence", "All key metrics within tolerance bounds", 
+                "recommendation", "Maintain standard monthly milestone surveillance."
+            ));
         }
         detail.setOfficialAttentionPriorities(official);
 
-        // 13. Recommended Interventions
+        // 13. Recommended Interventions (Evaluated & Data-Driven)
         List<Map<String, String>> recs = new ArrayList<>();
-        recs.add(Map.of("measure", "Milestone Progress Review", "reason", "Schedule slippage exceeds sector average", "responsible_authority", detail.getAgencyName(), "priority", "HIGH"));
+        int slippage = detail.getScheduleSlippageMonths();
+        double costEsc = detail.getCostEscalationPct();
+        double costEscCr = detail.getCostEscalationAmountCr();
+        double gap = detail.getPhysicalFinancialGap();
+
+        if (slippage >= 24) {
+            Map<String, String> r1 = new HashMap<>();
+            r1.put("measure", "Critical Path Acceleration & Taskforce Deployment");
+            r1.put("reason", "Cumulative commissioning slippage of " + slippage + " months severely compromises economic rate of return and asset utility.");
+            r1.put("responsible_authority", "Central Ministry Monitoring Cell / PM-GatiShakti Taskforce");
+            r1.put("priority", "CRITICAL");
+            r1.put("action_plan", "1. Institute bi-weekly critical path sprint reviews. 2. Clear state right-of-way/forest clearances within 30 days. 3. Issue formal contractual cure notice to EPC consortium.");
+            r1.put("expected_impact", "Arrests schedule slippage and targets commercial operations within compressed window.");
+            r1.put("evaluation_logic", "Triggered because schedule slippage (" + slippage + " mos) exceeds Critical threshold of 24 months.");
+            recs.add(r1);
+        } else if (slippage >= 6) {
+            Map<String, String> r1 = new HashMap<>();
+            r1.put("measure", "Milestone Catch-Up Recovery Plan");
+            r1.put("reason", "Commissioning delayed by " + slippage + " months against approved schedule baseline.");
+            r1.put("responsible_authority", detail.getAgencyName() + " Project Director");
+            r1.put("priority", "HIGH");
+            r1.put("action_plan", "1. Mandate contractor to submit augmented resource deployment matrix. 2. Parallel-track civil construction and equipment procurement.");
+            r1.put("expected_impact", "Recovers 15-20% of schedule loss over next two reporting quarters.");
+            r1.put("evaluation_logic", "Triggered because schedule slippage (" + slippage + " mos) exceeds 6 months threshold.");
+            recs.add(r1);
+        }
+
+        if (costEsc >= 20.0 || costEscCr >= 500.0) {
+            Map<String, String> r2 = new HashMap<>();
+            r2.put("measure", "Independent Quantity Survey & Revised Cost Committee (RC) Appraisal");
+            r2.put("reason", "Project budget expanded by " + String.format("%.1f", costEsc) + "% (+Rs. " + String.format("%.1f", costEscCr) + " Cr) over sanctioned allocation.");
+            r2.put("responsible_authority", "Ministry Financial Advisor & Expenditure Finance Committee (EFC)");
+            r2.put("priority", "CRITICAL");
+            r2.put("action_plan", "1. Institute third-party quantity survey audit to verify contractor variation claims. 2. Freeze non-essential scope expansion. 3. Submit RCE appraisal to Cabinet.");
+            r2.put("expected_impact", "Establishes legally audited revised cost ceiling and prevents unauthorized expenditure.");
+            r2.put("evaluation_logic", "Triggered because cost escalation exceeds statutory 20% / Rs. 500 Cr threshold under GFR Rule 130.");
+            recs.add(r2);
+        } else if (costEsc > 5.0) {
+            Map<String, String> r2 = new HashMap<>();
+            r2.put("measure", "Cost Engineering & Variation Review");
+            r2.put("reason", "Budget expansion of +" + String.format("%.1f", costEsc) + "% (+Rs. " + String.format("%.1f", costEscCr) + " Cr) observed over baseline.");
+            r2.put("responsible_authority", detail.getAgencyName() + " Finance Wing");
+            r2.put("priority", "HIGH");
+            r2.put("action_plan", "1. Re-examine contractor rate escalations and uncommitted contingencies. 2. Tighten expenditure approvals.");
+            r2.put("expected_impact", "Prevents budget creep from exceeding tolerance bounds.");
+            r2.put("evaluation_logic", "Triggered because cost escalation exceeds 5% baseline tolerance.");
+            recs.add(r2);
+        }
+
+        if (gap < -15.0) {
+            Map<String, String> r3 = new HashMap<>();
+            r3.put("measure", "Physical Output Verification & Staged Disbursement Freeze");
+            r3.put("reason", "Financial burn (" + String.format("%.1f", detail.getFinancialProgressPct()) + "%) outpaces physical progress (" + String.format("%.1f", detail.getPhysicalProgressPct()) + "%) by " + String.format("%.1f", Math.abs(gap)) + "% points.");
+            r3.put("responsible_authority", "Chief Vigilance Officer & Third-Party Inspection Agency (TPIA)");
+            r3.put("priority", "HIGH");
+            r3.put("action_plan", "1. Perform on-site technical inspection with drone/geotagged verification. 2. Condition further disbursements on certified milestone deliverables.");
+            r3.put("expected_impact", "Eliminates premature billing and aligns disbursement run-rate with verified physical outputs.");
+            r3.put("evaluation_logic", "Triggered because physical-financial gap (" + String.format("%.1f", gap) + "%) breaches the -15% governance threshold.");
+            recs.add(r3);
+        }
+
+        if (detail.isMultiState()) {
+            Map<String, String> r4 = new HashMap<>();
+            r4.put("measure", "Inter-State PMG Coordination Portal Escalation");
+            r4.put("reason", "Project traverses multiple state jurisdictions requiring synchronized right-of-way and utility relocation.");
+            r4.put("responsible_authority", "Cabinet Secretariat PMG / PRAGATI Cell");
+            r4.put("priority", "MEDIUM");
+            r4.put("action_plan", "1. Table project in monthly PMG inter-state coordination meeting. 2. Harmonize land acquisition compensation schedules.");
+            r4.put("expected_impact", "Resolves multi-state administrative impasses.");
+            r4.put("evaluation_logic", "Triggered by multi-state corridor classification.");
+            recs.add(r4);
+        }
+
+        if (recs.isEmpty()) {
+            Map<String, String> r0 = new HashMap<>();
+            r0.put("measure", "Routine Milestone Surveillance & Handover Readiness");
+            r0.put("reason", "All project operational metrics remain within allowable sanctioned baselines (Overall Risk: " + detail.getOverallRiskScore() + ").");
+            r0.put("responsible_authority", detail.getAgencyName() + " Project Implementation Unit");
+            r0.put("priority", "ROUTINE");
+            r0.put("action_plan", "1. Maintain monthly physical milestone tracking in OCMS. 2. Prepare pre-commissioning operational checklists.");
+            r0.put("expected_impact", "Ensures seamless commercial commissioning upon completion.");
+            r0.put("evaluation_logic", "Standard governance protocol for projects operating within allowable tolerances.");
+            recs.add(r0);
+        }
         detail.setRecommendedInterventions(recs);
 
-        // 14. Intervention Tracking
-        List<InterventionDto> intList = new ArrayList<>();
-        InterventionDto iv = new InterventionDto();
-        iv.setProjectId(detail.getProjectId());
-        iv.setProjectName(detail.getProjectName());
-        iv.setSectorName(detail.getSectorName());
-        iv.setMinistryName(detail.getMinistryName());
-        iv.setAgencyName(detail.getAgencyName());
-        iv.setStateName(detail.getStateName());
-        iv.setReportingMonth(detail.getLatestReportingMonth());
-        iv.setInterventionStatus("ACTION_INITIATED");
-        iv.setRecommendedIntervention("Quarterly Project Review Committee follow-up");
-        iv.setResponsibleAuthority(detail.getMinistryName());
-        iv.setPlannedDate("2026-08-15");
-        iv.setActualStartDate("2026-08-20");
-        iv.setFollowUpDate("2026-09-30");
-        iv.setLatestActionNotes("Detailed technical review meeting held with executing agency.");
-        intList.add(iv);
+        // 14 & 15. Intervention Tracking & Effectiveness (Real Operational Audit)
+        String actionSql = """
+            SELECT 
+                project_id, status, action_type, decision_authority,
+                planned_date, actual_start_date, follow_up_date, action_notes
+            FROM project_intervention_actions
+            WHERE project_id = ?
+            ORDER BY action_id DESC
+        """;
+        List<InterventionDto> intList = jdbcTemplate.query(actionSql, new Object[]{projectId}, (rs, rowNum) -> {
+            InterventionDto iv = new InterventionDto();
+            iv.setProjectId(rs.getString("project_id"));
+            iv.setProjectName(detail.getProjectName());
+            iv.setSectorName(detail.getSectorName());
+            iv.setMinistryName(detail.getMinistryName());
+            iv.setAgencyName(detail.getAgencyName());
+            iv.setStateName(detail.getStateName());
+            iv.setReportingMonth(detail.getLatestReportingMonth());
+            iv.setInterventionStatus(rs.getString("status"));
+            iv.setRecommendedIntervention(rs.getString("action_type"));
+            iv.setResponsibleAuthority(rs.getString("decision_authority"));
+            iv.setPlannedDate(rs.getString("planned_date"));
+            iv.setActualStartDate(rs.getString("actual_start_date"));
+            iv.setFollowUpDate(rs.getString("follow_up_date"));
+            iv.setLatestActionNotes(rs.getString("action_notes"));
+            return iv;
+        });
+
         detail.setInterventions(intList);
-        detail.setInterventionEffectivenessStatus("MONITORING");
+        if (!intList.isEmpty()) {
+            detail.setInterventionEffectivenessStatus(intList.get(0).getInterventionStatus());
+        } else {
+            detail.setInterventionEffectivenessStatus("NOT_SCHEDULED");
+        }
 
         return Optional.of(detail);
     }

@@ -126,15 +126,31 @@ public class EarlyWarningRepository {
             SELECT 
                 i.project_id, c.project_name, c.sector_name, c.ministry_name, c.agency_name, 
                 c.state_name, i.reporting_month, i.intervention_priority_score, 
-                i.recommended_action as recommended_intervention, 'UNDER_REVIEW' as intervention_status, 
-                i.responsible_authority, NULL as planned_date, NULL as actual_start_date, 
-                NULL as follow_up_date, i.action_evidence as latest_action_notes
+                COALESCE(a.action_type, i.recommended_action) as recommended_intervention, 
+                COALESCE(a.status, 'PENDING_REVIEW') as intervention_status, 
+                COALESCE(a.decision_authority, i.responsible_authority) as responsible_authority, 
+                a.planned_date, a.actual_start_date, 
+                a.follow_up_date, COALESCE(a.action_notes, i.action_evidence) as latest_action_notes
             FROM gold_intervention_priority i
             JOIN gold_project_current c ON i.project_id = c.project_id
-            WHERE 1=1
+            LEFT JOIN (
+                SELECT p1.project_id, p1.status, p1.action_type, p1.decision_authority, p1.planned_date, p1.actual_start_date, p1.follow_up_date, p1.action_notes
+                FROM project_intervention_actions p1
+                INNER JOIN (
+                    SELECT project_id, MAX(action_id) as max_id
+                    FROM project_intervention_actions
+                    GROUP BY project_id
+                ) p2 ON p1.project_id = p2.project_id AND p1.action_id = p2.max_id
+            ) a ON i.project_id = a.project_id
+            WHERE i.reporting_month = c.latest_reporting_month
         """);
 
         List<Object> params = new ArrayList<>();
+        if (status != null && !status.trim().isEmpty() && !"ALL".equalsIgnoreCase(status)) {
+            sql.append(" AND UPPER(COALESCE(a.status, 'PENDING_REVIEW')) = ?");
+            params.add(status.trim().toUpperCase());
+        }
+
         sql.append(" ORDER BY i.intervention_priority_score DESC LIMIT ? OFFSET ?");
         params.add(limit);
         params.add(offset);
@@ -161,7 +177,32 @@ public class EarlyWarningRepository {
     }
 
     public boolean updateInterventionStatus(String projectId, String status, String notes) {
-        // Can be stored or logged in action audit
-        return true;
+        try {
+            String auth = "Project Review Committee";
+            try {
+                auth = jdbcTemplate.queryForObject(
+                    "SELECT COALESCE(ministry_name, 'Project Review Committee') FROM gold_project_current WHERE project_id = ?",
+                    String.class, projectId
+                );
+            } catch (Exception ignored) {}
+
+            String actionType = "Milestone Recovery Plan";
+            try {
+                actionType = jdbcTemplate.queryForObject(
+                    "SELECT COALESCE(action_category, 'Executive Milestone Review') FROM gold_intervention_priority WHERE project_id = ? ORDER BY reporting_month DESC LIMIT 1",
+                    String.class, projectId
+                );
+            } catch (Exception ignored) {}
+
+            String insertSql = """
+                INSERT INTO project_intervention_actions 
+                    (project_id, status, action_type, decision_authority, planned_date, actual_start_date, follow_up_date, action_notes)
+                VALUES (?, ?, ?, ?, date('now'), date('now'), date('now', '+30 days'), ?)
+            """;
+            jdbcTemplate.update(insertSql, projectId, status, actionType, auth, notes);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

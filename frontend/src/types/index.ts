@@ -142,6 +142,7 @@ export interface ProjectDetail {
   positiveSignals: string[];
   negativeSignals: string[];
   activeWarningCount: number;
+  interventionPriorityScore?: number;
 
   costOverrunProbability: number;
   predictedFinalCostCr: number;
@@ -180,7 +181,15 @@ export interface ProjectDetail {
     peer_avg_delay: number;
   };
   officialAttentionPriorities: Array<{ priority: string; area: string; evidence: string; recommendation: string }>;
-  recommendedInterventions: Array<{ measure: string; reason: string; responsible_authority: string; priority: string }>;
+  recommendedInterventions: Array<{ 
+    measure: string; 
+    reason: string; 
+    responsible_authority: string; 
+    priority: string;
+    action_plan?: string;
+    expected_impact?: string;
+    evaluation_logic?: string;
+  }>;
   interventions: Intervention[];
   interventionEffectivenessStatus: string;
 }

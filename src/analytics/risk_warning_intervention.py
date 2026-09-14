@@ -158,26 +158,57 @@ def run_risk_warning_pipeline(workspace_dir: str):
         warn_factor = min(100.0, proj_warnings_active * 25.0)
         priority_score = round(0.50 * overall_risk + 0.30 * exp_factor + 0.20 * warn_factor, 2)
         
-        # Categorize action recommendation
-        if slip_m and slip_m >= 12.0:
-            cat = "Milestone Recovery"
-            rec = "Convene Joint Project Review to establish revised critical-path milestone baseline."
-            evidence = f"Cumulative delay of {slip_m} months against original approved schedule."
-        elif cost_esc_pct and cost_esc_pct >= 25.0:
-            cat = "Cost Audit & Contract Review"
-            rec = "Initiate independent third-party quantity survey and contract rate audit."
-            evidence = f"Project revised cost expanded by {cost_esc_pct:.1f}% (+{cost_esc_cr} Cr)."
-        elif gap and gap < -15.0:
-            cat = "Physical Progress Verification"
-            rec = "Conduct on-site technical inspection to verify work executed against fund disbursements."
-            evidence = f"Physical-financial divergence gap of {gap:.1f}% points."
+        # Multi-factor, compound, logic-driven action recommendation
+        has_critical_delay = slip_m is not None and slip_m >= 24.0
+        has_moderate_delay = slip_m is not None and slip_m >= 6.0
+        has_severe_overrun = (cost_esc_pct is not None and cost_esc_pct >= 25.0) or (cost_esc_cr is not None and cost_esc_cr >= 500.0)
+        has_moderate_overrun = (cost_esc_pct is not None and cost_esc_pct >= 10.0) or (cost_esc_cr is not None and cost_esc_cr >= 100.0)
+        has_gap_divergence = gap is not None and gap < -15.0
+        has_stagnant_velocity = prog_vel is not None and prog_vel < 0.2 and (t_elapsed_pct and t_elapsed_pct > 25.0)
+        
+        if has_critical_delay and has_severe_overrun:
+            cat = "Inter-Ministerial Project Restructuring & Revised Cost Committee"
+            rec = "Convene Cabinet Committee on Economic Affairs (CCEA) / EFC Joint Review to approve realistic Revised Cost Estimate (RCE) and restructure critical path."
+            evidence = f"Compounding crisis: {slip_m:.0f} months schedule delay and +{cost_esc_pct:.1f}% (+Rs. {cost_esc_cr:,.1f} Cr) cost escalation."
+            authority = "Cabinet Committee on Economic Affairs / Expenditure Finance Committee"
+        elif has_critical_delay:
+            cat = "Critical Path Acceleration & Taskforce Deployment"
+            rec = "Deploy Central Ministry High-Level Taskforce to institute weekly critical-path audits and resolve site clearance bottlenecks."
+            evidence = f"Chronic commissioning delay of {slip_m:.0f} months against approved schedule."
+            authority = "Central Line Ministry Project Review Cell"
+        elif has_severe_overrun:
+            cat = "Comprehensive Financial & Quantity Survey Audit"
+            rec = "Institute independent third-party quantity survey audit to verify price variation clauses and scope escalation before releasing further funds."
+            evidence = f"Sanctioned cost expanded by {cost_esc_pct:.1f}% (+Rs. {cost_esc_cr:,.1f} Cr over baseline)."
+            authority = "Ministry Financial Advisor & Chief Controller of Accounts"
+        elif has_gap_divergence:
+            cat = "Physical Output Verification & Disbursement Staging"
+            rec = "Conduct joint technical inspection to verify certified work and freeze milestone disbursements until physical progress catches up with expenditure."
+            evidence = f"Financial expenditure utilization leads physical progress certification by {abs(gap):.1f}% points."
+            authority = "Chief Vigilance Officer & Third-Party Inspection Agency"
+        elif has_stagnant_velocity:
+            cat = "Contractor Performance Cure Notice"
+            rec = "Issue formal contractual cure notice to non-performing EPC contractors with 30-day performance rectification deadline."
+            evidence = f"Monthly execution velocity stalled at {prog_vel:.2f}% despite {t_elapsed_pct:.1f}% contract duration elapsed."
+            authority = "Executing Agency Project Director"
+        elif has_moderate_delay:
+            cat = "Milestone Recovery Catch-Up Plan"
+            rec = "Mandate executing agency to submit compressed resource augmentation work-program to arrest slippage."
+            evidence = f"Schedule slippage of {slip_m:.0f} months recorded."
+            authority = "Executing Agency Project Director"
+        elif has_moderate_overrun:
+            cat = "Cost Engineering & Variation Review"
+            rec = "Conduct itemized rate and variation review to freeze uncommitted contingencies."
+            evidence = f"Observed cost escalation of +{cost_esc_pct:.1f}% (+Rs. {cost_esc_cr:,.1f} Cr)."
+            authority = "Agency Chief Engineer / Finance Wing"
         else:
-            cat = "Implementation Monitoring"
-            rec = "Standard monthly monitoring and contractor performance tracking."
-            evidence = f"Overall composite implementation risk score {overall_risk} ({band})."
+            cat = "Routine Monitoring & Commissioning Protocol"
+            rec = "Continue standard monthly OCMS milestone surveillance; no special remedial intervention warranted."
+            evidence = f"Operational metrics remain within allowable baseline tolerances (Overall Risk: {overall_risk:.1f})."
+            authority = "Field Project Implementation Unit (PIU)"
             
         intervention_records.append((
-            pid, rep_month, priority_score, 1, cat, rec, evidence, "Central Line Ministry / IPMD"
+            pid, rep_month, priority_score, 1, cat, rec, evidence, authority
         ))
         
         prev_risk = overall_risk

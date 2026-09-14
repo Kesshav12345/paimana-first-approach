@@ -44,6 +44,7 @@ public class ProjectDetailDto {
     private List<String> positiveSignals;
     private List<String> negativeSignals;
     private int activeWarningCount;
+    private double interventionPriorityScore;
 
     // 4. Cost Forecast (Supervised ML)
     private double costOverrunProbability;
@@ -162,6 +163,8 @@ public class ProjectDetailDto {
     public void setNegativeSignals(List<String> negativeSignals) { this.negativeSignals = negativeSignals; }
     public int getActiveWarningCount() { return activeWarningCount; }
     public void setActiveWarningCount(int activeWarningCount) { this.activeWarningCount = activeWarningCount; }
+    public double getInterventionPriorityScore() { return interventionPriorityScore; }
+    public void setInterventionPriorityScore(double interventionPriorityScore) { this.interventionPriorityScore = interventionPriorityScore; }
     public double getCostOverrunProbability() { return costOverrunProbability; }
     public void setCostOverrunProbability(double costOverrunProbability) { this.costOverrunProbability = costOverrunProbability; }
     public double getPredictedFinalCostCr() { return predictedFinalCostCr; }
