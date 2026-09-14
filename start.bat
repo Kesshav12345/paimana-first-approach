@@ -57,7 +57,7 @@ echo Opening PAIMANA Dashboard in your default browser...
 start http://127.0.0.1:5173/
 
 echo.
-echo To stop all services at any time, run 'stop.bat' or close the opened service windows.
+echo To stop all services at any time, run 'stop.bat' or close the 3 opened service windows.
 echo You can close this launcher window safely.
 echo.
 pause

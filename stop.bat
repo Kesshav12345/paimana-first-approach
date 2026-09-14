@@ -15,4 +15,5 @@ echo.
 echo =====================================================================
 echo   ALL PAIMANA SERVICES STOPPED CLEANLY!
 echo =====================================================================
-powershell -NoProfile -Command "Start-Sleep -Seconds 2"
+echo.
+pause
