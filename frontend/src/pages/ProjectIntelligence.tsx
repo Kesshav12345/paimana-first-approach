@@ -213,10 +213,25 @@ export const ProjectIntelligence: React.FC = () => {
             <div className="flex items-center justify-between p-3 rounded bg-slate-950/80 border border-slate-800 mb-3">
               <div>
                 <span className="text-[11px] text-slate-400">Implementation Health</span>
-                <div className={`text-sm font-bold ${
-                  detail.healthStatus === 'DETERIORATING' ? 'text-rose-400' : detail.healthStatus === 'IMPROVING' ? 'text-emerald-400' : 'text-slate-200'
+                <div className={`text-sm font-bold flex items-center gap-1.5 mt-0.5 ${
+                  detail.healthStatus === 'DETERIORATING' ? 'text-rose-400' :
+                  detail.healthStatus === 'COMPLETED' ? 'text-emerald-400' :
+                  detail.healthStatus === 'COMMISSIONING' ? 'text-blue-400' :
+                  detail.healthStatus === 'IMPROVING' ? 'text-emerald-400' : 'text-slate-200'
                 }`}>
-                  {detail.healthStatus}
+                  {detail.healthStatus === 'COMPLETED' ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span>COMPLETED & COMMISSIONED</span>
+                    </>
+                  ) : detail.healthStatus === 'COMMISSIONING' ? (
+                    <>
+                      <Activity className="w-4 h-4 text-blue-400" />
+                      <span>COMMISSIONING & TRIAL RUNS</span>
+                    </>
+                  ) : (
+                    detail.healthStatus
+                  )}
                 </div>
               </div>
               <RiskBadge band={detail.riskBand} score={detail.overallRiskScore} />
@@ -474,7 +489,15 @@ export const ProjectIntelligence: React.FC = () => {
 
           <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
             {detail.activeWarnings.length === 0 ? (
-              <div className="text-xs text-slate-500 py-4 text-center">Zero active warning alerts</div>
+              <div className="text-xs text-slate-400 py-4 text-center space-y-1">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto" />
+                <p className="font-semibold text-slate-300">Zero active warning alerts</p>
+                <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                  {detail.projectLifecycleStatus === 'Completed' || detail.physicalProgressPct >= 98.0
+                    ? 'Physical construction finished — All historical construction bottlenecks resolved'
+                    : 'All operational and financial metrics within statutory tolerance'}
+                </p>
+              </div>
             ) : (
               detail.activeWarnings.map((w, idx) => (
                 <div key={idx} className="p-2.5 rounded bg-slate-950/70 border border-slate-800 text-xs">
@@ -485,7 +508,7 @@ export const ProjectIntelligence: React.FC = () => {
                   <p className="text-[11px] text-slate-400 mt-1">{w.triggerCondition}</p>
                   <div className="mt-1.5 flex justify-between text-[10px] text-slate-500">
                     <span>Persistence: {w.persistencePeriods} mos</span>
-                    <span className="text-amber-400">Score: {w.interventionPriorityScore.toFixed(1)}</span>
+                    <span className="text-amber-400 font-semibold">Alert Severity: {w.interventionPriorityScore.toFixed(0)} / 100</span>
                   </div>
                 </div>
               ))
@@ -695,6 +718,11 @@ export const ProjectIntelligence: React.FC = () => {
           <div className="flex items-center gap-2">
             {detail.interventions.length > 0 ? (
               <StatusChip status={detail.interventionEffectivenessStatus} />
+            ) : (detail.projectLifecycleStatus === 'Completed' || detail.healthStatus === 'COMPLETED' || detail.physicalProgressPct >= 98.0) ? (
+              <span className="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                PROJECT COMPLETED & COMMISSIONED
+              </span>
             ) : (
               <span className="px-2.5 py-1 rounded text-xs font-semibold bg-slate-950 text-slate-300 border border-slate-800 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-amber-400" />
@@ -705,36 +733,66 @@ export const ProjectIntelligence: React.FC = () => {
         </div>
 
         {detail.interventions.length === 0 ? (
-          <div className="bg-slate-950/80 border border-slate-800/90 rounded-lg p-5">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div className="space-y-1.5 max-w-2xl">
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-amber-400" />
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-                    Awaiting Formal Decision in Early Warning Dashboard
-                  </h3>
+          (detail.projectLifecycleStatus === 'Completed' || detail.healthStatus === 'COMPLETED' || detail.physicalProgressPct >= 98.0) ? (
+            <div className="bg-slate-950/80 border border-emerald-800/50 rounded-lg p-5">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="space-y-1.5 max-w-2xl">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                      Physical Implementation Completed & Commissioned
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    This project has successfully completed physical construction and commercial commissioning (Current Progress: <strong className="text-emerald-400">{detail.physicalProgressPct}%</strong>). Zero active construction delays or operational bottlenecks remain. Official actions are limited to routine contractor final bill reconciliations, asset capitalization, and formal Project Completion Report (PCR) submission.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[11px] text-slate-400">
+                    <span>Lifecycle Status: <strong className="text-emerald-400 font-semibold">Completed & Commissioned</strong></span>
+                    <span>•</span>
+                    <span>Active Warnings: <strong className="text-emerald-400 font-bold">0</strong></span>
+                    <span>•</span>
+                    <span>Post-Commissioning Measure: <strong className="text-slate-200">{detail.recommendedInterventions[0]?.measure || 'Final Commercial Settlement & PCR Submission'}</strong></span>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  To ensure full operational transparency, PAIMANA tracks actual interventions only after they are officially sanctioned and scheduled through the <strong className="text-slate-200">Early Warning Dashboard</strong>. No restructuring or ministerial taskforce has been initiated for this project yet.
-                </p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[11px] text-slate-400">
-                  <span>Priority Score: <strong className="text-amber-400 font-mono font-bold">{(detail.interventionPriorityScore ?? 0).toFixed(1)} / 100</strong></span>
-                  <span>•</span>
-                  <span>Active Warnings: <strong className="text-rose-400 font-bold">{detail.activeWarnings.length}</strong></span>
-                  <span>•</span>
-                  <span>Recommended Action: <strong className="text-slate-200">{detail.recommendedInterventions[0]?.measure || 'Routine Monitoring'}</strong></span>
+
+                <div className="flex-shrink-0 px-4 py-2.5 bg-emerald-950/80 border border-emerald-800 text-emerald-300 rounded text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Asset Operational</span>
                 </div>
               </div>
-
-              <button
-                onClick={() => navigate('/early-warning')}
-                className="flex-shrink-0 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold flex items-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
-              >
-                <span>Schedule in Early Warning</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
             </div>
-          </div>
+          ) : (
+            <div className="bg-slate-950/80 border border-slate-800/90 rounded-lg p-5">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div className="space-y-1.5 max-w-2xl">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 text-amber-400" />
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                      Awaiting Formal Decision in Early Warning Dashboard
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    To ensure full operational transparency, PAIMANA tracks actual interventions only after they are officially sanctioned and scheduled through the <strong className="text-slate-200">Early Warning Dashboard</strong>. No restructuring or ministerial taskforce has been initiated for this project yet.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[11px] text-slate-400">
+                    <span>Priority Score: <strong className="text-amber-400 font-mono font-bold">{(detail.interventionPriorityScore ?? 0).toFixed(1)} / 100</strong></span>
+                    <span>•</span>
+                    <span>Active Warnings: <strong className="text-rose-400 font-bold">{detail.activeWarnings.length}</strong></span>
+                    <span>•</span>
+                    <span>Recommended Action: <strong className="text-slate-200">{detail.recommendedInterventions[0]?.measure || 'Routine Monitoring'}</strong></span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate('/early-warning')}
+                  className="flex-shrink-0 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold flex items-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
+                >
+                  <span>Schedule in Early Warning</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-300">
@@ -1054,6 +1112,7 @@ function renderEvaluationDetails(
               <p>• <strong>Cost Risk (35%):</strong> Normalized from cost escalation percentage and remaining exposure.</p>
               <p>• <strong>Schedule Risk (35%):</strong> Evaluated from schedule slippage months against project baseline duration.</p>
               <p>• <strong>Progress Risk (30%):</strong> Evaluated from physical-financial divergence gap and monthly velocity stagnation.</p>
+              <p className="pt-1 text-emerald-400 font-medium">• <strong>Lifecycle-Aware Modulation:</strong> Projects with &ge; 98% progress or verified commercial commissioning have schedule and execution risks attenuated to 0.0 with construction alerts retired, focusing purely on final audited cost variance.</p>
             </div>
           </div>
 
@@ -1137,19 +1196,31 @@ function renderEvaluationDetails(
 
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Active Alert Triggers ({detail.activeWarnings.length})</span>
-            {detail.activeWarnings.map((w, idx) => (
-              <div key={idx} className="p-3 rounded bg-slate-950 border border-slate-800 text-xs space-y-1">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-white">{w.warningType}</span>
-                  <SeverityBadge severity={w.severity} />
-                </div>
-                <p className="text-slate-300">{w.triggerCondition}</p>
-                <div className="flex justify-between text-[11px] text-slate-400 pt-1">
-                  <span>Persistence: <strong className="text-slate-200">{w.persistencePeriods} consecutive cycles</strong></span>
-                  <span>Trigger Priority: <strong className="text-amber-400">{w.interventionPriorityScore.toFixed(1)}</strong></span>
-                </div>
+            {detail.activeWarnings.length === 0 ? (
+              <div className="p-4 rounded-lg bg-slate-950 border border-slate-800 text-center space-y-1">
+                <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto" />
+                <p className="font-semibold text-slate-200">Zero Active Alert Triggers</p>
+                <p className="text-xs text-slate-400">
+                  {detail.projectLifecycleStatus === 'Completed' || detail.physicalProgressPct >= 98.0
+                    ? 'Physical construction is finished. All historical construction bottlenecks and delay alerts have been formally retired.'
+                    : 'No statutory threshold breaches detected in the latest reporting cycle.'}
+                </p>
               </div>
-            ))}
+            ) : (
+              detail.activeWarnings.map((w, idx) => (
+                <div key={idx} className="p-3 rounded bg-slate-950 border border-slate-800 text-xs space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-white">{w.warningType}</span>
+                    <SeverityBadge severity={w.severity} />
+                  </div>
+                  <p className="text-slate-300">{w.triggerCondition}</p>
+                  <div className="flex justify-between text-[11px] text-slate-400 pt-1">
+                    <span>Persistence: <strong className="text-slate-200">{w.persistencePeriods} consecutive cycles</strong></span>
+                    <span>Alert Severity Score: <strong className="text-amber-400 font-bold">{w.interventionPriorityScore.toFixed(0)} / 100</strong></span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       );

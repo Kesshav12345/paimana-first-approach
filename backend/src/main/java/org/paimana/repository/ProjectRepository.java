@@ -198,9 +198,13 @@ public class ProjectRepository {
                 c.cost_escalation_pct, c.original_doc, c.anticipated_doc, c.schedule_slippage_months,
                 c.overall_risk_score, c.risk_band, c.risk_trajectory, c.active_warning_count,
                 c.intervention_priority_score, c.intervention_recommendation, c.latest_reporting_month,
-                p.legacy_ocms_code, p.pmgid, p.project_lifecycle_status, p.original_approval_date, p.actual_start_date
+                p.legacy_ocms_code, p.pmgid, p.project_lifecycle_status, p.original_approval_date, p.actual_start_date,
+                COALESCE(r.cost_risk_score, 0.0) as cost_risk_score,
+                COALESCE(r.schedule_risk_score, 0.0) as schedule_risk_score,
+                COALESCE(r.progress_risk_score, 0.0) as progress_risk_score
             FROM gold_project_current c
             LEFT JOIN dim_project p ON c.project_id = p.project_id
+            LEFT JOIN gold_risk_engine_outputs r ON c.project_id = r.project_id AND c.latest_reporting_month = r.reporting_month
             WHERE c.project_id = ?
         """;
 
@@ -247,25 +251,47 @@ public class ProjectRepository {
             d.setActiveWarningCount(rs.getInt("active_warning_count"));
             d.setInterventionPriorityScore(rs.getDouble("intervention_priority_score"));
 
-            // Risk decomposition
-            d.setCostRiskScore(Math.min(100.0, Math.round(d.getCostEscalationPct() * 1.2)));
-            d.setScheduleRiskScore(Math.min(100.0, Math.round(d.getScheduleSlippageMonths() * 2.5)));
-            d.setProgressRiskScore(Math.min(100.0, Math.round(Math.max(0.0, -d.getPhysicalFinancialGap() * 1.5))));
+            // Lifecycle phase assessment
+            String lifeStatus = rs.getString("project_lifecycle_status");
+            boolean isCompleted = "Completed".equalsIgnoreCase(lifeStatus) || physProg >= 98.0;
+            boolean isCommissioning = "Commissioning".equalsIgnoreCase(lifeStatus) || (physProg >= 95.0 && !isCompleted);
+
+            // Risk decomposition mapped directly from canonical engine outputs
+            d.setCostRiskScore(rs.getDouble("cost_risk_score"));
+            d.setScheduleRiskScore(rs.getDouble("schedule_risk_score"));
+            d.setProgressRiskScore(rs.getDouble("progress_risk_score"));
 
             // Health Status
-            String traj = rs.getString("risk_trajectory");
-            d.setHealthStatus("DETERIORATING".equalsIgnoreCase(traj) ? "DETERIORATING" : ("IMPROVING".equalsIgnoreCase(traj) ? "IMPROVING" : "STABLE"));
+            if (isCompleted) {
+                d.setHealthStatus("COMPLETED");
+            } else if (isCommissioning) {
+                d.setHealthStatus("COMMISSIONING");
+            } else {
+                String traj = rs.getString("risk_trajectory");
+                d.setHealthStatus("DETERIORATING".equalsIgnoreCase(traj) ? "DETERIORATING" : ("IMPROVING".equalsIgnoreCase(traj) ? "IMPROVING" : "STABLE"));
+            }
             
             List<String> pos = new ArrayList<>();
             List<String> neg = new ArrayList<>();
-            if (physProg >= 80.0) pos.add("Advanced physical completion (" + physProg + "%)");
-            if (d.getCostEscalationPct() <= 0.0) pos.add("Zero sanctioned budget escalation");
-            if (d.getScheduleSlippageMonths() == 0) pos.add("On-schedule commissioning target");
-            if (d.getCostEscalationPct() > 20.0) neg.add("Severe cost escalation (+" + d.getCostEscalationPct() + "%)");
-            if (d.getScheduleSlippageMonths() > 12) neg.add("Over 12 months commissioning delay (" + d.getScheduleSlippageMonths() + " mos)");
-            if (d.getPhysicalFinancialGap() < -15.0) neg.add("Financial burn outpacing physical progress by " + Math.abs(d.getPhysicalFinancialGap()) + "%");
-            if (pos.isEmpty()) pos.add("Baseline monitoring active");
-            if (neg.isEmpty()) neg.add("No adverse thresholds breached");
+            if (isCompleted) {
+                pos.add("Physical execution 100% complete & commissioned into service");
+                pos.add("Operational handover complete; plant/facility in active operation");
+                pos.add("Defect liability period (DLP) & administrative closure underway");
+                neg.add("Zero active construction implementation risk");
+            } else if (isCommissioning) {
+                pos.add("Advanced pre-commissioning phase (" + String.format("%.1f", physProg) + "% progress)");
+                pos.add("Trial run and grid/traffic synchronization active");
+                if (d.getPhysicalFinancialGap() < -15.0) neg.add("Final billing reconciliation active");
+            } else {
+                if (physProg >= 80.0) pos.add("Advanced physical completion (" + physProg + "%)");
+                if (d.getCostEscalationPct() <= 0.0) pos.add("Zero sanctioned budget escalation");
+                if (d.getScheduleSlippageMonths() == 0) pos.add("On-schedule commissioning target");
+                if (d.getCostEscalationPct() > 20.0) neg.add("Severe cost escalation (+" + d.getCostEscalationPct() + "%)");
+                if (d.getScheduleSlippageMonths() > 12) neg.add("Over 12 months commissioning delay (" + d.getScheduleSlippageMonths() + " mos)");
+                if (d.getPhysicalFinancialGap() < -15.0) neg.add("Financial burn outpacing physical progress by " + Math.abs(d.getPhysicalFinancialGap()) + "%");
+                if (pos.isEmpty()) pos.add("Baseline monitoring active");
+                if (neg.isEmpty()) neg.add("No adverse thresholds breached");
+            }
             d.setPositiveSignals(pos);
             d.setNegativeSignals(neg);
 
@@ -277,6 +303,9 @@ public class ProjectRepository {
         }
 
         ProjectDetailDto detail = results.get(0);
+        double physProg = detail.getPhysicalProgressPct();
+        boolean isCompleted = "Completed".equalsIgnoreCase(detail.getProjectLifecycleStatus()) || physProg >= 98.0;
+        boolean isCommissioning = "Commissioning".equalsIgnoreCase(detail.getProjectLifecycleStatus()) || (physProg >= 95.0 && !isCompleted);
 
         // 7. Trajectory History (Monthly time series)
         String histSql = """
@@ -294,15 +323,15 @@ public class ProjectRepository {
         List<Map<String, Object>> history = jdbcTemplate.queryForList(histSql, projectId);
         detail.setMonthlyHistory(history);
 
-        // 8. Active Warnings
+        // 8. Active Warnings (Filtered to Active alerts with true priority score)
         String warnSql = """
             SELECT 
                 warning_id as alert_id, project_id, reporting_month, warning_type, severity, 
                 trigger_rule as trigger_condition, trigger_value, threshold_value, status as alert_status, 
                 persistence_months as persistence_periods, reporting_month as first_trigger_date, reporting_month as last_trigger_date, 
-                0.0 as intervention_priority_score, '' as recommended_intervention
+                COALESCE(intervention_priority_score, 50.0) as intervention_priority_score, '' as recommended_intervention
             FROM gold_warning_alerts
-            WHERE project_id = ?
+            WHERE project_id = ? AND UPPER(status) = 'ACTIVE'
             ORDER BY persistence_months DESC
         """;
         List<EarlyWarningAlertDto> warnings = jdbcTemplate.query(warnSql, new Object[]{projectId}, (rs, rowNum) -> {
@@ -325,19 +354,31 @@ public class ProjectRepository {
         });
         detail.setActiveWarnings(warnings);
 
-        // 9. Why Flagged
+        // 9. Why Flagged (Lifecycle-informed reasoning)
         List<Map<String, String>> flagging = new ArrayList<>();
-        if (detail.getCostEscalationPct() > 0) {
-            flagging.add(Map.of("signal_type", "Observed Cost Escalation", "detail", "Project budget increased by " + detail.getCostEscalationPct() + "% over original sanctioned baseline."));
-        }
-        if (detail.getScheduleSlippageMonths() > 0) {
-            flagging.add(Map.of("signal_type", "Schedule Slippage", "detail", "Target commissioning date delayed by " + detail.getScheduleSlippageMonths() + " months."));
-        }
-        if (detail.getPhysicalFinancialGap() < -10) {
-            flagging.add(Map.of("signal_type", "Progress-Expenditure Divergence", "detail", "Expenditure burn exceeds physical progress certification by " + Math.abs(detail.getPhysicalFinancialGap()) + "%."));
-        }
-        if (flagging.isEmpty()) {
-            flagging.add(Map.of("signal_type", "Normal Operations", "detail", "All monitored operational metrics remain within sanctioned project parameters."));
+        if (isCompleted) {
+            flagging.add(Map.of(
+                "signal_type", "Post-Commissioning Asset Handover",
+                "detail", "Project construction is 100% complete and operational. Active monitoring is maintained strictly for defect liability period (DLP) oversight and Project Completion Report (PCR) submission."
+            ));
+        } else if (isCommissioning) {
+            flagging.add(Map.of(
+                "signal_type", "Pre-Commissioning Stage",
+                "detail", "Project has achieved advanced physical execution (" + physProg + "%). Critical path construction is finished; final trial runs and statutory grid/safety clearances active."
+            ));
+        } else {
+            if (detail.getCostEscalationPct() > 0) {
+                flagging.add(Map.of("signal_type", "Observed Cost Escalation", "detail", "Project budget increased by " + detail.getCostEscalationPct() + "% over original sanctioned baseline."));
+            }
+            if (detail.getScheduleSlippageMonths() > 0) {
+                flagging.add(Map.of("signal_type", "Schedule Slippage", "detail", "Target commissioning date delayed by " + detail.getScheduleSlippageMonths() + " months."));
+            }
+            if (detail.getPhysicalFinancialGap() < -10) {
+                flagging.add(Map.of("signal_type", "Progress-Expenditure Divergence", "detail", "Expenditure burn exceeds physical progress certification by " + Math.abs(detail.getPhysicalFinancialGap()) + "%."));
+            }
+            if (flagging.isEmpty()) {
+                flagging.add(Map.of("signal_type", "Normal Operations", "detail", "All monitored operational metrics remain within sanctioned project parameters."));
+            }
         }
         detail.setFlaggingReasons(flagging);
 
@@ -358,127 +399,165 @@ public class ProjectRepository {
             detail.setPeerBenchmark(bm);
         }
 
-        // 12. Official Attention Priorities (Evaluated by severity)
+        // 12. Official Attention Priorities (Evaluated by severity & lifecycle)
         List<Map<String, String>> official = new ArrayList<>();
-        if (detail.getScheduleSlippageMonths() > 0) {
-            official.add(Map.of(
-                "priority", "Priority 1", 
-                "area", "Schedule Recovery", 
-                "evidence", detail.getScheduleSlippageMonths() + " months commissioning delay recorded", 
-                "recommendation", "Convene Joint Project Review to establish revised critical path milestone baseline."
-            ));
-        }
-        if (detail.getCostEscalationPct() > 0) {
-            official.add(Map.of(
-                "priority", official.isEmpty() ? "Priority 1" : "Priority 2", 
-                "area", "Cost Oversight", 
-                "evidence", "Sanctioned escalation of +" + String.format("%.1f", detail.getCostEscalationPct()) + "% (+Rs. " + String.format("%.1f", detail.getCostEscalationAmountCr()) + " Cr)", 
-                "recommendation", "Conduct revised cost committee audit and freeze non-essential variation orders."
-            ));
-        }
-        if (detail.getPhysicalFinancialGap() < -10) {
-            official.add(Map.of(
-                "priority", "Priority " + (official.size() + 1), 
-                "area", "Financial-Physical Alignment", 
-                "evidence", "Disbursement leads physical progress by " + String.format("%.1f", Math.abs(detail.getPhysicalFinancialGap())) + "% pts", 
-                "recommendation", "Enforce deliverable-linked disbursement controls and perform physical site verification."
-            ));
-        }
-        if (official.isEmpty()) {
+        if (isCompleted) {
             official.add(Map.of(
                 "priority", "Routine Priority", 
-                "area", "Baseline Tracking", 
-                "evidence", "All key metrics within tolerance bounds", 
-                "recommendation", "Maintain standard monthly milestone surveillance."
+                "area", "Commercial Settlement & Asset Capitalization", 
+                "evidence", "Physical deliverables 100% completed (" + physProg + "% progress)", 
+                "recommendation", "Reconcile final contractor variation claims, release retention guarantees, and submit formal PCR to MoSPI."
             ));
+        } else if (isCommissioning) {
+            official.add(Map.of(
+                "priority", "Priority 1", 
+                "area", "Commercial Operation Declaration (COD)", 
+                "evidence", "Physical progress at " + physProg + "% in trial synchronization", 
+                "recommendation", "Expedite statutory clearances (CEA/DGMS/CRS) and declare formal Commercial Operation Date (COD)."
+            ));
+        } else {
+            if (detail.getScheduleSlippageMonths() > 0) {
+                official.add(Map.of(
+                    "priority", "Priority 1", 
+                    "area", "Schedule Recovery", 
+                    "evidence", detail.getScheduleSlippageMonths() + " months commissioning delay recorded", 
+                    "recommendation", "Convene Joint Project Review to establish revised critical path milestone baseline."
+                ));
+            }
+            if (detail.getCostEscalationPct() > 0) {
+                official.add(Map.of(
+                    "priority", official.isEmpty() ? "Priority 1" : "Priority 2", 
+                    "area", "Cost Oversight", 
+                    "evidence", "Sanctioned escalation of +" + String.format("%.1f", detail.getCostEscalationPct()) + "% (+Rs. " + String.format("%.1f", detail.getCostEscalationAmountCr()) + " Cr)", 
+                    "recommendation", "Conduct revised cost committee audit and freeze non-essential variation orders."
+                ));
+            }
+            if (detail.getPhysicalFinancialGap() < -10) {
+                official.add(Map.of(
+                    "priority", "Priority " + (official.size() + 1), 
+                    "area", "Financial-Physical Alignment", 
+                    "evidence", "Disbursement leads physical progress by " + String.format("%.1f", Math.abs(detail.getPhysicalFinancialGap())) + "% pts", 
+                    "recommendation", "Enforce deliverable-linked disbursement controls and perform physical site verification."
+                ));
+            }
+            if (official.isEmpty()) {
+                official.add(Map.of(
+                    "priority", "Routine Priority", 
+                    "area", "Baseline Tracking", 
+                    "evidence", "All key metrics within tolerance bounds", 
+                    "recommendation", "Maintain standard monthly milestone surveillance."
+                ));
+            }
         }
         detail.setOfficialAttentionPriorities(official);
 
         // 13. Recommended Interventions (Evaluated & Data-Driven)
         List<Map<String, String>> recs = new ArrayList<>();
-        int slippage = detail.getScheduleSlippageMonths();
-        double costEsc = detail.getCostEscalationPct();
-        double costEscCr = detail.getCostEscalationAmountCr();
-        double gap = detail.getPhysicalFinancialGap();
-
-        if (slippage >= 24) {
-            Map<String, String> r1 = new HashMap<>();
-            r1.put("measure", "Critical Path Acceleration & Taskforce Deployment");
-            r1.put("reason", "Cumulative commissioning slippage of " + slippage + " months severely compromises economic rate of return and asset utility.");
-            r1.put("responsible_authority", "Central Ministry Monitoring Cell / PM-GatiShakti Taskforce");
-            r1.put("priority", "CRITICAL");
-            r1.put("action_plan", "1. Institute bi-weekly critical path sprint reviews. 2. Clear state right-of-way/forest clearances within 30 days. 3. Issue formal contractual cure notice to EPC consortium.");
-            r1.put("expected_impact", "Arrests schedule slippage and targets commercial operations within compressed window.");
-            r1.put("evaluation_logic", "Triggered because schedule slippage (" + slippage + " mos) exceeds Critical threshold of 24 months.");
-            recs.add(r1);
-        } else if (slippage >= 6) {
-            Map<String, String> r1 = new HashMap<>();
-            r1.put("measure", "Milestone Catch-Up Recovery Plan");
-            r1.put("reason", "Commissioning delayed by " + slippage + " months against approved schedule baseline.");
-            r1.put("responsible_authority", detail.getAgencyName() + " Project Director");
-            r1.put("priority", "HIGH");
-            r1.put("action_plan", "1. Mandate contractor to submit augmented resource deployment matrix. 2. Parallel-track civil construction and equipment procurement.");
-            r1.put("expected_impact", "Recovers 15-20% of schedule loss over next two reporting quarters.");
-            r1.put("evaluation_logic", "Triggered because schedule slippage (" + slippage + " mos) exceeds 6 months threshold.");
-            recs.add(r1);
-        }
-
-        if (costEsc >= 20.0 || costEscCr >= 500.0) {
-            Map<String, String> r2 = new HashMap<>();
-            r2.put("measure", "Independent Quantity Survey & Revised Cost Committee (RC) Appraisal");
-            r2.put("reason", "Project budget expanded by " + String.format("%.1f", costEsc) + "% (+Rs. " + String.format("%.1f", costEscCr) + " Cr) over sanctioned allocation.");
-            r2.put("responsible_authority", "Ministry Financial Advisor & Expenditure Finance Committee (EFC)");
-            r2.put("priority", "CRITICAL");
-            r2.put("action_plan", "1. Institute third-party quantity survey audit to verify contractor variation claims. 2. Freeze non-essential scope expansion. 3. Submit RCE appraisal to Cabinet.");
-            r2.put("expected_impact", "Establishes legally audited revised cost ceiling and prevents unauthorized expenditure.");
-            r2.put("evaluation_logic", "Triggered because cost escalation exceeds statutory 20% / Rs. 500 Cr threshold under GFR Rule 130.");
-            recs.add(r2);
-        } else if (costEsc > 5.0) {
-            Map<String, String> r2 = new HashMap<>();
-            r2.put("measure", "Cost Engineering & Variation Review");
-            r2.put("reason", "Budget expansion of +" + String.format("%.1f", costEsc) + "% (+Rs. " + String.format("%.1f", costEscCr) + " Cr) observed over baseline.");
-            r2.put("responsible_authority", detail.getAgencyName() + " Finance Wing");
-            r2.put("priority", "HIGH");
-            r2.put("action_plan", "1. Re-examine contractor rate escalations and uncommitted contingencies. 2. Tighten expenditure approvals.");
-            r2.put("expected_impact", "Prevents budget creep from exceeding tolerance bounds.");
-            r2.put("evaluation_logic", "Triggered because cost escalation exceeds 5% baseline tolerance.");
-            recs.add(r2);
-        }
-
-        if (gap < -15.0) {
-            Map<String, String> r3 = new HashMap<>();
-            r3.put("measure", "Physical Output Verification & Staged Disbursement Freeze");
-            r3.put("reason", "Financial burn (" + String.format("%.1f", detail.getFinancialProgressPct()) + "%) outpaces physical progress (" + String.format("%.1f", detail.getPhysicalProgressPct()) + "%) by " + String.format("%.1f", Math.abs(gap)) + "% points.");
-            r3.put("responsible_authority", "Chief Vigilance Officer & Third-Party Inspection Agency (TPIA)");
-            r3.put("priority", "HIGH");
-            r3.put("action_plan", "1. Perform on-site technical inspection with drone/geotagged verification. 2. Condition further disbursements on certified milestone deliverables.");
-            r3.put("expected_impact", "Eliminates premature billing and aligns disbursement run-rate with verified physical outputs.");
-            r3.put("evaluation_logic", "Triggered because physical-financial gap (" + String.format("%.1f", gap) + "%) breaches the -15% governance threshold.");
-            recs.add(r3);
-        }
-
-        if (detail.isMultiState()) {
-            Map<String, String> r4 = new HashMap<>();
-            r4.put("measure", "Inter-State PMG Coordination Portal Escalation");
-            r4.put("reason", "Project traverses multiple state jurisdictions requiring synchronized right-of-way and utility relocation.");
-            r4.put("responsible_authority", "Cabinet Secretariat PMG / PRAGATI Cell");
-            r4.put("priority", "MEDIUM");
-            r4.put("action_plan", "1. Table project in monthly PMG inter-state coordination meeting. 2. Harmonize land acquisition compensation schedules.");
-            r4.put("expected_impact", "Resolves multi-state administrative impasses.");
-            r4.put("evaluation_logic", "Triggered by multi-state corridor classification.");
-            recs.add(r4);
-        }
-
-        if (recs.isEmpty()) {
+        if (isCompleted) {
             Map<String, String> r0 = new HashMap<>();
-            r0.put("measure", "Routine Milestone Surveillance & Handover Readiness");
-            r0.put("reason", "All project operational metrics remain within allowable sanctioned baselines (Overall Risk: " + detail.getOverallRiskScore() + ").");
-            r0.put("responsible_authority", detail.getAgencyName() + " Project Implementation Unit");
+            r0.put("measure", "Final Commercial Settlement & Project Completion Report (PCR) Submission");
+            r0.put("reason", "Project construction is 100% completed and commissioned. Asset has entered commercial operations.");
+            r0.put("responsible_authority", detail.getAgencyName() + " & " + detail.getMinistryName() + " Finance Wing");
             r0.put("priority", "ROUTINE");
-            r0.put("action_plan", "1. Maintain monthly physical milestone tracking in OCMS. 2. Prepare pre-commissioning operational checklists.");
-            r0.put("expected_impact", "Ensures seamless commercial commissioning upon completion.");
-            r0.put("evaluation_logic", "Standard governance protocol for projects operating within allowable tolerances.");
+            r0.put("action_plan", "1. Finalize contractor final bill reconciliations and audit variation claims. 2. Release defect liability retention deposits per contract terms. 3. Submit formal Project Completion Report (PCR) to MoSPI and Administrative Line Ministry.");
+            r0.put("expected_impact", "Formal administrative closure, asset capitalization in audited balance sheet, and release of statutory bank guarantees.");
+            r0.put("evaluation_logic", "Triggered because physical progress is complete (>= 98.0% / commissioned); project transitioned from construction to operational lifecycle.");
             recs.add(r0);
+        } else if (isCommissioning) {
+            Map<String, String> r0 = new HashMap<>();
+            r0.put("measure", "Pre-Commissioning Testing, Punch-List Clearance & Commercial Operation Declaration (COD)");
+            r0.put("reason", "Project in advanced commissioning / synchronization phase with " + physProg + "% physical deliverables complete.");
+            r0.put("responsible_authority", detail.getAgencyName() + " & Sector Technical Directorate");
+            r0.put("priority", "MODERATE");
+            r0.put("action_plan", "1. Complete multi-unit trial runs, statutory safety clearances (CEA/DGMS/CRS), and grid/traffic synchronization. 2. Clear minor punch-list civil works within 45 days. 3. Formally declare Commercial Operation Date (COD).");
+            r0.put("expected_impact", "Full commercial commissioning, commercial generation/traffic tolling commencement, and operational asset handover.");
+            r0.put("evaluation_logic", "Triggered because physical progress is >= 95.0%; critical path construction is complete; final pre-commissioning procedures active.");
+            recs.add(r0);
+        } else {
+            int slippage = detail.getScheduleSlippageMonths();
+            double costEsc = detail.getCostEscalationPct();
+            double costEscCr = detail.getCostEscalationAmountCr();
+            double gap = detail.getPhysicalFinancialGap();
+
+            if (slippage >= 24) {
+                Map<String, String> r1 = new HashMap<>();
+                r1.put("measure", "Critical Path Acceleration & Taskforce Deployment");
+                r1.put("reason", "Cumulative commissioning slippage of " + slippage + " months severely compromises economic rate of return and asset utility.");
+                r1.put("responsible_authority", "Central Ministry Monitoring Cell / PM-GatiShakti Taskforce");
+                r1.put("priority", "CRITICAL");
+                r1.put("action_plan", "1. Institute bi-weekly critical path sprint reviews. 2. Clear state right-of-way/forest clearances within 30 days. 3. Issue formal contractual cure notice to EPC consortium.");
+                r1.put("expected_impact", "Arrests schedule slippage and targets commercial operations within compressed window.");
+                r1.put("evaluation_logic", "Triggered because schedule slippage (" + slippage + " mos) exceeds Critical threshold of 24 months.");
+                recs.add(r1);
+            } else if (slippage >= 6) {
+                Map<String, String> r1 = new HashMap<>();
+                r1.put("measure", "Milestone Catch-Up Recovery Plan");
+                r1.put("reason", "Commissioning delayed by " + slippage + " months against approved schedule baseline.");
+                r1.put("responsible_authority", detail.getAgencyName() + " Project Director");
+                r1.put("priority", "HIGH");
+                r1.put("action_plan", "1. Mandate contractor to submit augmented resource deployment matrix. 2. Parallel-track civil construction and equipment procurement.");
+                r1.put("expected_impact", "Recovers 15-20% of schedule loss over next two reporting quarters.");
+                r1.put("evaluation_logic", "Triggered because schedule slippage (" + slippage + " mos) exceeds 6 months threshold.");
+                recs.add(r1);
+            }
+
+            if (costEsc >= 20.0 || costEscCr >= 500.0) {
+                Map<String, String> r2 = new HashMap<>();
+                r2.put("measure", "Independent Quantity Survey & Revised Cost Committee (RC) Appraisal");
+                r2.put("reason", "Project budget expanded by " + String.format("%.1f", costEsc) + "% (+Rs. " + String.format("%.1f", costEscCr) + " Cr) over sanctioned allocation.");
+                r2.put("responsible_authority", "Ministry Financial Advisor & Expenditure Finance Committee (EFC)");
+                r2.put("priority", "CRITICAL");
+                r2.put("action_plan", "1. Institute third-party quantity survey audit to verify contractor variation claims. 2. Freeze non-essential scope expansion. 3. Submit RCE appraisal to Cabinet.");
+                r2.put("expected_impact", "Establishes legally audited revised cost ceiling and prevents unauthorized expenditure.");
+                r2.put("evaluation_logic", "Triggered because cost escalation exceeds statutory 20% / Rs. 500 Cr threshold under GFR Rule 130.");
+                recs.add(r2);
+            } else if (costEsc > 5.0) {
+                Map<String, String> r2 = new HashMap<>();
+                r2.put("measure", "Cost Engineering & Variation Review");
+                r2.put("reason", "Budget expansion of +" + String.format("%.1f", costEsc) + "% (+Rs. " + String.format("%.1f", costEscCr) + " Cr) observed over baseline.");
+                r2.put("responsible_authority", detail.getAgencyName() + " Finance Wing");
+                r2.put("priority", "HIGH");
+                r2.put("action_plan", "1. Re-examine contractor rate escalations and uncommitted contingencies. 2. Tighten expenditure approvals.");
+                r2.put("expected_impact", "Prevents budget creep from exceeding tolerance bounds.");
+                r2.put("evaluation_logic", "Triggered because cost escalation exceeds 5% baseline tolerance.");
+                recs.add(r2);
+            }
+
+            if (gap < -15.0) {
+                Map<String, String> r3 = new HashMap<>();
+                r3.put("measure", "Physical Output Verification & Staged Disbursement Freeze");
+                r3.put("reason", "Financial burn (" + String.format("%.1f", detail.getFinancialProgressPct()) + "%) outpaces physical progress (" + String.format("%.1f", detail.getPhysicalProgressPct()) + "%) by " + String.format("%.1f", Math.abs(gap)) + "% points.");
+                r3.put("responsible_authority", "Chief Vigilance Officer & Third-Party Inspection Agency (TPIA)");
+                r3.put("priority", "HIGH");
+                r3.put("action_plan", "1. Perform on-site technical inspection with drone/geotagged verification. 2. Condition further disbursements on certified milestone deliverables.");
+                r3.put("expected_impact", "Eliminates premature billing and aligns disbursement run-rate with verified physical outputs.");
+                r3.put("evaluation_logic", "Triggered because physical-financial gap (" + String.format("%.1f", gap) + "%) breaches the -15% governance threshold.");
+                recs.add(r3);
+            }
+
+            if (detail.isMultiState()) {
+                Map<String, String> r4 = new HashMap<>();
+                r4.put("measure", "Inter-State PMG Coordination Portal Escalation");
+                r4.put("reason", "Project traverses multiple state jurisdictions requiring synchronized right-of-way and utility relocation.");
+                r4.put("responsible_authority", "Cabinet Secretariat PMG / PRAGATI Cell");
+                r4.put("priority", "MEDIUM");
+                r4.put("action_plan", "1. Table project in monthly PMG inter-state coordination meeting. 2. Harmonize land acquisition compensation schedules.");
+                r4.put("expected_impact", "Resolves multi-state administrative impasses.");
+                r4.put("evaluation_logic", "Triggered by multi-state corridor classification.");
+                recs.add(r4);
+            }
+
+            if (recs.isEmpty()) {
+                Map<String, String> r0 = new HashMap<>();
+                r0.put("measure", "Routine Milestone Surveillance & Handover Readiness");
+                r0.put("reason", "All project operational metrics remain within allowable sanctioned baselines (Overall Risk: " + detail.getOverallRiskScore() + ").");
+                r0.put("responsible_authority", detail.getAgencyName() + " Project Implementation Unit");
+                r0.put("priority", "ROUTINE");
+                r0.put("action_plan", "1. Maintain monthly physical milestone tracking in OCMS. 2. Prepare pre-commissioning operational checklists.");
+                r0.put("expected_impact", "Ensures seamless commercial commissioning upon completion.");
+                r0.put("evaluation_logic", "Standard governance protocol for projects operating within allowable tolerances.");
+                recs.add(r0);
+            }
         }
         detail.setRecommendedInterventions(recs);
 

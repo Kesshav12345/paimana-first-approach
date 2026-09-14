@@ -25,10 +25,10 @@ public class EarlyWarningRepository {
                 c.risk_band, w.trigger_rule as trigger_condition, w.trigger_value, w.threshold_value, 
                 w.status as alert_status, w.persistence_months as persistence_periods, 
                 w.reporting_month as first_trigger_date, w.reporting_month as last_trigger_date, 
-                c.intervention_priority_score, c.intervention_recommendation as recommended_intervention
+                COALESCE(w.intervention_priority_score, c.intervention_priority_score) as intervention_priority_score, c.intervention_recommendation as recommended_intervention
             FROM gold_warning_alerts w
             JOIN gold_project_current c ON w.project_id = c.project_id
-            WHERE 1=1
+            WHERE UPPER(w.status) = 'ACTIVE'
         """);
 
         List<Object> params = new ArrayList<>();
@@ -90,7 +90,7 @@ public class EarlyWarningRepository {
             SELECT COUNT(*) 
             FROM gold_warning_alerts w
             JOIN gold_project_current c ON w.project_id = c.project_id
-            WHERE 1=1
+            WHERE UPPER(w.status) = 'ACTIVE'
         """);
 
         List<Object> params = new ArrayList<>();
