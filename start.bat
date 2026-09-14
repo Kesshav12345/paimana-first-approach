@@ -32,6 +32,23 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
+:: 2. First-run auto-healing if setup.bat was skipped
+if not exist "frontend\node_modules\" (
+    echo.
+    echo [*] First-time setup detected: Installing frontend npm packages...
+    cd frontend && call npm install && cd ..
+)
+
+if not exist "backend\target\paimana-backend-1.0.0.jar" (
+    echo.
+    echo [*] Backend JAR not found. Building Spring Boot application...
+    if exist "backend\mvnw.cmd" (
+        call backend\mvnw.cmd -f backend/pom.xml clean package -DskipTests
+    ) else (
+        call mvn -f backend/pom.xml clean package -DskipTests
+    )
+)
+
 echo [1/4] Starting Python ML Service on http://127.0.0.1:8000 ...
 start "PAIMANA - ML Service (Port 8000)" /D "%~dp0." cmd /k "title PAIMANA ML Service && color 0B && python -m uvicorn main:app --app-dir ml-service --port 8000 --host 127.0.0.1"
 

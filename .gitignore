@@ -14,7 +14,8 @@ ENV/
 catboost_info/
 
 # Build artifacts
-backend/target/
+backend/target/*
+!backend/target/paimana-backend-1.0.0.jar
 frontend/node_modules/
 frontend/dist/
 tools/

@@ -40,7 +40,34 @@ PAIMANA-INTEL delivers an end-to-end, multi-tier decision support platform desig
 
 ---
 
-## 2. Core Functional Dashboards
+## 2. 🚀 Quickstart for Collaborators & Antigravity Setup
+
+If you have just cloned this repository or are setting it up on a fresh machine with **Antigravity**:
+
+### Option A: One-Click Windows Setup (Recommended)
+1. Open PowerShell or Command Prompt in the repository root directory.
+2. Run the environment setup wizard:
+   ```powershell
+   .\setup.bat
+   ```
+   *This automatically verifies Python 3.10+, Java 21+, and Node.js, installs Python packages from `ml-service/requirements.txt`, runs `npm install` in `frontend/`, and verifies the pre-packaged Spring Boot backend JAR.*
+3. Launch all services and open the browser:
+   ```powershell
+   .\start.bat
+   ```
+   *Frontend UI: `http://127.0.0.1:5173/` | Java API: `http://127.0.0.1:8080/api/v1/home` | ML API: `http://127.0.0.1:8000/docs`*
+4. To cleanly shut down all services at any time:
+   ```powershell
+   .\stop.bat
+   ```
+
+### Option B: Instructing Antigravity on a Collaborator's Machine
+Simply give Antigravity this prompt:
+> *"I have just cloned the repository. Please run `.\setup.bat` to install all dependencies and verify the Java backend, Python ML service, and React frontend, and then run `.\start.bat` to launch the platform."*
+
+---
+
+## 3. Core Functional Dashboards
 
 1. **Portfolio Overview (Home)** (`/`):
    - Key Performance Indicators: Total Monitored Projects (3,977), Approved Baseline (₹61.82L Cr), Revised Sanctioned Cost (₹75.36L Cr), Cumulative Expenditure (₹82.02L Cr), and Projects Requiring Attention (1,052).
