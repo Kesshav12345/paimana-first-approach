@@ -3,34 +3,50 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Building, 
   Layers, 
-  MapPin, 
   AlertTriangle, 
-  Database, 
   TrendingUp, 
   ArrowRight,
-  ShieldAlert
+  ShieldAlert,
+  CheckCircle2,
+  Cpu,
+  ChevronRight,
+  BookOpen
 } from 'lucide-react';
 import { api } from '../services/api';
-import type { PortfolioSummary } from '../types';
+import type { PortfolioSummary, ProjectSummary, SectorSummary } from '../types';
 import { KpiCard } from '../components/common/KpiCard';
 import { RiskBadge } from '../components/common/Badges';
-import { IndiaRiskMap } from '../components/map/IndiaRiskMap';
+import { HeroCarousel } from '../components/home/HeroCarousel';
+import { IndiaMap } from '../components/map/IndiaMap';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<PortfolioSummary | null>(null);
+  const [priorityProjects, setPriorityProjects] = useState<ProjectSummary[]>([]);
+  const [sectors, setSectors] = useState<SectorSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedState, setSelectedState] = useState('');
+  const [selectedState, setSelectedState] = useState<string>('');
 
   useEffect(() => {
-    api.getHomeSummary()
-      .then(res => {
-        setData(res);
+    setLoading(true);
+    Promise.all([
+      api.getHomeSummary(),
+      api.getProjects({ riskBand: 'CRITICAL', sortBy: 'risk', size: 6 }).catch(() => null),
+      api.getSectors().catch(() => [])
+    ])
+      .then(([homeData, criticalPrjs, sectorsData]) => {
+        setData(homeData);
+        if (criticalPrjs?.projects && criticalPrjs.projects.length > 0) {
+          setPriorityProjects(criticalPrjs.projects);
+        }
+        if (sectorsData && Array.isArray(sectorsData)) {
+          setSectors(sectorsData.slice(0, 8));
+        }
         setLoading(false);
       })
-      .catch(err => {
-        setError(err.message);
+      .catch((err) => {
+        setError(err.message || 'Failed to initialize executive infrastructure telemetry');
         setLoading(false);
       });
   }, []);
@@ -38,9 +54,11 @@ export const Home: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs text-slate-400">Loading Portfolio Telemetry...</span>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-3 border-[#1877C9] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Loading National Infrastructure Telemetry...
+          </span>
         </div>
       </div>
     );
@@ -48,16 +66,19 @@ export const Home: React.FC = () => {
 
   if (error || !data) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-rose-950/40 border border-rose-800 rounded-lg p-6 text-center text-rose-300">
-          <AlertTriangle className="w-8 h-8 mx-auto text-rose-400 mb-2" />
-          <h3 className="font-semibold">Failed to load portfolio overview</h3>
-          <p className="text-xs text-slate-400 mt-1">{error || 'Unknown error'}</p>
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="bg-white border border-red-200 rounded-xl p-8 text-center max-w-xl mx-auto shadow-xs">
+          <AlertTriangle className="w-10 h-10 mx-auto text-[#C62828] mb-3" />
+          <h3 className="font-bold text-slate-900 text-base">Unable to Load Portfolio Telemetry</h3>
+          <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
+            {error || 'Unable to establish secure handshake with the canonical monitoring database.'}
+          </p>
           <button 
+            type="button"
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-1.5 text-xs bg-rose-900 hover:bg-rose-800 rounded text-white"
+            className="mt-5 px-4 py-2 text-xs font-semibold bg-[#1877C9] hover:bg-[#123B63] text-white rounded-lg shadow-xs transition-colors cursor-pointer"
           >
-            Retry Connection
+            Retry Telemetry Handshake
           </button>
         </div>
       </div>
@@ -65,170 +86,370 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      
-      {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Executive Infrastructure Portfolio</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Real-time monitoring across Central Sector Infrastructure Projects (₹150 Cr & Above)
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-xs text-slate-300">
-            Reporting Period: <strong className="text-blue-400">{data.latestReportingPeriod}</strong>
-          </span>
-        </div>
-      </div>
+    <div className="w-full space-y-8 pb-12">
+      {/* SECTION B: Hero Image Carousel (Full-bleed across screen width) */}
+      <section aria-label="National Infrastructure Highlights" className="w-full">
+        <HeroCarousel />
+      </section>
 
-      {/* 5 Core Governing KPIs */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <KpiCard
-          title="Projects Monitored"
-          value={data.totalProjects.toLocaleString()}
-          subtitle="Entity-resolved projects"
-          colorClass="text-white"
-          icon={<Building className="w-4 h-4" />}
-        />
-        <KpiCard
-          title="Sanctioned Cost"
-          value={`₹${(data.totalOriginalCostCr / 100000).toFixed(2)}L Cr`}
-          subtitle="Original approved baseline"
-          colorClass="text-slate-200"
-          icon={<TrendingUp className="w-4 h-4" />}
-        />
-        <KpiCard
-          title="Revised Cost"
-          value={`₹${(data.totalRevisedCostCr / 100000).toFixed(2)}L Cr`}
-          subtitle={`Escalation: +${data.portfolioCostEscalationPct.toFixed(1)}%`}
-          trendDirection="up"
-          trend={`+₹${((data.totalRevisedCostCr - data.totalOriginalCostCr) / 100000).toFixed(2)}L Cr`}
-          colorClass="text-amber-400"
-        />
-        <KpiCard
-          title="Cumulative Spend"
-          value={`₹${(data.totalCumulativeExpenditureCr / 100000).toFixed(2)}L Cr`}
-          subtitle={`Financial utilization: ${data.portfolioExpenditurePct.toFixed(1)}%`}
-          colorClass="text-blue-400"
-        />
-        <KpiCard
-          title="Requiring Attention"
-          value={data.projectsRequiringAttentionCount.toLocaleString()}
-          subtitle={`${data.criticalRiskCount} Critical | ${data.highRiskCount} High Risk`}
-          colorClass="text-rose-400"
-          icon={<ShieldAlert className="w-4 h-4 text-rose-400" />}
-        />
-      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        {/* SECTION C: National Infrastructure Snapshot */}
+        <section aria-label="National Infrastructure Snapshot" className="space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#D9E1EA]">
+          <div>
+            <span className="text-[11px] font-bold text-[#1877C9] uppercase tracking-wider">
+              Executive Telemetry Strip
+            </span>
+            <h2 className="text-lg font-extrabold text-[#0B2945] tracking-tight">
+              National Infrastructure Snapshot
+            </h2>
+          </div>
+          <div className="text-xs text-slate-500">
+            Reporting Period: <strong className="text-[#123B63] font-semibold">{data.latestReportingPeriod}</strong>
+          </div>
+        </div>
 
-      {/* Geographic Density & Critical Projects Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Map / State Distribution */}
-        <div className="lg:col-span-2">
-          <IndiaRiskMap
-            states={data.stateDistribution || []}
-            selectedState={selectedState}
-            onSelectState={setSelectedState}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5">
+          <KpiCard
+            title="Projects Monitored"
+            value={data.totalProjects.toLocaleString()}
+            subtitle="Central Sector (₹150 Cr+)"
+            colorClass="text-[#0B2945]"
+            icon={<Building className="w-4 h-4 text-[#1877C9]" />}
+          />
+
+          <KpiCard
+            title="Revised Cost"
+            value={`₹${(data.totalRevisedCostCr / 100000).toFixed(2)}L Cr`}
+            subtitle={`Original: ₹${(data.totalOriginalCostCr / 100000).toFixed(2)}L Cr`}
+            trendDirection="up"
+            trend={`+${data.portfolioCostEscalationPct.toFixed(1)}%`}
+            colorClass="text-[#123B63]"
+            icon={<TrendingUp className="w-4 h-4 text-amber-500" />}
+          />
+
+          <KpiCard
+            title="Cumulative Spend"
+            value={`₹${(data.totalCumulativeExpenditureCr / 100000).toFixed(2)}L Cr`}
+            subtitle={`Financial Spend: ${data.portfolioExpenditurePct.toFixed(1)}%`}
+            colorClass="text-[#1877C9]"
+          />
+
+          <KpiCard
+            title="Attention Required"
+            value={data.projectsRequiringAttentionCount.toLocaleString()}
+            subtitle={`${data.criticalRiskCount} Critical | ${data.highRiskCount} High Risk`}
+            colorClass="text-[#C62828]"
+            icon={<ShieldAlert className="w-4 h-4 text-[#C62828]" />}
+          />
+
+          <KpiCard
+            title="Avg Progress"
+            value={`${data.averagePhysicalProgressPct.toFixed(1)}%`}
+            subtitle="Weighted Physical Completion"
+            colorClass="text-emerald-700"
+            icon={<CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+          />
+
+          <KpiCard
+            title="Active Warnings"
+            value={data.activeWarningsCount.toLocaleString()}
+            subtitle="Triggered Triage Signals"
+            colorClass="text-amber-700"
+            icon={<AlertTriangle className="w-4 h-4 text-amber-500" />}
           />
         </div>
+      </section>
 
-        {/* Priority Projects Requiring Immediate Attention */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 flex flex-col justify-between">
+      {/* SECTION D: Real Interactive India Map */}
+      <section aria-label="India Infrastructure Pulse">
+        <IndiaMap
+          states={data.stateDistribution || []}
+          selectedState={selectedState}
+          onSelectState={setSelectedState}
+          title="India Infrastructure Pulse & State Density"
+          subtitle="Explore geographic investment volumes, project clusters, and regional risk alerts"
+        />
+      </section>
+
+      {/* SECTION E: Projects Requiring Immediate Attention */}
+      <section aria-label="Projects Requiring Attention" className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#D9E1EA]">
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-400" />
-                Priority Flagged Projects
-              </h3>
-              <span className="text-[11px] text-slate-400">{data.activeWarningsCount} active alerts</span>
+            <div className="flex items-center gap-2 text-[#C62828] text-xs font-bold uppercase tracking-wider">
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span>Priority Flagged Projects</span>
             </div>
-
-            <div className="space-y-2.5">
-              {data.recentChanges.slice(0, 5).map((p) => (
-                <div
-                  key={p.project_id}
-                  onClick={() => navigate(`/projects/${p.project_id}`)}
-                  className="p-3 rounded bg-slate-950/70 border border-slate-800/80 hover:border-slate-700 hover:bg-slate-950 cursor-pointer transition"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-xs font-semibold text-slate-200 line-clamp-1">
-                      {p.project_name}
-                    </span>
-                    <RiskBadge band={p.risk_band} score={p.overall_risk_score} />
-                  </div>
-                  <div className="flex items-center justify-between mt-1.5 text-[11px] text-slate-400">
-                    <span>{p.sector_name}</span>
-                    <span className="text-amber-400 font-medium">
-                      {p.active_warning_count} alerts
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h2 className="text-lg font-extrabold text-[#0B2945] tracking-tight">
+              Projects Requiring Immediate Executive Attention
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Ranked by composite risk severity, cost escalation magnitude, and active early warning signals.
+            </p>
           </div>
 
           <button
+            type="button"
             onClick={() => navigate('/early-warning')}
-            className="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-xs font-semibold text-slate-200 flex items-center justify-center gap-1.5 transition"
+            className="px-3.5 py-2 rounded-lg bg-white border border-[#D9E1EA] hover:border-[#1877C9] text-xs font-semibold text-[#123B63] flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
           >
-            Open Early Warning Queue <ArrowRight className="w-3.5 h-3.5" />
+            <span>Open Early Warning Queue</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#1877C9]" />
           </button>
         </div>
-      </div>
 
-      {/* Navigation Exploration Cards */}
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-          Explore Analytical Dimensions
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div
-            onClick={() => navigate('/sectors')}
-            className="p-4 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/80 cursor-pointer transition group"
-          >
-            <Layers className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform mb-2" />
-            <h4 className="text-sm font-semibold text-white">Sector Analytics</h4>
-            <p className="text-xs text-slate-400 mt-1">Drill down across 12 infrastructure sectors and state performance.</p>
-          </div>
+        {/* Prioritized Table of Attention Projects */}
+        <div className="bg-white border border-[#D9E1EA] rounded-xl overflow-hidden shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse gov-table">
+              <thead>
+                <tr>
+                  <th className="w-1/3">Project & Identity</th>
+                  <th>Sector & Ministry</th>
+                  <th>State</th>
+                  <th>Risk Band</th>
+                  <th className="text-right">Cost Escalation</th>
+                  <th className="text-right">Schedule Delay</th>
+                  <th className="text-center">Active Warnings</th>
+                  <th className="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {(priorityProjects.length > 0 
+                  ? priorityProjects 
+                  : data.recentChanges.slice(0, 6).map((rc) => ({
+                      projectId: rc.project_id,
+                      projectName: rc.project_name,
+                      sectorName: rc.sector_name,
+                      ministryName: 'Central Implementing Ministry',
+                      agencyName: '',
+                      stateName: 'National Corridor',
+                      multiState: false,
+                      originalCostCr: 0,
+                      latestRevisedCostCr: 0,
+                      cumulativeExpenditureCr: 0,
+                      physicalProgressPct: 0,
+                      costEscalationPct: 0,
+                      scheduleSlippageMonths: 0,
+                      overallRiskScore: rc.overall_risk_score,
+                      riskBand: rc.risk_band,
+                      riskTrajectory: rc.risk_trajectory,
+                      activeWarningCount: rc.active_warning_count,
+                      interventionPriorityScore: 0,
+                      interventionRecommendation: 'Executive review recommended',
+                      latestReportingMonth: data.latestReportingPeriod
+                    }))
+                ).map((prj) => (
+                  <tr key={prj.projectId} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 px-4">
+                      <div className="font-semibold text-slate-900 text-xs sm:text-sm line-clamp-1">
+                        {prj.projectName}
+                      </div>
+                      <div className="text-[11px] font-mono text-slate-600 mt-0.5">
+                        ID: {prj.projectId}
+                      </div>
+                    </td>
 
-          <div
-            onClick={() => navigate('/ministries')}
-            className="p-4 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/80 cursor-pointer transition group"
-          >
-            <Building className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform mb-2" />
-            <h4 className="text-sm font-semibold text-white">Ministry Analytics</h4>
-            <p className="text-xs text-slate-400 mt-1">Track line ministries, implementing agencies, and executing bodies.</p>
-          </div>
+                    <td className="py-3 px-4 text-xs text-slate-600">
+                      <div className="font-medium text-slate-800">{prj.sectorName}</div>
+                      <div className="text-[11px] text-slate-600 line-clamp-1">{prj.ministryName}</div>
+                    </td>
 
-          <div
-            onClick={() => navigate('/states')}
-            className="p-4 rounded-lg bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-slate-900/80 cursor-pointer transition group"
-          >
-            <MapPin className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform mb-2" />
-            <h4 className="text-sm font-semibold text-white">State Analytics</h4>
-            <p className="text-xs text-slate-400 mt-1">Geographic investments, regional execution pace, and local bottlenecks.</p>
-          </div>
+                    <td className="py-3 px-4 text-xs text-slate-700">
+                      {prj.stateName}
+                    </td>
 
-          <div
-            onClick={() => navigate('/early-warning')}
-            className="p-4 rounded-lg bg-slate-900 border border-slate-800 hover:border-amber-500/50 hover:bg-slate-900/80 cursor-pointer transition group"
-          >
-            <AlertTriangle className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform mb-2" />
-            <h4 className="text-sm font-semibold text-white">Early Warning</h4>
-            <p className="text-xs text-slate-400 mt-1">Multi-criteria triage queue and intervention workflow management.</p>
-          </div>
+                    <td className="py-3 px-4">
+                      <RiskBadge band={prj.riskBand} score={prj.overallRiskScore} />
+                    </td>
 
-          <div
-            onClick={() => navigate('/operations')}
-            className="p-4 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-900/80 cursor-pointer transition group"
-          >
-            <Database className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform mb-2" />
-            <h4 className="text-sm font-semibold text-white">Data & Model Operations</h4>
-            <p className="text-xs text-slate-400 mt-1">Upload new PDF reports, retrain ML models, and audit pipeline data.</p>
+                    <td className="py-3 px-4 text-xs font-semibold text-right text-slate-800">
+                      {prj.costEscalationPct > 0 ? (
+                        <span className="text-amber-700">+{prj.costEscalationPct.toFixed(1)}%</span>
+                      ) : (
+                        <span className="text-slate-600">0.0%</span>
+                      )}
+                    </td>
+
+                    <td className="py-3 px-4 text-xs font-semibold text-right text-slate-800">
+                      {prj.scheduleSlippageMonths > 0 ? (
+                        <span className="text-rose-700">{prj.scheduleSlippageMonths} mo</span>
+                      ) : (
+                        <span className="text-emerald-700">On Track</span>
+                      )}
+                    </td>
+
+                    <td className="py-3 px-4 text-center">
+                      <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                        {prj.activeWarningCount}
+                      </span>
+                    </td>
+
+                    <td className="py-3 px-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/projects/${prj.projectId}`)}
+                        className="px-2.5 py-1.5 rounded-md bg-blue-50 hover:bg-[#1877C9] text-[#1877C9] hover:text-white border border-blue-200 text-xs font-semibold transition-colors cursor-pointer inline-flex items-center gap-1"
+                      >
+                        <span>Inspect</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+      </section>
 
+      {/* SECTION F: Sector Intelligence Overview */}
+      <section aria-label="Sector Intelligence" className="space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[#D9E1EA]">
+          <div>
+            <div className="flex items-center gap-2 text-[#1877C9] text-xs font-bold uppercase tracking-wider">
+              <Layers className="w-3.5 h-3.5" />
+              <span>Sectoral Distribution</span>
+            </div>
+            <h2 className="text-lg font-extrabold text-[#0B2945] tracking-tight">
+              Infrastructure Sector Intelligence
+            </h2>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Portfolio distribution, capital intensity, and execution pace across central infrastructure sectors.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => navigate('/sectors')}
+            className="px-3.5 py-2 rounded-lg bg-white border border-[#D9E1EA] hover:border-[#1877C9] text-xs font-semibold text-[#123B63] flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer self-start sm:self-auto"
+          >
+            <span>Explore All 12 Sectors</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#1877C9]" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {sectors.map((sec) => (
+            <div
+              key={sec.sectorName}
+              onClick={() => navigate(`/sectors?sectorDetail=${encodeURIComponent(sec.sectorName)}`)}
+              className="bg-white border border-[#D9E1EA] rounded-xl p-4 shadow-xs hover:border-[#1877C9] hover:shadow-sm transition-all cursor-pointer flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <h3 className="font-bold text-[#0B2945] text-sm line-clamp-1">
+                    {sec.sectorName}
+                  </h3>
+                  <span className="text-xs font-bold text-[#1877C9] bg-blue-50 px-2 py-0.5 rounded border border-blue-100 flex-shrink-0">
+                    {sec.projectCount} prjs
+                  </span>
+                </div>
+
+                <div className="space-y-1.5 text-xs text-slate-600 mt-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600">Revised Outlay:</span>
+                    <span className="font-semibold text-slate-800">
+                      ₹{(sec.totalRevisedCostCr / 1000).toFixed(1)}k Cr
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600">Avg Progress:</span>
+                    <span className="font-semibold text-emerald-700">
+                      {sec.avgPhysicalProgressPct !== undefined ? sec.avgPhysicalProgressPct.toFixed(1) : '0.0'}%
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-600">Critical / High:</span>
+                    <span className="font-semibold text-[#C62828]">
+                      {(sec.criticalRiskCount || 0) + (sec.highRiskCount || 0)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-[#1877C9] font-semibold">
+                <span>View Sector Analytics</span>
+                <ChevronRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SECTION G & H: How PAIMANA Works & Methodology Credibility Strip */}
+      <section aria-label="Methodology and Credibility" className="bg-white border border-[#D9E1EA] rounded-2xl p-6 sm:p-8 shadow-xs">
+        <div className="max-w-3xl mb-6">
+          <div className="flex items-center gap-2 text-[#1877C9] text-xs font-bold uppercase tracking-wider">
+            <Cpu className="w-3.5 h-3.5" />
+            <span>Methodological Rigor</span>
+          </div>
+          <h2 className="text-xl font-extrabold text-[#0B2945] tracking-tight mt-1">
+            How PAIMANA Intelligence Operates
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed">
+            A dual-engine infrastructure monitoring architecture combining authoritative deterministic calculations with point-in-time supervised machine learning.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200">
+            <div className="w-7 h-7 rounded-lg bg-blue-100 text-[#1877C9] flex items-center justify-center font-bold text-xs mb-3">
+              01
+            </div>
+            <h4 className="font-bold text-slate-900 text-xs sm:text-sm">MoSPI Ingestion & Resolution</h4>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Automated extraction of monthly Flash and Monthly Monitoring Reports with Levenshtein-based entity resolution across project nomenclature shifts.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200">
+            <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs mb-3">
+              02
+            </div>
+            <h4 className="font-bold text-slate-900 text-xs sm:text-sm">Deterministic Metrics Engine</h4>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Mathematical computation of cost growth factors, physical-financial slippage gaps, expenditure velocity, and historical revision trajectories.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200">
+            <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs mb-3">
+              03
+            </div>
+            <h4 className="font-bold text-slate-900 text-xs sm:text-sm">CatBoost MLOps Layer</h4>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Leakage-free point-in-time forecasting models predicting final cost escalation, probability of severe delay, and completion horizons with SHAP attributions.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#F8FAFC] border border-slate-200">
+            <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs mb-3">
+              04
+            </div>
+            <h4 className="font-bold text-slate-900 text-xs sm:text-sm">Early Warning & Decision Support</h4>
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+              Multi-criteria triage engine prioritizing projects for Empowered Committee interventions with evidence provenance and causal factor mapping.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <span className="text-slate-500">
+            Read complete mathematical formulations, loss functions, and data lineage documentation.
+          </span>
+          <button
+            type="button"
+            onClick={() => navigate('/methodology')}
+            className="px-4 py-2 rounded-lg bg-[#0B2945] hover:bg-[#123B63] text-white font-semibold transition-colors flex items-center gap-1.5 cursor-pointer flex-shrink-0"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-sky-300" />
+            <span>Inspect Technical Methodology</span>
+          </button>
+        </div>
+      </section>
+
+      </div>
     </div>
   );
 };

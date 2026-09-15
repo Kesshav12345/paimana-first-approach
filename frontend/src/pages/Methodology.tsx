@@ -660,60 +660,59 @@ export const Methodology: React.FC = () => {
   };
 
   return (
-    <div id="methodology-content-root" className="space-y-8 pb-16">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-8 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden">
-        <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-4xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-semibold uppercase tracking-wider">
+    <div id="methodology-content-root" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Header Banner - Institutional Light Government Theme */}
+      <div className="bg-white border border-[#D9E1EA] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+        <div className="max-w-4xl space-y-2.5">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-blue-50 text-[#1877C9] border border-blue-200 text-xs font-bold uppercase tracking-wider">
             <BookOpen className="w-3.5 h-3.5" />
-            Decision Support Methodology & Engineering Specification
+            <span>Decision Support Methodology & Engineering Specification</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            Systems Ops & Methodology
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0B2945]">
+            Systems Architecture & Analytical Methodology
           </h1>
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            PAIMANA-INTEL fuses official infrastructure monitoring records, historical project trajectories, 
-            deterministic analytics, predictive CatBoost models, and multi-tier external intelligence to surface 
-            early-warning signals and explain why they matter for governance and intervention.
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-4xl">
+            PAIMANA Intelligence fuses official infrastructure monitoring records, historical project trajectories, 
+            deterministic analytics, predictive CatBoost ML models, and multi-tier external intelligence to surface 
+            early-warning signals and explain why they matter for governance and timely intervention.
           </p>
         </div>
 
         {/* Dynamic Telemetry Strip */}
-        <div className="mt-6 pt-6 border-t border-slate-800 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <div className="bg-slate-800/60 backdrop-blur rounded-lg p-3 border border-slate-700/50">
-            <span className="text-[11px] text-slate-400 block font-medium">Methodology Version</span>
-            <span className="text-sm font-bold text-blue-300">
+        <div className="mt-6 pt-5 border-t border-[#D9E1EA] grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#D9E1EA]">
+            <span className="text-[11px] text-slate-500 block font-medium">Methodology Version</span>
+            <span className="text-sm font-bold text-[#1877C9]">
               {loadingTelemetry ? '...' : telemetry?.active_methodology_version || 'v2.4.0'}
             </span>
           </div>
-          <div className="bg-slate-800/60 backdrop-blur rounded-lg p-3 border border-slate-700/50">
-            <span className="text-[11px] text-slate-400 block font-medium">Production ML</span>
-            <span className="text-sm font-bold text-emerald-300">
+          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#D9E1EA]">
+            <span className="text-[11px] text-slate-500 block font-medium">Production ML</span>
+            <span className="text-sm font-bold text-[#123B63]">
               {loadingTelemetry ? '...' : telemetry?.production_model_version || 'CatBoost v2026.07'}
             </span>
           </div>
-          <div className="bg-slate-800/60 backdrop-blur rounded-lg p-3 border border-slate-700/50">
-            <span className="text-[11px] text-slate-400 block font-medium">Reporting Cycle</span>
-            <span className="text-sm font-bold text-amber-300">
+          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#D9E1EA]">
+            <span className="text-[11px] text-slate-500 block font-medium">Reporting Cycle</span>
+            <span className="text-sm font-bold text-amber-700">
               {loadingTelemetry ? '...' : telemetry?.latest_dataset_period || 'Jul 2026'}
             </span>
           </div>
-          <div className="bg-slate-800/60 backdrop-blur rounded-lg p-3 border border-slate-700/50">
-            <span className="text-[11px] text-slate-400 block font-medium">Monitored Projects</span>
-            <span className="text-sm font-bold text-white">
+          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#D9E1EA]">
+            <span className="text-[11px] text-slate-500 block font-medium">Monitored Projects</span>
+            <span className="text-sm font-bold text-[#0B2945]">
               {loadingTelemetry ? '...' : (telemetry?.total_monitored_projects?.toLocaleString() || '1,892')}
             </span>
           </div>
-          <div className="bg-slate-800/60 backdrop-blur rounded-lg p-3 border border-slate-700/50">
-            <span className="text-[11px] text-slate-400 block font-medium">Evidence Claims</span>
-            <span className="text-sm font-bold text-purple-300">
+          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#D9E1EA]">
+            <span className="text-[11px] text-slate-500 block font-medium">Evidence Claims</span>
+            <span className="text-sm font-bold text-[#16804B]">
               {loadingTelemetry ? '...' : (telemetry?.total_evidence_claims?.toLocaleString() || '4,280')}
             </span>
           </div>
-          <div className="bg-slate-800/60 backdrop-blur rounded-lg p-3 border border-slate-700/50">
-            <span className="text-[11px] text-slate-400 block font-medium">Search Provider</span>
-            <span className="text-sm font-bold text-slate-200">
+          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#D9E1EA]">
+            <span className="text-[11px] text-slate-500 block font-medium">Search Provider</span>
+            <span className="text-sm font-bold text-slate-800">
               {loadingTelemetry ? '...' : telemetry?.search_provider || 'Composite / Gov Direct'}
             </span>
           </div>

@@ -1,0 +1,48 @@
+services:
+  # ─── ML Python Service ────────────────────────────────────────────────────────
+  - type: web
+    name: paimana-ml-service
+    runtime: docker
+    dockerfilePath: ml-service/Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: PORT
+        value: 8000
+    disk:
+      name: paimana-db
+      mountPath: /app
+      sizeGB: 2
+
+  # ─── Java Spring Boot Backend ─────────────────────────────────────────────────
+  - type: web
+    name: paimana-backend
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: default
+      - key: PORT
+        value: 8080
+      - key: PYTHON_SERVICE_URL
+        fromService:
+          name: paimana-ml-service
+          type: web
+          property: host
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://paimana-frontend.onrender.com
+    disk:
+      name: paimana-db-backend
+      mountPath: /app
+      sizeGB: 2
+
+  # ─── React Frontend (Nginx + Static) ─────────────────────────────────────────
+  - type: web
+    name: paimana-frontend
+    runtime: docker
+    dockerfilePath: frontend/Dockerfile
+    dockerContext: .
+    plan: free
+    envVars: []

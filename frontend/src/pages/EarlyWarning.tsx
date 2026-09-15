@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
-  AlertTriangle, 
   Search, 
   ShieldAlert, 
   ExternalLink,
@@ -375,25 +374,29 @@ export const EarlyWarning: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header & Analytical Scope Question */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#D9E1EA] pb-4">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-400" />
-            Infrastructure Early Warning & Intervention System
+          <div className="flex items-center gap-2 text-[#1877C9] text-xs font-bold uppercase tracking-wider mb-1">
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <span>Operational Triage & Decision Support</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B2945] tracking-tight flex items-center gap-2.5">
+            <ShieldAlert className="w-6 h-6 text-amber-500 flex-shrink-0" />
+            <span>Infrastructure Early Warning & Intervention System</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
             Deterministic trigger rules, anomaly persistence duration, compound alerts, and structured operational remediation
           </p>
         </div>
 
         {/* Dual Tab Switcher with Dynamic Counts */}
-        <div className="flex bg-slate-900 border border-slate-800 p-1 rounded-lg text-xs self-start sm:self-auto">
+        <div className="flex bg-slate-100 border border-[#D9E1EA] p-1 rounded-lg text-xs self-start sm:self-auto">
           <button
             onClick={() => handleTabSwitch('alerts')}
-            className={`px-3.5 py-1.5 rounded-md font-medium transition flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-md font-semibold transition flex items-center gap-1.5 cursor-pointer ${
               tab === 'alerts'
-                ? 'bg-blue-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[#1877C9] text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" />
@@ -401,10 +404,10 @@ export const EarlyWarning: React.FC = () => {
           </button>
           <button
             onClick={() => handleTabSwitch('interventions')}
-            className={`px-3.5 py-1.5 rounded-md font-medium transition flex items-center gap-1.5 ${
+            className={`px-3.5 py-2 rounded-md font-semibold transition flex items-center gap-1.5 cursor-pointer ${
               tab === 'interventions'
-                ? 'bg-blue-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-[#1877C9] text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
             }`}
           >
             <Workflow className="w-3.5 h-3.5" />
@@ -548,13 +551,13 @@ export const EarlyWarning: React.FC = () => {
 
           {/* INITIAL UNQUERIED LANDING STATE */}
           {!hasAppliedAlerts && (
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-8 text-center space-y-4">
-              <div className="w-12 h-12 rounded-full bg-blue-950/60 border border-blue-800 text-blue-400 flex items-center justify-center mx-auto">
+            <div className="bg-white border border-[#D9E1EA] rounded-xl p-8 text-center space-y-4 shadow-xs">
+              <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-200 text-[#1877C9] flex items-center justify-center mx-auto">
                 <SlidersHorizontal className="w-6 h-6" />
               </div>
               <div className="max-w-md mx-auto">
-                <h3 className="text-base font-semibold text-white">Define Scope & Apply Criteria</h3>
-                <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+                <h3 className="text-base font-bold text-[#0B2945]">Define Scope & Apply Criteria</h3>
+                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
                   Early warning alerts are derived from deterministic project telemetry spanning cost escalation, schedule slippage, physical stagnation, and physical-financial divergence.
                 </p>
                 <p className="text-xs text-slate-500 mt-2">
@@ -566,9 +569,9 @@ export const EarlyWarning: React.FC = () => {
                   <button
                     key={preset.id}
                     onClick={preset.onApply}
-                    className="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-800 text-xs font-medium text-slate-300 hover:text-white rounded-lg border border-slate-700 transition"
+                    className="px-3.5 py-2 bg-slate-50 hover:bg-blue-50 text-xs font-semibold text-slate-700 hover:text-[#1877C9] rounded-lg border border-slate-200 hover:border-blue-200 transition cursor-pointer"
                   >
-                    {preset.label} →
+                    {preset.label} &rarr;
                   </button>
                 ))}
               </div>
@@ -582,43 +585,43 @@ export const EarlyWarning: React.FC = () => {
               {/* Filtered KPI Snapshot */}
               {alertSummary && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                  <div className="bg-slate-900 border border-slate-800 rounded-lg p-3.5">
-                    <p className="text-[11px] font-medium text-slate-400">Matching Projects</p>
-                    <p className="text-lg font-bold text-white mt-0.5">{alertSummary.matchingProjects.toLocaleString()}</p>
+                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase">Matching Projects</p>
+                    <p className="text-lg font-extrabold text-[#0B2945] mt-0.5">{alertSummary.matchingProjects.toLocaleString()}</p>
                     <p className="text-[10px] text-slate-500 mt-0.5">Unique entities flagged</p>
                   </div>
-                  <div className="bg-slate-900 border border-slate-800 rounded-lg p-3.5">
-                    <p className="text-[11px] font-medium text-slate-400">Active Warning Signals</p>
-                    <p className="text-lg font-bold text-amber-400 mt-0.5">{alertSummary.activeWarnings.toLocaleString()}</p>
+                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase">Active Signals</p>
+                    <p className="text-lg font-extrabold text-amber-700 mt-0.5">{alertSummary.activeWarnings.toLocaleString()}</p>
                     <p className="text-[10px] text-slate-500 mt-0.5">Total rule triggers</p>
                   </div>
-                  <div className="bg-slate-900 border border-slate-800 rounded-lg p-3.5">
-                    <p className="text-[11px] font-medium text-slate-400">Critical Signals</p>
-                    <p className="text-lg font-bold text-rose-400 mt-0.5">{alertSummary.criticalSignals.toLocaleString()}</p>
+                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase">Critical Signals</p>
+                    <p className="text-lg font-extrabold text-[#C62828] mt-0.5">{alertSummary.criticalSignals.toLocaleString()}</p>
                     <p className="text-[10px] text-slate-500 mt-0.5">Urgent severity</p>
                   </div>
-                  <div className="bg-slate-900 border border-slate-800 rounded-lg p-3.5">
-                    <p className="text-[11px] font-medium text-slate-400">Compound Risk</p>
-                    <p className="text-lg font-bold text-orange-400 mt-0.5">{alertSummary.multiWarningProjects.toLocaleString()}</p>
+                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase">Compound Risk</p>
+                    <p className="text-lg font-extrabold text-[#0B2945] mt-0.5">{alertSummary.multiWarningProjects.toLocaleString()}</p>
                     <p className="text-[10px] text-slate-500 mt-0.5">≥ 2 concurrent alerts</p>
                   </div>
-                  <div className="bg-slate-900 border border-slate-800 rounded-lg p-3.5">
-                    <p className="text-[11px] font-medium text-slate-400">Intervention Candidates</p>
-                    <p className="text-lg font-bold text-blue-400 mt-0.5">{alertSummary.interventionCandidates.toLocaleString()}</p>
+                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase">Intervention Need</p>
+                    <p className="text-lg font-extrabold text-[#1877C9] mt-0.5">{alertSummary.interventionCandidates.toLocaleString()}</p>
                     <p className="text-[10px] text-slate-500 mt-0.5">Priority score ≥ 50</p>
                   </div>
-                  <div className="bg-slate-900 border border-slate-800 rounded-lg p-3.5">
-                    <p className="text-[11px] font-medium text-slate-400">Active Interventions</p>
-                    <p className="text-lg font-bold text-emerald-400 mt-0.5">{alertSummary.activeInterventions.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Workflow in progress</p>
+                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-slate-500 uppercase">Active In-Progress</p>
+                    <p className="text-lg font-extrabold text-emerald-800 mt-0.5">{alertSummary.activeInterventions.toLocaleString()}</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">Workflow active</p>
                   </div>
                 </div>
               )}
 
               {/* Context Summary Sentence */}
-              <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+              <div className="flex items-center justify-between text-xs text-slate-600 px-1">
                 <span>
-                  Showing <strong className="text-slate-200">{alerts.length}</strong> alerts across <strong className="text-slate-200">{alertSummary?.matchingProjects || 0}</strong> projects ({alertTotal.toLocaleString()} total warning records matching cohort)
+                  Showing <strong className="text-slate-900">{alerts.length}</strong> alerts across <strong className="text-slate-900">{alertSummary?.matchingProjects || 0}</strong> projects ({alertTotal.toLocaleString()} total warning records matching cohort)
                 </span>
                 <span className="text-[11px] text-slate-500">
                   Ordered by persistence duration & intervention priority
@@ -627,31 +630,31 @@ export const EarlyWarning: React.FC = () => {
 
               {/* Error Message */}
               {alertError && (
-                <div className="bg-rose-950/40 border border-rose-800 rounded-lg p-4 text-xs text-rose-300 flex items-center justify-between">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-xs text-red-700 flex items-center justify-between">
                   <span>{alertError}</span>
-                  <button onClick={() => fetchAlerts(appliedAlertFilters)} className="underline hover:text-white font-semibold">
+                  <button onClick={() => fetchAlerts(appliedAlertFilters)} className="underline hover:text-red-900 font-semibold cursor-pointer">
                     Retry
                   </button>
                 </div>
               )}
 
               {/* Table */}
-              <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow-sm">
+              <div className="bg-white border border-[#D9E1EA] rounded-xl overflow-hidden shadow-xs">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-slate-300">
-                    <thead className="bg-slate-950/80 border-b border-slate-800 uppercase text-[11px] font-semibold text-slate-400">
+                  <table className="w-full text-left text-xs text-slate-800 gov-table">
+                    <thead className="bg-[#F8FAFC] border-b border-[#D9E1EA] uppercase text-[11px] font-bold text-slate-600">
                       <tr>
-                        <th className="px-4 py-2.5">Project ID & Name</th>
-                        <th className="px-4 py-2.5">Administrative Scope</th>
-                        <th className="px-4 py-2.5">Warning Signal</th>
-                        <th className="px-4 py-2.5 text-center">Severity</th>
-                        <th className="px-4 py-2.5 text-center">Overall Risk</th>
-                        <th className="px-4 py-2.5 text-right">Persistence</th>
-                        <th className="px-4 py-2.5">Intervention Relationship</th>
-                        <th className="px-4 py-2.5 text-center">Actions</th>
+                        <th className="px-4 py-3">Project ID & Name</th>
+                        <th className="px-4 py-3">Administrative Scope</th>
+                        <th className="px-4 py-3">Warning Signal</th>
+                        <th className="px-4 py-3 text-center">Severity</th>
+                        <th className="px-4 py-3 text-center">Overall Risk</th>
+                        <th className="px-4 py-3 text-right">Persistence</th>
+                        <th className="px-4 py-3">Intervention Relationship</th>
+                        <th className="px-4 py-3 text-center">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody className="divide-y divide-slate-100">
                       {loadingAlerts ? (
                         <tr>
                           <td colSpan={8} className="text-center py-12 text-slate-500">
@@ -673,46 +676,52 @@ export const EarlyWarning: React.FC = () => {
                         </tr>
                       ) : (
                         alerts.map((a) => (
-                          <tr key={a.alertId} className="hover:bg-slate-800/40 transition">
-                            <td className="px-4 py-2.5 max-w-xs">
-                              <div className="font-mono text-[11px] text-slate-400">{a.projectId}</div>
-                              <div className="font-medium text-white truncate" title={a.projectName}>
+                          <tr 
+                            key={a.alertId} 
+                            className={`hover:bg-slate-50/80 transition-colors ${
+                              a.severity === 'CRITICAL' ? 'border-l-3 border-l-[#C62828] bg-red-50/15' : ''
+                            }`}
+                          >
+                            <td className="px-4 py-3 max-w-xs">
+                              <div className="font-mono text-[11px] text-slate-500 font-semibold">{a.projectId}</div>
+                              <div className="font-bold text-slate-900 hover:text-[#1877C9] transition truncate cursor-pointer" title={a.projectName} onClick={() => navigate(`/projects/${a.projectId}`)}>
                                 {a.projectName}
                               </div>
                             </td>
-                            <td className="px-4 py-2.5 text-[11px] text-slate-400">
-                              <div className="font-medium text-slate-300">{a.sectorName}</div>
-                              <div className="truncate max-w-[160px]" title={a.ministryName}>{a.ministryName}</div>
-                              <div>{a.stateName}</div>
+                            <td className="px-4 py-3 text-xs text-slate-600">
+                              <div className="font-semibold text-slate-800">{a.sectorName}</div>
+                              <div className="truncate max-w-[160px] text-[11px] text-slate-500" title={a.ministryName}>{a.ministryName}</div>
+                              <div className="text-[11px] text-slate-500">{a.stateName}</div>
                             </td>
-                            <td className="px-4 py-2.5">
-                              <div className="font-semibold text-slate-200">{a.warningType}</div>
-                              <div className="text-[11px] text-slate-400 max-w-xs truncate" title={a.triggerCondition}>
+                            <td className="px-4 py-3">
+                              <div className="font-semibold text-slate-900">{a.warningType}</div>
+                              <div className="text-[11px] text-slate-500 max-w-xs truncate" title={a.triggerCondition}>
                                 {a.triggerCondition}
                               </div>
                             </td>
-                            <td className="px-4 py-2.5 text-center">
+                            <td className="px-4 py-3 text-center">
                               <SeverityBadge severity={a.severity} />
                             </td>
-                            <td className="px-4 py-2.5 text-center">
+                            <td className="px-4 py-3 text-center">
                               <RiskBadge band={a.riskBand || 'LOW'} />
                             </td>
-                            <td className="px-4 py-2.5 text-right font-mono">
-                              <span className={a.persistencePeriods >= 3 ? 'text-rose-400 font-semibold' : 'text-slate-400'}>
+                            <td className="px-4 py-3 text-right font-mono">
+                              <span className={a.persistencePeriods >= 3 ? 'text-rose-700 font-bold' : 'text-slate-600'}>
                                 {a.persistencePeriods} mo{a.persistencePeriods > 1 ? 's' : ''}
                               </span>
                             </td>
-                            <td className="px-4 py-2.5">
+                            <td className="px-4 py-3">
                               <div className="text-xs">
                                 <StatusChip status={a.projectInterventionStatus || 'PENDING_REVIEW'} />
                               </div>
-                              <div className="text-[11px] text-slate-400 max-w-xs truncate mt-0.5" title={a.recommendedIntervention}>
+                              <div className="text-[11px] text-slate-500 max-w-xs truncate mt-0.5" title={a.recommendedIntervention}>
                                 {a.recommendedIntervention || 'Milestone review recommended'}
                               </div>
                             </td>
-                            <td className="px-4 py-2.5 text-center">
+                            <td className="px-4 py-3 text-center">
                               <div className="flex items-center justify-center gap-1.5">
                                 <button
+                                  type="button"
                                   onClick={() => {
                                     setModalProject({
                                       projectId: a.projectId,
@@ -734,13 +743,14 @@ export const EarlyWarning: React.FC = () => {
                                     setNewStatus(a.projectInterventionStatus || 'UNDER_REVIEW');
                                     setNewNotes('');
                                   }}
-                                  className="px-2.5 py-1 bg-amber-600/80 hover:bg-amber-600 text-white rounded text-[11px] font-semibold transition"
+                                  className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded text-[11px] font-semibold transition cursor-pointer"
                                 >
                                   Triage
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => navigate(`/projects/${a.projectId}`)}
-                                  className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded text-[11px] border border-slate-700 transition"
+                                  className="px-2 py-1 bg-blue-50 hover:bg-[#1877C9] text-[#1877C9] hover:text-white rounded text-[11px] border border-blue-200 transition cursor-pointer"
                                   title="Open Project Intelligence"
                                 >
                                   <ExternalLink className="w-3 h-3" />
@@ -876,10 +886,10 @@ export const EarlyWarning: React.FC = () => {
           {/* Horizontal Lifecycle Stage Summary */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { id: 'UNDER_REVIEW', title: 'Under Review', count: stageCounts.UNDER_REVIEW, color: 'text-purple-400 border-purple-800' },
-              { id: 'ACTION_INITIATED', title: 'Action Initiated', count: stageCounts.ACTION_INITIATED, color: 'text-amber-400 border-amber-800' },
-              { id: 'MONITORING', title: 'Monitoring', count: stageCounts.MONITORING, color: 'text-blue-400 border-blue-800' },
-              { id: 'RESOLVED', title: 'Resolved', count: stageCounts.RESOLVED, color: 'text-emerald-400 border-emerald-800' },
+              { id: 'UNDER_REVIEW', title: 'Under Review', count: stageCounts.UNDER_REVIEW, color: 'text-purple-700 bg-purple-50 border-purple-200' },
+              { id: 'ACTION_INITIATED', title: 'Action Initiated', count: stageCounts.ACTION_INITIATED, color: 'text-amber-800 bg-amber-50 border-amber-200' },
+              { id: 'MONITORING', title: 'Monitoring', count: stageCounts.MONITORING, color: 'text-blue-700 bg-blue-50 border-blue-200' },
+              { id: 'RESOLVED', title: 'Resolved', count: stageCounts.RESOLVED, color: 'text-emerald-800 bg-emerald-50 border-emerald-200' },
             ].map(stage => {
               const isActive = appliedIntFilters.status === stage.id;
               return (
@@ -893,17 +903,17 @@ export const EarlyWarning: React.FC = () => {
                     syncUrl('interventions', appliedAlertFilters, updated);
                     fetchInterventions(updated);
                   }}
-                  className={`p-3 rounded-lg border text-left transition flex items-center justify-between ${
+                  className={`p-3 rounded-xl border text-left transition flex items-center justify-between cursor-pointer ${
                     isActive 
-                      ? 'bg-slate-800 border-blue-500 shadow-md ring-1 ring-blue-500' 
-                      : 'bg-slate-900 border-slate-800 hover:bg-slate-800/60'
+                      ? 'bg-blue-50/80 border-[#1877C9] shadow-xs ring-1 ring-[#1877C9]' 
+                      : 'bg-white border-[#D9E1EA] hover:border-slate-300 hover:bg-slate-50/60 shadow-xs'
                   }`}
                 >
                   <div>
-                    <p className="text-[11px] font-medium text-slate-400">{stage.title}</p>
-                    <p className={`text-lg font-bold mt-0.5 ${stage.color.split(' ')[0]}`}>{stage.count.toLocaleString()}</p>
+                    <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">{stage.title}</p>
+                    <p className={`text-lg font-extrabold mt-0.5 ${stage.color.split(' ')[0]}`}>{stage.count.toLocaleString()}</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-600" />
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
                 </button>
               );
             })}
@@ -911,44 +921,44 @@ export const EarlyWarning: React.FC = () => {
 
           {/* Error Message */}
           {intError && (
-            <div className="bg-rose-950/40 border border-rose-800 rounded-lg p-4 text-xs text-rose-300 flex items-center justify-between">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-xs text-red-700 flex items-center justify-between">
               <span>{intError}</span>
-              <button onClick={() => fetchInterventions(appliedIntFilters)} className="underline hover:text-white font-semibold">
+              <button onClick={() => fetchInterventions(appliedIntFilters)} className="underline hover:text-red-900 font-semibold cursor-pointer">
                 Retry
               </button>
             </div>
           )}
 
           {/* Interventions Table */}
-          <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow-sm">
+          <div className="bg-white border border-[#D9E1EA] rounded-xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="bg-slate-950/80 border-b border-slate-800 uppercase text-[11px] font-semibold text-slate-400">
+              <table className="w-full text-left text-xs text-slate-800 gov-table">
+                <thead className="bg-[#F8FAFC] border-b border-[#D9E1EA] uppercase text-[11px] font-bold text-slate-600">
                   <tr>
-                    <th className="px-4 py-2.5">Project ID & Name</th>
-                    <th className="px-4 py-2.5">Administrative Entity</th>
-                    <th className="px-4 py-2.5">Recommended Measure</th>
-                    <th className="px-4 py-2.5 text-center">Lifecycle Status</th>
-                    <th className="px-4 py-2.5 text-right">Priority Score</th>
-                    <th className="px-4 py-2.5">Latest Action Notes</th>
-                    <th className="px-4 py-2.5 text-center">Actions</th>
+                    <th className="px-4 py-3">Project ID & Name</th>
+                    <th className="px-4 py-3">Administrative Entity</th>
+                    <th className="px-4 py-3">Recommended Measure</th>
+                    <th className="px-4 py-3 text-center">Lifecycle Status</th>
+                    <th className="px-4 py-3 text-right">Priority Score</th>
+                    <th className="px-4 py-3">Latest Action Notes</th>
+                    <th className="px-4 py-3 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100">
                   {loadingInt ? (
                     <tr>
                       <td colSpan={7} className="text-center py-12 text-slate-500">
-                        Loading interventions and operational log...
+                        Loading interventions and operational remediation log...
                       </td>
                     </tr>
                   ) : interventions.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="text-center py-12 space-y-2">
-                        <p className="text-sm font-medium text-slate-400">No intervention records matched the selected criteria.</p>
-                        <p className="text-xs text-slate-500">Modify filters to view other operational remediation records.</p>
+                        <p className="text-sm font-medium text-slate-500">No intervention records matched the selected criteria.</p>
+                        <p className="text-xs text-slate-400">Modify filters to view other operational remediation records.</p>
                         <button
                           onClick={handleResetIntFilters}
-                          className="mt-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold"
+                          className="mt-2 px-3 py-1.5 bg-[#1877C9] hover:bg-[#123B63] text-white rounded-md text-xs font-semibold shadow-xs cursor-pointer"
                         >
                           Reset Filters
                         </button>
@@ -956,44 +966,50 @@ export const EarlyWarning: React.FC = () => {
                     </tr>
                   ) : (
                     interventions.map((iv) => (
-                      <tr key={iv.projectId} className="hover:bg-slate-800/40 transition">
-                        <td className="px-4 py-2.5 max-w-xs">
-                          <div className="font-mono text-[11px] text-slate-400">{iv.projectId}</div>
-                          <div className="font-medium text-white truncate" title={iv.projectName}>
+                      <tr key={iv.projectId} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-4 py-3 max-w-xs">
+                          <div className="font-mono text-[11px] text-slate-500 font-semibold">{iv.projectId}</div>
+                          <div 
+                            className="font-bold text-slate-900 hover:text-[#1877C9] transition truncate cursor-pointer" 
+                            title={iv.projectName}
+                            onClick={() => navigate(`/projects/${iv.projectId}`)}
+                          >
                             {iv.projectName}
                           </div>
                         </td>
-                        <td className="px-4 py-2.5 text-[11px] text-slate-400">
-                          <div className="font-medium text-slate-300">{iv.responsibleAuthority || iv.ministryName}</div>
-                          <div>{iv.sectorName} · {iv.stateName}</div>
+                        <td className="px-4 py-3 text-xs text-slate-600">
+                          <div className="font-semibold text-slate-800">{iv.responsibleAuthority || iv.ministryName}</div>
+                          <div className="text-[11px] text-slate-500">{iv.sectorName} · {iv.stateName}</div>
                         </td>
-                        <td className="px-4 py-2.5 text-slate-300 max-w-xs truncate" title={iv.recommendedIntervention}>
+                        <td className="px-4 py-3 text-slate-700 max-w-xs truncate" title={iv.recommendedIntervention}>
                           {iv.recommendedIntervention}
                         </td>
-                        <td className="px-4 py-2.5 text-center">
+                        <td className="px-4 py-3 text-center">
                           <StatusChip status={iv.interventionStatus} />
                         </td>
-                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-amber-400">
+                        <td className="px-4 py-3 text-right font-mono font-bold text-amber-700">
                           {iv.interventionPriorityScore.toFixed(1)}
                         </td>
-                        <td className="px-4 py-2.5 text-slate-400 text-[11px] max-w-xs truncate">
+                        <td className="px-4 py-3 text-slate-600 text-xs max-w-xs truncate">
                           {iv.latestActionNotes || 'No notes logged yet'}
                         </td>
-                        <td className="px-4 py-2.5 text-center">
+                        <td className="px-4 py-3 text-center">
                           <div className="flex items-center justify-center gap-1.5">
                             <button
+                              type="button"
                               onClick={() => {
                                 setModalProject(iv);
                                 setNewStatus(iv.interventionStatus);
                                 setNewNotes(iv.latestActionNotes || '');
                               }}
-                              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded text-[11px] border border-slate-700 font-medium transition"
+                              className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 rounded text-[11px] font-semibold transition cursor-pointer"
                             >
                               Update
                             </button>
                             <button
+                              type="button"
                               onClick={() => navigate(`/projects/${iv.projectId}`)}
-                              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded text-[11px] border border-slate-700 transition"
+                              className="px-2 py-1 bg-blue-50 hover:bg-[#1877C9] text-[#1877C9] hover:text-white rounded text-[11px] border border-blue-200 transition cursor-pointer"
                               title="Open Project Intelligence"
                             >
                               <ExternalLink className="w-3 h-3" />
@@ -1026,22 +1042,22 @@ export const EarlyWarning: React.FC = () => {
       {/* INTERVENTION UPDATE / TRANSITION MODAL                                    */}
       {/* ========================================================================= */}
       {modalProject && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-5 space-y-4 shadow-2xl">
-            <div>
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                <Workflow className="w-4 h-4 text-blue-400" />
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-[#D9E1EA] rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold text-[#0B2945] flex items-center gap-2">
+                <Workflow className="w-4 h-4 text-[#1877C9]" />
                 Update Intervention Workflow Status
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5 truncate">{modalProject.projectName} ({modalProject.projectId})</p>
+              <p className="text-xs text-slate-500 mt-1 truncate">{modalProject.projectName} ({modalProject.projectId})</p>
             </div>
 
             <div>
-              <label className="block text-xs text-slate-400 mb-1">State Machine Lifecycle Transition</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">State Machine Lifecycle Transition</label>
               <select
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500"
+                className="w-full bg-white border border-[#D9E1EA] rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#1877C9] shadow-2xs"
               >
                 <option value="UNDER_REVIEW">Under Review</option>
                 <option value="ACTION_INITIATED">Action Initiated</option>
@@ -1051,22 +1067,22 @@ export const EarlyWarning: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs text-slate-400 mb-1">Action Notes / Directive Details</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Action Notes / Directive Details</label>
               <textarea
                 rows={3}
                 value={newNotes}
                 onChange={(e) => setNewNotes(e.target.value)}
                 placeholder="Log official meeting decisions, committee orders, or contractor directives..."
-                className="w-full bg-slate-950 border border-slate-800 rounded p-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500"
+                className="w-full bg-white border border-[#D9E1EA] rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#1877C9] shadow-2xs"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-800/80">
+            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setModalProject(null)}
                 disabled={isUpdatingStatus}
-                className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition"
+                className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-[#D9E1EA] text-xs font-semibold text-slate-700 transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -1074,7 +1090,7 @@ export const EarlyWarning: React.FC = () => {
                 type="button"
                 onClick={handleUpdateStatus}
                 disabled={isUpdatingStatus}
-                className="px-4 py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition disabled:opacity-50"
+                className="px-4 py-1.5 rounded-lg bg-[#1877C9] hover:bg-[#123B63] text-xs font-semibold text-white transition disabled:opacity-50 cursor-pointer shadow-xs"
               >
                 {isUpdatingStatus ? 'Saving...' : 'Save Transition'}
               </button>
