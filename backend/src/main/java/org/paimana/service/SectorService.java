@@ -33,8 +33,25 @@ public class SectorService {
         return sectorRepository.getSectorStateBreakdown(sectorName);
     }
 
+    public List<Map<String, Object>> getSectorStates(
+            String sectorName, String ministry, String riskBand,
+            String trajectory, String costFilter, String delayFilter,
+            String warningFilter, String multiState
+    ) {
+        return sectorRepository.getSectorStateBreakdown(sectorName, ministry, riskBand, trajectory, costFilter, delayFilter, warningFilter, multiState);
+    }
+
     public List<ProjectSummaryDto> getSectorProjects(String sectorName, String stateName, int page, int size) {
         int offset = Math.max(0, (page - 1) * size);
         return sectorRepository.getSectorProjects(sectorName, stateName, size, offset);
+    }
+
+    public List<ProjectSummaryDto> getSectorProjects(
+            String sectorName, String stateName, String ministry, String riskBand,
+            String trajectory, String costFilter, String delayFilter,
+            String warningFilter, String multiState, int page, int size
+    ) {
+        int offset = Math.max(0, (page - 1) * size);
+        return sectorRepository.getSectorProjects(sectorName, stateName, ministry, riskBand, trajectory, costFilter, delayFilter, warningFilter, multiState, size, offset);
     }
 }

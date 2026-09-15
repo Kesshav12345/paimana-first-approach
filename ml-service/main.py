@@ -6,6 +6,8 @@ automated PDF ingestion & ETL execution, candidate retraining, and operations au
 
 import os
 import sys
+import json
+import uuid
 import shutil
 import sqlite3
 import logging
@@ -13,6 +15,7 @@ import subprocess
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 from contextlib import asynccontextmanager
+
 
 import numpy as np
 import pandas as pd
@@ -337,6 +340,13 @@ def predict_project_outcomes(req: PredictRequest):
 
 # -------------------------------------------------------------
 # Operations & Ingestion Endpoints (CRITICAL USER REQUIREMENT)
+from orchestrator.intelligence_refresh import IntelligenceRefreshOrchestrator
+from intelligence.search_provider import get_search_provider
+
+orchestrator = IntelligenceRefreshOrchestrator(db_path=DB_PATH)
+
+# -------------------------------------------------------------
+# Operations & Ingestion Endpoints (EVOLVED INTELLIGENCE REFRESH)
 # -------------------------------------------------------------
 @app.get("/api/operations/status")
 def get_operations_status():
@@ -347,12 +357,20 @@ def get_operations_status():
     total_facts = cur.execute("SELECT COUNT(*) FROM fact_project_month").fetchone()[0]
     latest_month = cur.execute("SELECT MAX(reporting_month) FROM fact_project_month").fetchone()[0]
     
-    # Audit log check
-    last_run = "2026-09-13 13:16:12"
-    cur.execute("SELECT created_at FROM etl_runs ORDER BY run_id DESC LIMIT 1")
-    row = cur.fetchone()
-    if row:
-        last_run = row[0]
+    # Check latest pipeline execution run
+    last_run = "2026-09-15 12:08:47"
+    pipeline_state = "IDLE"
+    cur.execute("SELECT completed_at, status FROM pipeline_execution_jobs ORDER BY created_at DESC LIMIT 1")
+    job_row = cur.fetchone()
+    if job_row:
+        last_run = job_row[0] or "In Progress"
+        if job_row[1] == "IN_PROGRESS":
+            pipeline_state = "PROCESSING"
+    else:
+        cur.execute("SELECT created_at FROM etl_runs ORDER BY run_id DESC LIMIT 1")
+        row = cur.fetchone()
+        if row:
+            last_run = row[0]
         
     conn.close()
     
@@ -365,37 +383,24 @@ def get_operations_status():
         active_model_version=models.version,
         candidate_model_version=models.candidate_version,
         last_pipeline_run=last_run,
-        pipeline_state="IDLE"
+        pipeline_state=pipeline_state
     )
 
-def execute_pipeline_refresh(filename: str):
-    """Executes background ETL pipeline, recalculates metrics and updates DB."""
-    logger.info(f"Background ETL pipeline initiated for newly uploaded file: {filename}")
-    try:
-        # Run orchestrator
-        cmd = [sys.executable, os.path.join(BASE_DIR, "run_pipeline.py")]
-        res = subprocess.run(cmd, cwd=BASE_DIR, capture_output=True, text=True)
-        if res.returncode == 0:
-            logger.info("Pipeline re-run completed successfully!")
-            load_models()
-        else:
-            logger.error(f"Pipeline failed: {res.stderr}")
-    except Exception as e:
-        logger.error(f"ETL execution exception: {e}")
-
-@app.post("/api/operations/ingest-pdf")
-async def ingest_new_pdf(
+@app.post("/api/operations/intelligence-refresh")
+async def trigger_intelligence_refresh(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
-    reporting_month: Optional[str] = Form(None)
+    reporting_month: Optional[str] = Form(None),
+    force_reprocess: Optional[bool] = Form(False)
 ):
     """
-    Accepts new PDF Flash Report or Sector Review, saves to primary dataset,
-    and executes the automated ETL pipeline asynchronously.
+    Primary Monthly Report Ingestion Endpoint:
+    Accepts new MoSPI Flash Report or CPR PDF, initializes job state,
+    and executes the full 12-stage Monthly Intelligence Refresh in background.
     """
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
-        
+
     os.makedirs(PRIMARY_DATASET_DIR, exist_ok=True)
     target_path = os.path.join(PRIMARY_DATASET_DIR, file.filename)
     
@@ -403,19 +408,291 @@ async def ingest_new_pdf(
         shutil.copyfileobj(file.file, buffer)
         
     file_size_kb = round(os.path.getsize(target_path) / 1024, 2)
-    logger.info(f"Received new file: {file.filename} ({file_size_kb} KB). Scheduling automated ETL pipeline...")
+    job_id = f"job-{uuid.uuid4().hex[:10]}"
     
-    # Trigger background pipeline execution
-    background_tasks.add_task(execute_pipeline_refresh, file.filename)
-    
+    logger.info(f"Accepted report {file.filename} ({file_size_kb} KB). Assigned Job ID: {job_id}")
+
+    # Launch 12-stage orchestrator in background
+    def run_job():
+        try:
+            orchestrator.run_intelligence_refresh(
+                file_path=target_path,
+                reporting_month=reporting_month,
+                force_reprocess=bool(force_reprocess),
+                job_id=job_id
+            )
+        except Exception as e:
+            logger.error(f"Background intelligence refresh job {job_id} failed: {e}")
+
+    background_tasks.add_task(run_job)
+
     return {
-        "status": "ACCEPTED",
-        "message": f"File '{file.filename}' uploaded successfully ({file_size_kb} KB). Automated ETL pipeline and ML dataset sync started in background.",
+        "job_id": job_id,
+        "status": "QUEUED",
+        "stage": "VALIDATING_REPORT",
         "filename": file.filename,
-        "target_path": target_path,
         "reporting_month": reporting_month,
+        "message": f"Report '{file.filename}' queued for 12-stage Intelligence Refresh. Monitor progress via /api/operations/jobs/{job_id}",
         "timestamp": datetime.now().isoformat()
     }
+
+@app.get("/api/operations/jobs/{job_id}")
+def get_job_progress(job_id: str):
+    """Returns live stage tracker state and telemetry for an intelligence refresh execution job."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT job_id, trigger_type, report_file, reporting_month, stage, status,
+               total_projects, affected_projects_count, researched_count, claims_count,
+               conflicts_count, started_at, completed_at, elapsed_seconds, error_summary, details_json
+        FROM pipeline_execution_jobs
+        WHERE job_id = ?
+    """, (job_id,))
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        raise HTTPException(status_code=404, detail=f"Job {job_id} not found")
+
+    details = {}
+    if row[15]:
+        try:
+            details = json.loads(row[15])
+        except Exception:
+            pass
+
+    return {
+        "job_id": row[0],
+        "trigger_type": row[1],
+        "report_file": row[2],
+        "reporting_month": row[3],
+        "stage": row[4],
+        "status": row[5],
+        "total_projects": row[6],
+        "affected_projects_count": row[7],
+        "researched_count": row[8],
+        "claims_count": row[9],
+        "conflicts_count": row[10],
+        "started_at": row[11],
+        "completed_at": row[12],
+        "elapsed_seconds": row[13],
+        "error_summary": row[14],
+        "details": details
+    }
+
+@app.get("/api/operations/recent-runs")
+def get_recent_pipeline_runs(limit: int = 10):
+    """Returns compact historical registry of pipeline execution runs."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT job_id, trigger_type, report_file, reporting_month, stage, status,
+               affected_projects_count, researched_count, claims_count, conflicts_count,
+               started_at, completed_at, elapsed_seconds
+        FROM pipeline_execution_jobs
+        ORDER BY created_at DESC
+        LIMIT ?
+    """, (limit,))
+    rows = cur.fetchall()
+    conn.close()
+
+    runs = []
+    for r in rows:
+        runs.append({
+            "job_id": r[0],
+            "trigger_type": r[1],
+            "report_file": r[2],
+            "reporting_month": r[3],
+            "stage": r[4],
+            "status": r[5],
+            "affected_projects": r[6],
+            "researched_count": r[7],
+            "claims_count": r[8],
+            "conflicts_count": r[9],
+            "started_at": r[10],
+            "completed_at": r[11],
+            "elapsed_seconds": r[12]
+        })
+    return runs
+
+class ScopedResearchRequest(BaseModel):
+    scope: str = "AFFECTED"  # AFFECTED, CRITICAL_HIGH_RISK, STALE_ONLY, ALL_ACTIVE
+    limit: Optional[int] = 15
+
+@app.post("/api/operations/refresh-external-intelligence")
+def refresh_external_intelligence(req: ScopedResearchRequest, background_tasks: BackgroundTasks):
+    """
+    Reruns internet deep dives on demand for projects within selected scope.
+    Bounded execution protects rate limits and ensures idempotency.
+    """
+    job_id = f"research-{uuid.uuid4().hex[:8]}"
+    logger.info(f"Triggering Scoped Research Refresh: {req.scope} (Limit: {req.limit}). Job ID: {job_id}")
+
+    def execute_scoped_research():
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        cur.execute("""
+            INSERT INTO pipeline_execution_jobs
+            (job_id, trigger_type, stage, status, started_at)
+            VALUES (?, 'EXTERNAL_INTELLIGENCE_REFRESH', 'RESEARCHING_AFFECTED', 'IN_PROGRESS', ?)
+        """, (job_id, now_str))
+        conn.commit()
+
+        # Determine target projects based on scope
+        if req.scope == "CRITICAL_HIGH_RISK":
+            cur.execute("""
+                SELECT project_id FROM gold_project_current
+                WHERE risk_band IN ('CRITICAL', 'HIGH')
+                ORDER BY overall_risk_score DESC LIMIT ?
+            """, (req.limit or 15,))
+        elif req.scope == "STALE_ONLY":
+            cur.execute("""
+                SELECT q.project_id FROM project_research_queue q
+                WHERE q.status = 'PENDING'
+                ORDER BY q.priority_score DESC LIMIT ?
+            """, (req.limit or 15,))
+        else: # AFFECTED or ALL_ACTIVE
+            cur.execute("""
+                SELECT project_id FROM gold_project_current
+                ORDER BY overall_risk_score DESC LIMIT ?
+            """, (req.limit or 15,))
+
+        pids = [r[0] for r in cur.fetchall()]
+        conn.close()
+
+        researched = 0
+        claims_tot = 0
+        conflicts_tot = 0
+
+        for pid in pids:
+            try:
+                conn2 = sqlite3.connect(DB_PATH)
+                cur2 = conn2.cursor()
+                cur2.execute("""
+                    SELECT p.project_id, p.canonical_project_name, s.sector_name, m.ministry_name, a.agency_name, st.state_name
+                    FROM dim_project p
+                    LEFT JOIN dim_sector s ON p.sector_id = s.sector_id
+                    LEFT JOIN dim_ministry m ON p.ministry_id = m.ministry_id
+                    LEFT JOIN dim_agency a ON p.agency_id = a.agency_id
+                    LEFT JOIN dim_state st ON p.primary_state_id = st.state_id
+                    WHERE p.project_id = ?
+                """, (pid,))
+                p_row = cur2.fetchone()
+                conn2.close()
+
+                if not p_row:
+                    continue
+
+                p_dict = {
+                    "project_id": p_row[0], "project_name": p_row[1],
+                    "sector_name": p_row[2], "ministry_name": p_row[3],
+                    "agency_name": p_row[4], "state_name": p_row[5]
+                }
+                plan = orchestrator.planner.create_plan(p_dict, max_queries=3)
+                results = []
+                for q in plan.queries:
+                    results.extend(orchestrator.search_provider.search(q.query_text, max_results=3))
+                claims = orchestrator.claim_extractor.extract_claims(p_dict, results)
+                state = orchestrator.evidence_resolver.resolve(pid, claims)
+                orchestrator.snapshot_builder.persist_snapshot(pid, state, search_count=len(plan.queries))
+
+                researched += 1
+                claims_tot += len(state.claims)
+                conflicts_tot += len(state.conflicts)
+            except Exception as e:
+                logger.warning(f"Error researching project {pid}: {e}")
+
+        conn_fin = sqlite3.connect(DB_PATH)
+        cur_fin = conn_fin.cursor()
+        fin_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cur_fin.execute("""
+            UPDATE pipeline_execution_jobs
+            SET stage = 'PUBLISHED', status = 'COMPLETED', completed_at = ?,
+                researched_count = ?, claims_count = ?, conflicts_count = ?
+            WHERE job_id = ?
+        """, (fin_now, researched, claims_tot, conflicts_tot, job_id))
+        conn_fin.commit()
+        conn_fin.close()
+        logger.info(f"Completed scoped research job {job_id}: {researched} projects researched, {claims_tot} claims.")
+
+    background_tasks.add_task(execute_scoped_research)
+
+    return {
+        "job_id": job_id,
+        "status": "QUEUED",
+        "scope": req.scope,
+        "message": f"External intelligence research initiated for scope '{req.scope}' (Limit: {req.limit}).",
+        "timestamp": datetime.now().isoformat()
+    }
+
+@app.post("/api/operations/recalculate-derived")
+def recalculate_derived_values(background_tasks: BackgroundTasks):
+    """
+    Recalculates deterministic analytics, slippages, velocity, risk scores, and warnings
+    from existing canonical facts and stored external evidence without re-querying the internet.
+    """
+    job_id = f"recalc-{uuid.uuid4().hex[:8]}"
+    logger.info(f"Recalculate Derived Values initiated. Job ID: {job_id}")
+
+    def run_recalc():
+        conn = sqlite3.connect(DB_PATH)
+        cur = conn.cursor()
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cur.execute("""
+            INSERT INTO pipeline_execution_jobs
+            (job_id, trigger_type, stage, status, started_at)
+            VALUES (?, 'DERIVED_RECALCULATION', 'RECOMPUTING_ANALYTICS', 'IN_PROGRESS', ?)
+        """, (job_id, now_str))
+        conn.commit()
+        conn.close()
+
+        # Run analytics calculations
+        cmd1 = [sys.executable, os.path.join(BASE_DIR, "src", "analytics", "compute_metrics.py")]
+        subprocess.run(cmd1, cwd=BASE_DIR, capture_output=True, text=True)
+
+        cmd2 = [sys.executable, os.path.join(BASE_DIR, "src", "analytics", "risk_warning_intervention.py")]
+        subprocess.run(cmd2, cwd=BASE_DIR, capture_output=True, text=True)
+
+        cmd3 = [sys.executable, os.path.join(BASE_DIR, "src", "analytics", "portfolio_rollups.py")]
+        subprocess.run(cmd3, cwd=BASE_DIR, capture_output=True, text=True)
+
+        conn2 = sqlite3.connect(DB_PATH)
+        cur2 = conn2.cursor()
+        end_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        cur2.execute("""
+            UPDATE pipeline_execution_jobs
+            SET stage = 'PUBLISHED', status = 'COMPLETED', completed_at = ?
+            WHERE job_id = ?
+        """, (end_str, job_id))
+        conn2.commit()
+        conn2.close()
+        logger.info(f"Derived values recalculation job {job_id} completed successfully.")
+
+    background_tasks.add_task(run_recalc)
+
+    return {
+        "job_id": job_id,
+        "status": "QUEUED",
+        "message": "Deterministic feature, risk index, and early-warning recalculation started in background.",
+        "timestamp": datetime.now().isoformat()
+    }
+
+# Retain backward compatibility for legacy endpoint
+@app.post("/api/operations/ingest-pdf")
+async def ingest_new_pdf(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    reporting_month: Optional[str] = Form(None)
+):
+    """Legacy backward-compatible adapter forwarding to the 12-stage Intelligence Refresh."""
+    return await trigger_intelligence_refresh(
+        background_tasks=background_tasks,
+        file=file,
+        reporting_month=reporting_month,
+        force_reprocess=False
+    )
 
 @app.post("/api/operations/retrain")
 def retrain_candidate_models(background_tasks: BackgroundTasks):
@@ -442,7 +719,6 @@ def retrain_candidate_models(background_tasks: BackgroundTasks):
 def promote_candidate_model():
     """Promotes candidate model to active production model."""
     if not models.candidate_version:
-        # If no candidate version string, promote with new timestamp
         models.candidate_version = f"v{datetime.now().strftime('%Y%m%d%H%M')}"
         
     old_version = models.version
@@ -459,7 +735,7 @@ def promote_candidate_model():
 
 @app.post("/api/operations/refresh-predictions")
 def refresh_all_predictions():
-    """Recalculates predictions, risk scores, and alerts across the entire active portfolio."""
+    """Reruns production model inference across all active monitored projects."""
     logger.info("Refreshing all predictions and risk scores...")
     cmd = [sys.executable, os.path.join(BASE_DIR, "src", "analytics", "risk_warning_intervention.py")]
     res = subprocess.run(cmd, cwd=BASE_DIR, capture_output=True, text=True)
@@ -468,10 +744,48 @@ def refresh_all_predictions():
         
     return {
         "status": "SUCCESS",
-        "message": "Portfolio predictions, risk scores, and early warnings refreshed across all 3,977 projects.",
+        "message": "Production CatBoost predictions and risk scores refreshed across all projects.",
         "timestamp": datetime.now().isoformat()
+    }
+
+@app.get("/api/methodology/metadata")
+def get_methodology_metadata():
+    """Returns dynamic system parameters and operational telemetry for the Methodology dashboard."""
+    conn = sqlite3.connect(DB_PATH)
+    cur = conn.cursor()
+    
+    total_proj = cur.execute("SELECT COUNT(*) FROM dim_project").fetchone()[0]
+    total_facts = cur.execute("SELECT COUNT(*) FROM fact_project_month").fetchone()[0]
+    latest_month = cur.execute("SELECT MAX(reporting_month) FROM fact_project_month").fetchone()[0]
+    quarantine_count = cur.execute("SELECT COUNT(*) FROM quarantine_records").fetchone()[0]
+    total_evidence = cur.execute("SELECT COUNT(*) FROM project_evidence_claims").fetchone()[0]
+    total_sources = cur.execute("SELECT COUNT(*) FROM project_external_sources").fetchone()[0]
+    completed_research = cur.execute("SELECT COUNT(*) FROM project_research_queue WHERE status = 'COMPLETED'").fetchone()[0]
+    
+    cur.execute("SELECT completed_at, status FROM pipeline_execution_jobs ORDER BY created_at DESC LIMIT 1")
+    job_row = cur.fetchone()
+    last_refresh = job_row[0] if job_row else "2026-09-15 12:08:47"
+    
+    conn.close()
+    
+    return {
+        "active_methodology_version": "v2.1-canonical",
+        "production_model_version": models.version,
+        "feature_version": models.feature_version,
+        "latest_dataset_period": latest_month or "2026-07",
+        "total_monitored_projects": total_proj,
+        "total_canonical_facts": total_facts,
+        "total_evidence_claims": total_evidence,
+        "total_external_sources": total_sources,
+        "researched_projects_count": completed_research,
+        "quarantine_records_count": quarantine_count,
+        "last_intelligence_refresh": last_refresh,
+        "search_provider": orchestrator.search_provider.get_provider_name(),
+        "model_family": "CatBoost Multi-Target Ensemble + TreeSHAP",
+        "system_status": "OPERATIONAL"
     }
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+

@@ -10,7 +10,7 @@
       "category": "Entity Integrity",
       "description": "Primary key uniqueness on dim_project(project_id)",
       "status": "PASS",
-      "observed_value": "3977 rows, 3977 distinct",
+      "observed_value": "3414 rows, 3414 distinct",
       "severity": "CRITICAL"
     },
     {
@@ -18,7 +18,7 @@
       "category": "Grain Integrity",
       "description": "Composite grain uniqueness on fact_project_month(project_id, reporting_month)",
       "status": "PASS",
-      "observed_value": "23724 facts, 23724 distinct grain pairs",
+      "observed_value": "19755 facts, 19755 distinct grain pairs",
       "severity": "CRITICAL"
     },
     {

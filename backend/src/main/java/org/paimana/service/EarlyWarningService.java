@@ -17,17 +17,55 @@ public class EarlyWarningService {
     }
 
     public List<EarlyWarningAlertDto> getActiveAlerts(String sector, String ministry, String state, String severity, String search, int page, int size) {
+        return getActiveAlerts(sector, ministry, state, severity, null, null, null, null, search, page, size);
+    }
+
+    public List<EarlyWarningAlertDto> getActiveAlerts(
+            String sector, String ministry, String state, String severity,
+            String warningType, String persistence, String riskBand,
+            String interventionStatus, String search, int page, int size
+    ) {
         int offset = Math.max(0, (page - 1) * size);
-        return earlyWarningRepository.getActiveAlerts(sector, ministry, state, severity, search, size, offset);
+        return earlyWarningRepository.getActiveAlerts(sector, ministry, state, severity, warningType, persistence, riskBand, interventionStatus, search, size, offset);
     }
 
     public int countActiveAlerts(String sector, String ministry, String state, String severity, String search) {
-        return earlyWarningRepository.countActiveAlerts(sector, ministry, state, severity, search);
+        return countActiveAlerts(sector, ministry, state, severity, null, null, null, null, search);
+    }
+
+    public int countActiveAlerts(
+            String sector, String ministry, String state, String severity,
+            String warningType, String persistence, String riskBand,
+            String interventionStatus, String search
+    ) {
+        return earlyWarningRepository.countActiveAlerts(sector, ministry, state, severity, warningType, persistence, riskBand, interventionStatus, search);
+    }
+
+    public java.util.Map<String, Object> getEarlyWarningSummary(
+            String sector, String ministry, String state, String severity,
+            String warningType, String persistence, String riskBand,
+            String interventionStatus, String search
+    ) {
+        return earlyWarningRepository.getEarlyWarningSummary(sector, ministry, state, severity, warningType, persistence, riskBand, interventionStatus, search);
     }
 
     public List<InterventionDto> getInterventions(String status, int page, int size) {
+        return getInterventions(null, null, null, null, status, null, "priority", page, size);
+    }
+
+    public List<InterventionDto> getInterventions(
+            String sector, String ministry, String state, String riskBand,
+            String status, String search, String sortBy, int page, int size
+    ) {
         int offset = Math.max(0, (page - 1) * size);
-        return earlyWarningRepository.getInterventions(status, size, offset);
+        return earlyWarningRepository.getInterventions(sector, ministry, state, riskBand, status, search, sortBy, size, offset);
+    }
+
+    public int countInterventions(
+            String sector, String ministry, String state, String riskBand,
+            String status, String search
+    ) {
+        return earlyWarningRepository.countInterventions(sector, ministry, state, riskBand, status, search);
     }
 
     public boolean updateIntervention(String projectId, String status, String notes) {

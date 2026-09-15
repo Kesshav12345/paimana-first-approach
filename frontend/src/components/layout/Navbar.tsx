@@ -8,7 +8,8 @@ import {
   MapPin, 
   AlertTriangle, 
   Activity, 
-  Database
+  Database,
+  BookOpen
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -73,6 +74,11 @@ export const Navbar: React.FC = () => {
               <Database className="w-3.5 h-3.5 text-emerald-400" />
               <span>Operations</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            </NavLink>
+
+            <NavLink to="/methodology" className={navLinkClass}>
+              <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Methodology</span>
             </NavLink>
           </nav>
 

@@ -112,23 +112,27 @@ public class SectorRepository {
             sql.append(" AND cost_escalation_pct >= 20");
         } else if ("SEVERE_ESCALATION".equalsIgnoreCase(costFilter)) {
             sql.append(" AND cost_escalation_pct >= 50");
+        } else if ("MODERATE_ESCALATION".equalsIgnoreCase(costFilter)) {
+            sql.append(" AND cost_escalation_pct > 0 AND cost_escalation_pct < 20");
         } else if ("WITHIN_BUDGET".equalsIgnoreCase(costFilter)) {
             sql.append(" AND cost_escalation_pct <= 0");
         }
 
         if ("DELAYED".equalsIgnoreCase(delayFilter)) {
             sql.append(" AND schedule_slippage_months > 0");
+        } else if ("MODERATE_DELAY".equalsIgnoreCase(delayFilter)) {
+            sql.append(" AND schedule_slippage_months > 0 AND schedule_slippage_months < 12");
         } else if ("SEVERE_DELAY".equalsIgnoreCase(delayFilter)) {
             sql.append(" AND schedule_slippage_months >= 12");
         } else if ("CRITICAL_DELAY".equalsIgnoreCase(delayFilter)) {
             sql.append(" AND schedule_slippage_months >= 24");
-        } else if ("ON_TIME".equalsIgnoreCase(delayFilter)) {
+        } else if ("ON_TIME".equalsIgnoreCase(delayFilter) || "ON_SCHEDULE".equalsIgnoreCase(delayFilter)) {
             sql.append(" AND schedule_slippage_months <= 0");
         }
 
-        if ("HAS_WARNINGS".equalsIgnoreCase(warningFilter)) {
+        if ("HAS_WARNINGS".equalsIgnoreCase(warningFilter) || "ACTIVE_WARNINGS".equalsIgnoreCase(warningFilter)) {
             sql.append(" AND active_warning_count > 0");
-        } else if ("MULTI_WARNING".equalsIgnoreCase(warningFilter)) {
+        } else if ("MULTI_WARNING".equalsIgnoreCase(warningFilter) || "MULTIPLE_WARNINGS".equalsIgnoreCase(warningFilter)) {
             sql.append(" AND active_warning_count >= 2");
         } else if ("NO_WARNINGS".equalsIgnoreCase(warningFilter)) {
             sql.append(" AND active_warning_count = 0");
@@ -143,7 +147,15 @@ public class SectorRepository {
 
 
     public List<Map<String, Object>> getSectorStateBreakdown(String sectorName) {
-        String sql = """
+        return getSectorStateBreakdown(sectorName, null, null, null, null, null, null, null);
+    }
+
+    public List<Map<String, Object>> getSectorStateBreakdown(
+            String sectorName, String ministry, String riskBand,
+            String trajectory, String costFilter, String delayFilter,
+            String warningFilter, String multiState
+    ) {
+        StringBuilder sql = new StringBuilder("""
             SELECT 
                 state_name, COUNT(*) as project_count,
                 ROUND(SUM(latest_revised_cost_cr), 2) as total_revised_cost_cr,
@@ -151,13 +163,23 @@ public class SectorRepository {
                 SUM(CASE WHEN UPPER(risk_band) IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) as high_risk_count
             FROM gold_project_current
             WHERE sector_name = ?
-            GROUP BY state_name
-            ORDER BY project_count DESC
-        """;
-        return jdbcTemplate.queryForList(sql, sectorName);
+        """);
+        List<Object> params = new ArrayList<>();
+        params.add(sectorName);
+        appendFilters(sql, params, null, ministry, riskBand, trajectory, costFilter, delayFilter, warningFilter, multiState);
+        sql.append(" GROUP BY state_name ORDER BY project_count DESC");
+        return jdbcTemplate.queryForList(sql.toString(), params.toArray());
     }
 
     public List<ProjectSummaryDto> getSectorProjects(String sectorName, String stateName, int limit, int offset) {
+        return getSectorProjects(sectorName, stateName, null, null, null, null, null, null, null, limit, offset);
+    }
+
+    public List<ProjectSummaryDto> getSectorProjects(
+            String sectorName, String stateName, String ministry, String riskBand,
+            String trajectory, String costFilter, String delayFilter,
+            String warningFilter, String multiState, int limit, int offset
+    ) {
         StringBuilder sql = new StringBuilder("""
             SELECT 
                 project_id, project_name, sector_name, ministry_name, agency_name, state_name,
@@ -168,15 +190,13 @@ public class SectorRepository {
             FROM gold_project_current
             WHERE sector_name = ?
         """);
-
-        if (stateName != null && !stateName.trim().isEmpty() && !"ALL".equalsIgnoreCase(stateName)) {
-            sql.append(" AND state_name = ?");
-            sql.append(" ORDER BY overall_risk_score DESC LIMIT ? OFFSET ?");
-            return queryProjects(sql.toString(), sectorName, stateName.trim(), limit, offset);
-        } else {
-            sql.append(" ORDER BY overall_risk_score DESC LIMIT ? OFFSET ?");
-            return queryProjects(sql.toString(), sectorName, limit, offset);
-        }
+        List<Object> params = new ArrayList<>();
+        params.add(sectorName);
+        appendFilters(sql, params, stateName, ministry, riskBand, trajectory, costFilter, delayFilter, warningFilter, multiState);
+        sql.append(" ORDER BY overall_risk_score DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+        return queryProjects(sql.toString(), params.toArray());
     }
 
     private List<ProjectSummaryDto> queryProjects(String sql, Object... params) {

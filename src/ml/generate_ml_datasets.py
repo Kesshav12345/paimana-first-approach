@@ -261,4 +261,7 @@ def generate_ml_datasets(workspace_dir: str):
     return master_df
 
 if __name__ == "__main__":
-    generate_ml_datasets(r"c:\Users\kessh\OneDrive\Documents\paimana first approach")
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
+    generate_ml_datasets(workspace)
+

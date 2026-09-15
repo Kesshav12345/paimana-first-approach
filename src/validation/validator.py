@@ -160,4 +160,7 @@ def run_validation_checks(workspace_dir: str):
     return results
 
 if __name__ == "__main__":
-    run_validation_checks(r"c:\Users\kessh\OneDrive\Documents\paimana first approach")
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
+    run_validation_checks(workspace)
+

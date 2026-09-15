@@ -237,4 +237,5 @@ def load_canonical_database(workspace_dir: str):
     logger.info("Canonical database population complete!")
 
 if __name__ == "__main__":
-    load_canonical_database(r"c:\Users\kessh\OneDrive\Documents\paimana first approach")
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    load_canonical_database(os.environ.get("WORKSPACE_DIR", repo_root))

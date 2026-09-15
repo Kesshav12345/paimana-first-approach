@@ -375,7 +375,33 @@ CREATE TABLE IF NOT EXISTS ml_dataset_master (
 );
 
 -- --------------------------------------------------------------------
--- 9. PERFORMANCE INDEXES
+-- 9. PIPELINE EXECUTION AUDITING & REFRESH JOBS
+-- --------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS pipeline_execution_jobs (
+    job_id TEXT PRIMARY KEY,
+    trigger_type TEXT NOT NULL,
+    report_file TEXT,
+    reporting_month TEXT,
+    content_hash TEXT,
+    stage TEXT NOT NULL,
+    status TEXT NOT NULL,
+    total_projects INTEGER DEFAULT 0,
+    affected_projects_count INTEGER DEFAULT 0,
+    researched_count INTEGER DEFAULT 0,
+    claims_count INTEGER DEFAULT 0,
+    conflicts_count INTEGER DEFAULT 0,
+    warnings_refreshed INTEGER DEFAULT 0,
+    predictions_refreshed INTEGER DEFAULT 0,
+    started_at TEXT,
+    completed_at TEXT,
+    elapsed_seconds REAL DEFAULT 0.0,
+    error_summary TEXT,
+    details_json TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- --------------------------------------------------------------------
+-- 10. PERFORMANCE INDEXES
 -- --------------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_fpm_proj_month ON fact_project_month(project_id, reporting_month);
 CREATE INDEX IF NOT EXISTS idx_fpm_month ON fact_project_month(reporting_month);
@@ -385,3 +411,6 @@ CREATE INDEX IF NOT EXISTS idx_proj_state ON dim_project(primary_state_id);
 CREATE INDEX IF NOT EXISTS idx_gold_risk ON gold_risk_engine_outputs(risk_band, overall_risk_score);
 CREATE INDEX IF NOT EXISTS idx_gold_warning ON gold_warning_alerts(project_id, status);
 CREATE INDEX IF NOT EXISTS idx_ml_split ON ml_dataset_master(dataset_split, is_censored);
+CREATE INDEX IF NOT EXISTS idx_pipe_jobs_status ON pipeline_execution_jobs(status);
+CREATE INDEX IF NOT EXISTS idx_pipe_jobs_created ON pipeline_execution_jobs(created_at);
+

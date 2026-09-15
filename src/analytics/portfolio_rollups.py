@@ -116,4 +116,7 @@ def build_portfolio_rollups(workspace_dir: str):
     conn.close()
 
 if __name__ == "__main__":
-    build_portfolio_rollups(r"c:\Users\kessh\OneDrive\Documents\paimana first approach")
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
+    build_portfolio_rollups(workspace)
+

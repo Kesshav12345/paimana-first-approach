@@ -8,6 +8,7 @@ import { EarlyWarning } from './pages/EarlyWarning';
 import { Projects } from './pages/Projects';
 import { ProjectIntelligence } from './pages/ProjectIntelligence';
 import { Operations } from './pages/Operations';
+import { Methodology } from './pages/Methodology';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/early-warning" element={<EarlyWarning />} />
             <Route path="/projects/:id" element={<ProjectIntelligence />} />
             <Route path="/operations" element={<Operations />} />
+            <Route path="/methodology" element={<Methodology />} />
             
             {/* 404 Fallback */}
             <Route path="*" element={

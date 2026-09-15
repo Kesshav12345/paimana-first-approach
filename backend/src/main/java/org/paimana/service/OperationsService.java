@@ -41,8 +41,31 @@ public class OperationsService {
     }
 
     public Map<String, Object> uploadAndIngestPdf(MultipartFile file, String month) throws IOException {
-        // Forward to Python microservice to trigger the automated extraction & pipeline
-        return pythonBridgeClient.forwardPdfUpload(file, month);
+        return pythonBridgeClient.triggerIntelligenceRefresh(file, month, false);
+    }
+
+    public Map<String, Object> triggerIntelligenceRefresh(MultipartFile file, String month, Boolean forceReprocess) throws IOException {
+        return pythonBridgeClient.triggerIntelligenceRefresh(file, month, forceReprocess);
+    }
+
+    public Map<String, Object> getJobProgress(String jobId) {
+        return pythonBridgeClient.getJobProgress(jobId);
+    }
+
+    public java.util.List<Map<String, Object>> getRecentPipelineRuns(int limit) {
+        return pythonBridgeClient.getRecentPipelineRuns(limit);
+    }
+
+    public Map<String, Object> refreshExternalIntelligence(String scope, Integer limit) {
+        return pythonBridgeClient.refreshExternalIntelligence(scope, limit);
+    }
+
+    public Map<String, Object> recalculateDerivedValues() {
+        return pythonBridgeClient.recalculateDerivedValues();
+    }
+
+    public Map<String, Object> getMethodologyMetadata() {
+        return pythonBridgeClient.getMethodologyMetadata();
     }
 
     public Map<String, Object> triggerRetrain() {
@@ -57,3 +80,4 @@ public class OperationsService {
         return pythonBridgeClient.refreshPredictions();
     }
 }
+

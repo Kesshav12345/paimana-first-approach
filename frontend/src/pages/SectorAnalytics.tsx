@@ -1,17 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   Layers, 
   ArrowLeft, 
-  Filter, 
-  RotateCcw, 
-  MapPin, 
-  ShieldAlert, 
-  TrendingUp, 
-  Clock, 
-  AlertTriangle,
-  BarChart3,
-  ChevronRight
+  ExternalLink,
+  ChevronRight,
+  BarChart3
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -26,211 +20,279 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 import { api } from '../services/api';
-import type { SectorSummary, ProjectSummary, FilterMetadata } from '../types';
+import type { 
+  SectorSummary, 
+  ProjectSummary, 
+  FilterMetadata, 
+  AnalyticalFilterParams 
+} from '../types';
 import { RiskBadge } from '../components/common/Badges';
 import { Pagination } from '../components/common/Pagination';
+import { AnalyticalFilterPanel } from '../components/common/AnalyticalFilterPanel';
+import type { QuickPreset } from '../components/common/AnalyticalFilterPanel';
+import { FilterSelect } from '../components/common/FilterSelect';
+import type { ActiveChip } from '../components/common/ActiveFilterChips';
+
+const DEFAULT_FILTERS: AnalyticalFilterParams = {
+  state: 'ALL',
+  ministry: 'ALL',
+  riskBand: 'ALL',
+  trajectory: 'ALL',
+  costFilter: 'ALL',
+  delayFilter: 'ALL',
+  warningFilter: 'ALL',
+  multiState: 'ALL',
+  sortBy: 'cost'
+};
 
 export const SectorAnalytics: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Sector Overview State
   const [sectors, setSectors] = useState<SectorSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Filter Metadata from backend
   const [meta, setMeta] = useState<FilterMetadata | null>(null);
 
-  // Filter Form State
-  const [state, setState] = useState('ALL');
-  const [ministry, setMinistry] = useState('ALL');
-  const [riskBand, setRiskBand] = useState('ALL');
-  const [trajectory, setTrajectory] = useState('ALL');
-  const [costFilter, setCostFilter] = useState('ALL');
-  const [delayFilter, setDelayFilter] = useState('ALL');
-  const [warningFilter, setWarningFilter] = useState('ALL');
-  const [multiState, setMultiState] = useState('ALL');
-  const [sortBy, setSortBy] = useState('cost');
-
   // Active chart visualization tab
   const [activeChartTab, setActiveChartTab] = useState<'CAPITAL' | 'COST_DELAY' | 'RISK' | 'PROGRESS'>('CAPITAL');
 
-  // Interface 2 & 3: Sector Detail Drill-Down
-  const [selectedSector, setSelectedSector] = useState<string | null>(null);
-  const [selectedState, setSelectedState] = useState<string | null>(null);
+  // Filter State: Draft vs Applied
+  const [draftFilters, setDraftFilters] = useState<AnalyticalFilterParams>(() => ({
+    state: searchParams.get('state') || 'ALL',
+    ministry: searchParams.get('ministry') || 'ALL',
+    riskBand: searchParams.get('riskBand') || 'ALL',
+    trajectory: searchParams.get('trajectory') || 'ALL',
+    costFilter: searchParams.get('costFilter') || 'ALL',
+    delayFilter: searchParams.get('delayFilter') || 'ALL',
+    warningFilter: searchParams.get('warningFilter') || 'ALL',
+    multiState: searchParams.get('multiState') || 'ALL',
+    sortBy: searchParams.get('sortBy') || 'cost'
+  }));
+
+  const [appliedFilters, setAppliedFilters] = useState<AnalyticalFilterParams>(draftFilters);
+
+  // Drill-down State
+  const [selectedSector, setSelectedSector] = useState<string | null>(searchParams.get('sectorDetail') || null);
+  const [selectedState, setSelectedState] = useState<string | null>(searchParams.get('stateDetail') || null);
   const [sectorStates, setSectorStates] = useState<Array<{ state_name: string; project_count: number; total_revised_cost_cr: number; avg_progress_pct: number; high_risk_count: number }>>([]);
   const [projects, setProjects] = useState<ProjectSummary[]>([]);
   const [page, setPage] = useState(1);
-  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [loadingDrilldown, setLoadingDrilldown] = useState(false);
 
-  // Fetch filter metadata on mount
+  // Load canonical filter metadata on mount
   useEffect(() => {
-    api.getProjectFilters()
+    api.getFilterMetadata()
       .then(setMeta)
       .catch(err => console.error('Failed to load filter metadata:', err));
   }, []);
 
-  // Fetch Sectors based on current filters
-  const fetchSectors = useCallback(() => {
+  // Fetch Sectors based on applied filters
+  const fetchSectors = useCallback(async (filters: AnalyticalFilterParams) => {
     setLoading(true);
-    api.getSectors({
-      state,
-      ministry,
-      riskBand,
-      trajectory,
-      costFilter,
-      delayFilter,
-      warningFilter,
-      multiState,
-      sortBy
-    })
-      .then(res => {
-        setSectors(res || []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Failed to fetch sectors:', err);
-        setSectors([]);
-        setLoading(false);
-      });
-  }, [state, ministry, riskBand, trajectory, costFilter, delayFilter, warningFilter, multiState, sortBy]);
+    setError(null);
+    try {
+      const res = await api.getSectors(filters);
+      setSectors(res || []);
+    } catch (e: any) {
+      setError(e.message || 'Failed to load sector analytics');
+      setSectors([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Sync applied state to URL
+  const syncUrl = useCallback((filters: AnalyticalFilterParams, secDetail: string | null, stDetail: string | null) => {
+    const sp = new URLSearchParams();
+    if (filters.state && filters.state !== 'ALL') sp.set('state', filters.state);
+    if (filters.ministry && filters.ministry !== 'ALL') sp.set('ministry', filters.ministry);
+    if (filters.riskBand && filters.riskBand !== 'ALL') sp.set('riskBand', filters.riskBand);
+    if (filters.trajectory && filters.trajectory !== 'ALL') sp.set('trajectory', filters.trajectory);
+    if (filters.costFilter && filters.costFilter !== 'ALL') sp.set('costFilter', filters.costFilter);
+    if (filters.delayFilter && filters.delayFilter !== 'ALL') sp.set('delayFilter', filters.delayFilter);
+    if (filters.warningFilter && filters.warningFilter !== 'ALL') sp.set('warningFilter', filters.warningFilter);
+    if (filters.multiState && filters.multiState !== 'ALL') sp.set('multiState', filters.multiState);
+    if (filters.sortBy && filters.sortBy !== 'cost') sp.set('sortBy', filters.sortBy);
+    if (secDetail) sp.set('sectorDetail', secDetail);
+    if (stDetail) sp.set('stateDetail', stDetail);
+    setSearchParams(sp, { replace: true });
+  }, [setSearchParams]);
 
   // Initial load
   useEffect(() => {
-    fetchSectors();
-  }, [fetchSectors]);
+    fetchSectors(appliedFilters);
+  }, []);
 
-  // Handle Preset Quick Filters
-  const applyPreset = (preset: {
-    riskBand?: string;
-    costFilter?: string;
-    delayFilter?: string;
-    warningFilter?: string;
-    multiState?: string;
-  }) => {
-    setState('ALL');
-    setMinistry('ALL');
-    setRiskBand(preset.riskBand || 'ALL');
-    setTrajectory('ALL');
-    setCostFilter(preset.costFilter || 'ALL');
-    setDelayFilter(preset.delayFilter || 'ALL');
-    setWarningFilter(preset.warningFilter || 'ALL');
-    setMultiState(preset.multiState || 'ALL');
-    setSortBy('cost');
-
-    setLoading(true);
-    api.getSectors({
-      ...preset,
-      sortBy: 'cost'
-    }).then(res => {
-      setSectors(res || []);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+  // Apply Action: Commit draft filters and trigger query
+  const handleApply = () => {
+    setAppliedFilters(draftFilters);
+    syncUrl(draftFilters, selectedSector, selectedState);
+    fetchSectors(draftFilters);
   };
 
-  // Reset Filters to National Default
-  const resetFilters = () => {
-    setState('ALL');
-    setMinistry('ALL');
-    setRiskBand('ALL');
-    setTrajectory('ALL');
-    setCostFilter('ALL');
-    setDelayFilter('ALL');
-    setWarningFilter('ALL');
-    setMultiState('ALL');
-    setSortBy('cost');
-
-    setLoading(true);
-    api.getSectors().then(res => {
-      setSectors(res || []);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+  // Reset Action: Restore defaults and query national aggregate
+  const handleReset = () => {
+    setDraftFilters(DEFAULT_FILTERS);
+    setAppliedFilters(DEFAULT_FILTERS);
+    syncUrl(DEFAULT_FILTERS, selectedSector, selectedState);
+    fetchSectors(DEFAULT_FILTERS);
   };
 
-  // Active filter count
-  const activeCount = [
-    state !== 'ALL',
-    ministry !== 'ALL',
-    riskBand !== 'ALL',
-    trajectory !== 'ALL',
-    costFilter !== 'ALL',
-    delayFilter !== 'ALL',
-    warningFilter !== 'ALL',
-    multiState !== 'ALL',
-  ].filter(Boolean).length;
+  // Quick Preset
+  const handlePreset = (preset: Partial<AnalyticalFilterParams>) => {
+    const updated: AnalyticalFilterParams = {
+      ...DEFAULT_FILTERS,
+      ...preset
+    };
+    setDraftFilters(updated);
+    setAppliedFilters(updated);
+    syncUrl(updated, selectedSector, selectedState);
+    fetchSectors(updated);
+  };
 
-  // Handle Sector Selection (Drill-Down to Interface 2 & 3)
+  // Remove Chip
+  const handleRemoveChip = (key: string) => {
+    const updated = { ...appliedFilters, [key]: 'ALL' };
+    setDraftFilters(updated);
+    setAppliedFilters(updated);
+    syncUrl(updated, selectedSector, selectedState);
+    fetchSectors(updated);
+  };
+
+  // Check unsaved changes
+  const hasUnsavedChanges = JSON.stringify(draftFilters) !== JSON.stringify(appliedFilters);
+
+  // Convert applied filters to chips
+  const activeChips: ActiveChip[] = [
+    appliedFilters.state && appliedFilters.state !== 'ALL' ? { key: 'state', label: 'State', value: appliedFilters.state, onRemove: () => handleRemoveChip('state') } : null,
+    appliedFilters.ministry && appliedFilters.ministry !== 'ALL' ? { key: 'ministry', label: 'Ministry', value: appliedFilters.ministry, onRemove: () => handleRemoveChip('ministry') } : null,
+    appliedFilters.riskBand && appliedFilters.riskBand !== 'ALL' ? { key: 'riskBand', label: 'Risk Band', value: appliedFilters.riskBand, onRemove: () => handleRemoveChip('riskBand') } : null,
+    appliedFilters.costFilter && appliedFilters.costFilter !== 'ALL' ? { key: 'costFilter', label: 'Cost Profile', value: appliedFilters.costFilter.replace(/_/g, ' '), onRemove: () => handleRemoveChip('costFilter') } : null,
+    appliedFilters.delayFilter && appliedFilters.delayFilter !== 'ALL' ? { key: 'delayFilter', label: 'Delay Profile', value: appliedFilters.delayFilter.replace(/_/g, ' '), onRemove: () => handleRemoveChip('delayFilter') } : null,
+    appliedFilters.warningFilter && appliedFilters.warningFilter !== 'ALL' ? { key: 'warningFilter', label: 'Warnings', value: appliedFilters.warningFilter.replace(/_/g, ' '), onRemove: () => handleRemoveChip('warningFilter') } : null,
+    appliedFilters.multiState && appliedFilters.multiState !== 'ALL' ? { key: 'multiState', label: 'Multi-State', value: appliedFilters.multiState, onRemove: () => handleRemoveChip('multiState') } : null,
+  ].filter(Boolean) as ActiveChip[];
+
+  // Quick Presets
+  const presets: QuickPreset[] = [
+    { id: 'all', label: 'All Sectors (National)', onApply: handleReset },
+    { id: 'crit', label: 'Critical Risk Only', onApply: () => handlePreset({ riskBand: 'CRITICAL' }) },
+    { id: 'cost20', label: 'Cost Overrun ≥ 20%', onApply: () => handlePreset({ costFilter: 'HIGH_ESCALATION' }) },
+    { id: 'delay12', label: 'Delayed ≥ 12 Mo', onApply: () => handlePreset({ delayFilter: 'SEVERE_DELAY' }) },
+    { id: 'multi', label: 'Multi-State Corridors', onApply: () => handlePreset({ multiState: 'YES' }) },
+  ];
+
+  // Drilldown data loader: inherits appliedFilters
+  const loadDrilldown = useCallback(async (secName: string, stName: string | null, currentPage: number) => {
+    setLoadingDrilldown(true);
+    try {
+      const [stRes, projRes] = await Promise.all([
+        api.getSectorStates(secName, appliedFilters),
+        api.getSectorProjects(secName, stName || undefined, currentPage, 20, appliedFilters)
+      ]);
+      setSectorStates(stRes || []);
+      setProjects(projRes || []);
+    } catch (e) {
+      console.error('Failed to load sector drilldown:', e);
+    } finally {
+      setLoadingDrilldown(false);
+    }
+  }, [appliedFilters]);
+
+  // Handle Explore Sector from table or dropdown
   const handleSelectSector = (secName: string) => {
     setSelectedSector(secName);
     setSelectedState(null);
     setPage(1);
-    setLoadingProjects(true);
-    api.getSectorStates(secName).then(setSectorStates);
-    api.getSectorProjects(secName, undefined, 1, 20)
-      .then(res => {
-        setProjects(res || []);
-        setLoadingProjects(false);
-      })
-      .catch(() => setLoadingProjects(false));
+    syncUrl(appliedFilters, secName, null);
+    loadDrilldown(secName, null, 1);
   };
 
-  const handleSelectState = (stName: string) => {
-    setSelectedState(stName);
+  // Handle Select State in drill-down dropdown
+  const handleSelectState = (stName: string | null) => {
+    const cleanSt = stName && stName !== 'ALL' ? stName : null;
+    setSelectedState(cleanSt);
     setPage(1);
     if (selectedSector) {
-      setLoadingProjects(true);
-      api.getSectorProjects(selectedSector, stName || undefined, 1, 20)
-        .then(res => {
-          setProjects(res || []);
-          setLoadingProjects(false);
-        })
-        .catch(() => setLoadingProjects(false));
+      syncUrl(appliedFilters, selectedSector, cleanSt);
+      loadDrilldown(selectedSector, cleanSt, 1);
     }
   };
 
+  // Detail Page Change
+  const handleDrilldownPageChange = (newPage: number) => {
+    setPage(newPage);
+    if (selectedSector) {
+      loadDrilldown(selectedSector, selectedState, newPage);
+    }
+  };
+
+  // Trigger drilldown if initial URL has sectorDetail
+  useEffect(() => {
+    if (selectedSector) {
+      loadDrilldown(selectedSector, selectedState, page);
+    }
+  }, []);
+
   // Aggregated Portfolio Totals for Top KPI Cards
-  const totalProjects = sectors.reduce((acc, s) => acc + s.projectCount, 0);
-  const totalRevisedCost = sectors.reduce((acc, s) => acc + s.totalRevisedCostCr, 0);
-  const totalOrigCost = sectors.reduce((acc, s) => acc + s.totalOriginalCostCr, 0);
-  const totalSpend = sectors.reduce((acc, s) => acc + s.totalCumulativeExpenditureCr, 0);
-  const totalHighCritical = sectors.reduce((acc, s) => acc + s.highRiskCount + s.criticalRiskCount, 0);
-  const totalWarnings = sectors.reduce((acc, s) => acc + s.activeWarningCount, 0);
-  const portfolioCostEscalation = totalOrigCost > 0 ? ((totalRevisedCost - totalOrigCost) / totalOrigCost) * 100 : 0;
+  const kpi = useMemo(() => {
+    const totalProjects = sectors.reduce((acc, s) => acc + s.projectCount, 0);
+    const totalRevisedCost = sectors.reduce((acc, s) => acc + s.totalRevisedCostCr, 0);
+    const totalOrigCost = sectors.reduce((acc, s) => acc + s.totalOriginalCostCr, 0);
+    const totalSpend = sectors.reduce((acc, s) => acc + s.totalCumulativeExpenditureCr, 0);
+    const totalHighCritical = sectors.reduce((acc, s) => acc + s.highRiskCount + s.criticalRiskCount, 0);
+    const totalWarnings = sectors.reduce((acc, s) => acc + s.activeWarningCount, 0);
+    const portfolioCostEscalation = totalOrigCost > 0 ? ((totalRevisedCost - totalOrigCost) / totalOrigCost) * 100 : 0;
+    const avgDelay = sectors.length > 0
+      ? sectors.reduce((acc, s) => acc + (s.avgScheduleDelayMonths || 0) * s.projectCount, 0) / (totalProjects || 1)
+      : 0;
+
+    return {
+      totalProjects,
+      sectorsCount: sectors.length,
+      totalRevisedCost,
+      totalSpend,
+      portfolioCostEscalation,
+      totalHighCritical,
+      totalWarnings,
+      avgDelay
+    };
+  }, [sectors]);
 
   // Chart Data preparation
-  const chartData = sectors.map(s => ({
-    name: s.sectorName,
-    shortName: s.sectorName.length > 14 ? s.sectorName.substring(0, 12) + '...' : s.sectorName,
-    projects: s.projectCount,
-    originalCost: Math.round(s.totalOriginalCostCr),
-    revisedCost: Math.round(s.totalRevisedCostCr),
-    expenditure: Math.round(s.totalCumulativeExpenditureCr),
-    costEscalationPct: Number(s.weightedCostEscalationPct.toFixed(1)),
-    expenditurePct: Number(s.weightedExpenditurePct.toFixed(1)),
-    physicalProgressPct: Number(s.avgPhysicalProgressPct.toFixed(1)),
-    scheduleDelayMonths: Number((s.avgScheduleDelayMonths || 0).toFixed(1)),
-    criticalRiskCount: s.criticalRiskCount,
-    highRiskCount: s.highRiskCount,
-    moderateLowRiskCount: Math.max(0, s.projectCount - (s.highRiskCount + s.criticalRiskCount)),
-    warningCount: s.activeWarningCount,
-  }));
-
-  // Color Palette for Sectors
-  const SECTOR_COLORS = [
-    '#2563eb', '#3b82f6', '#0ea5e9', '#06b6d4', 
-    '#10b981', '#059669', '#f59e0b', '#d97706', 
-    '#ef4444', '#dc2626', '#8b5cf6', '#6366f1'
-  ];
+  const chartData = useMemo(() => {
+    return sectors.map(s => ({
+      name: s.sectorName,
+      shortName: s.sectorName.length > 14 ? s.sectorName.substring(0, 12) + '...' : s.sectorName,
+      projects: s.projectCount,
+      originalCost: Math.round(s.totalOriginalCostCr),
+      revisedCost: Math.round(s.totalRevisedCostCr),
+      expenditure: Math.round(s.totalCumulativeExpenditureCr),
+      costEscalationPct: Number(s.weightedCostEscalationPct.toFixed(1)),
+      expenditurePct: Number(s.weightedExpenditurePct.toFixed(1)),
+      physicalProgressPct: Number(s.avgPhysicalProgressPct.toFixed(1)),
+      scheduleDelayMonths: Number((s.avgScheduleDelayMonths || 0).toFixed(1)),
+      criticalRiskCount: s.criticalRiskCount,
+      highRiskCount: s.highRiskCount,
+      moderateLowRiskCount: Math.max(0, s.projectCount - (s.highRiskCount + s.criticalRiskCount)),
+      warningCount: s.activeWarningCount,
+    }));
+  }, [sectors]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
           <div className="flex items-center gap-2 text-blue-600 font-semibold text-xs uppercase tracking-wider mb-1">
             {selectedSector ? (
               <button
-                onClick={() => { setSelectedSector(null); setSelectedState(null); }}
+                onClick={() => { setSelectedSector(null); setSelectedState(null); syncUrl(appliedFilters, null, null); }}
                 className="flex items-center gap-1 hover:underline text-slate-500 hover:text-blue-600"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to Sector Overview
@@ -260,903 +322,578 @@ export const SectorAnalytics: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Sector Overview Mode (When no specific sector drill-down is open) */}
+      {/* ========================================================================= */}
+      {/* OVERVIEW MODE: FILTERS -> KPIS -> CHARTS -> COMPARISON TABLE             */}
+      {/* ========================================================================= */}
       {!selectedSector && (
-        <>
-          {/* TOP SECTION: Multi-Attribute Filtering System */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            
-            {/* Filter Header & Quick Presets Bar */}
-            <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-bold text-slate-800">
-                    Sector Analytical Filtering System
-                  </span>
-                  {activeCount > 0 ? (
-                    <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-600 text-white">
-                      {activeCount} active criteria
-                    </span>
-                  ) : (
-                    <span className="text-[11px] text-slate-400">
-                      Showing All 12 Sectors (National Aggregate)
-                    </span>
-                  )}
-                </div>
+        <div className="space-y-6">
+          
+          {/* Analytical Filter Panel */}
+          <AnalyticalFilterPanel
+            title="Sector Analytical Scope"
+            subtitle="Configure cohort criteria. Visual charts and sector rankings reflect applied filters."
+            onApply={handleApply}
+            onReset={handleReset}
+            loading={loading}
+            hasUnsavedChanges={hasUnsavedChanges}
+            applyButtonLabel="Apply Sector Filters"
+            presets={presets}
+            activeChips={activeChips}
+            onClearAllChips={handleReset}
+            totalMatching={kpi.totalProjects}
+            entityLabel="projects"
+          >
+            {/* State / UT */}
+            <FilterSelect
+              label="State / Union Territory"
+              value={draftFilters.state || 'ALL'}
+              onChange={(v) => setDraftFilters(prev => ({ ...prev, state: v }))}
+              options={meta?.states || []}
+            />
 
-                <div className="text-xs text-slate-500">
-                  Select filters to update pictorial comparisons and table below
-                </div>
-              </div>
+            {/* Ministry */}
+            <FilterSelect
+              label="Administrative Ministry"
+              value={draftFilters.ministry || 'ALL'}
+              onChange={(v) => setDraftFilters(prev => ({ ...prev, ministry: v }))}
+              options={meta?.ministries || []}
+            />
 
-              {/* Quick Preset Pills */}
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1">
-                  Presets:
-                </span>
-                <button
-                  onClick={resetFilters}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition ${
-                    activeCount === 0
-                      ? 'bg-blue-600 text-white border-blue-700 shadow-sm'
-                      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-                  }`}
-                >
-                  All Sectors (National)
-                </button>
-                <button
-                  onClick={() => applyPreset({ riskBand: 'CRITICAL' })}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition flex items-center gap-1 ${
-                    riskBand === 'CRITICAL'
-                      ? 'bg-red-600 text-white border-red-700 shadow-sm'
-                      : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
-                  }`}
-                >
-                  <ShieldAlert className="w-3 h-3" />
-                  Critical Risk Only
-                </button>
-                <button
-                  onClick={() => applyPreset({ costFilter: 'HIGH_ESCALATION' })}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition flex items-center gap-1 ${
-                    costFilter === 'HIGH_ESCALATION'
-                      ? 'bg-amber-600 text-white border-amber-700 shadow-sm'
-                      : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
-                  }`}
-                >
-                  <TrendingUp className="w-3 h-3" />
-                  Cost Overrun &ge; 20%
-                </button>
-                <button
-                  onClick={() => applyPreset({ delayFilter: 'SEVERE_DELAY' })}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition flex items-center gap-1 ${
-                    delayFilter === 'SEVERE_DELAY'
-                      ? 'bg-orange-600 text-white border-orange-700 shadow-sm'
-                      : 'bg-orange-50 text-orange-800 border-orange-200 hover:bg-orange-100'
-                  }`}
-                >
-                  <Clock className="w-3 h-3" />
-                  Delayed &ge; 12 Mo
-                </button>
-                <button
-                  onClick={() => applyPreset({ multiState: 'YES' })}
-                  className={`px-2.5 py-1 rounded-md text-xs font-medium border transition flex items-center gap-1 ${
-                    multiState === 'YES'
-                      ? 'bg-indigo-600 text-white border-indigo-700 shadow-sm'
-                      : 'bg-indigo-50 text-indigo-800 border-indigo-200 hover:bg-indigo-100'
-                  }`}
-                >
-                  <MapPin className="w-3 h-3" />
-                  Multi-State Corridors
-                </button>
-              </div>
+            {/* Risk Band */}
+            <FilterSelect
+              label="Project Risk Band"
+              value={draftFilters.riskBand || 'ALL'}
+              onChange={(v) => setDraftFilters(prev => ({ ...prev, riskBand: v }))}
+              options={[
+                { value: 'ALL', label: 'All Risk Bands' },
+                { value: 'CRITICAL', label: 'Critical Risk' },
+                { value: 'HIGH', label: 'High Risk' },
+                { value: 'MODERATE', label: 'Moderate Risk' },
+                { value: 'LOW', label: 'Low Risk' },
+              ]}
+            />
+
+            {/* Cost Escalation Profile */}
+            <FilterSelect
+              label="Cost Escalation Profile"
+              value={draftFilters.costFilter || 'ALL'}
+              onChange={(v) => setDraftFilters(prev => ({ ...prev, costFilter: v }))}
+              options={[
+                { value: 'ALL', label: 'All Budget Profiles' },
+                { value: 'ESCALATED', label: 'Any Cost Overrun (> 0%)' },
+                { value: 'HIGH_ESCALATION', label: 'High Escalation (≥ 20%)' },
+                { value: 'SEVERE_ESCALATION', label: 'Severe Escalation (≥ 50%)' },
+                { value: 'WITHIN_BUDGET', label: 'Within Sanction (≤ 0%)' },
+              ]}
+            />
+
+            {/* Schedule Slippage Profile */}
+            <FilterSelect
+              label="Schedule Slippage Profile"
+              value={draftFilters.delayFilter || 'ALL'}
+              onChange={(v) => setDraftFilters(prev => ({ ...prev, delayFilter: v }))}
+              options={[
+                { value: 'ALL', label: 'All Schedule Profiles' },
+                { value: 'DELAYED', label: 'Any Slippage (> 0 Mo)' },
+                { value: 'MODERATE_DELAY', label: 'Moderate Delay (1 - 11 Mo)' },
+                { value: 'SEVERE_DELAY', label: 'Severe Delay (≥ 12 Mo)' },
+                { value: 'CRITICAL_DELAY', label: 'Critical Delay (≥ 24 Mo)' },
+                { value: 'ON_TIME', label: 'On Schedule or Ahead' },
+              ]}
+            />
+
+            {/* Warning Profile */}
+            <FilterSelect
+              label="Warning Signal Status"
+              value={draftFilters.warningFilter || 'ALL'}
+              onChange={(v) => setDraftFilters(prev => ({ ...prev, warningFilter: v }))}
+              options={[
+                { value: 'ALL', label: 'All Alert Levels' },
+                { value: 'HAS_WARNINGS', label: 'Has Active Warnings' },
+                { value: 'MULTI_WARNING', label: 'Multiple Warnings (≥ 2)' },
+                { value: 'NO_WARNINGS', label: 'Clean (No Warnings)' },
+              ]}
+            />
+
+            {/* Multi-State Footprint */}
+            <FilterSelect
+              label="Corridor Footprint"
+              value={draftFilters.multiState || 'ALL'}
+              onChange={(v) => setDraftFilters(prev => ({ ...prev, multiState: v }))}
+              options={[
+                { value: 'ALL', label: 'All Corridor Footprints' },
+                { value: 'YES', label: 'Multi-State Corridors Only' },
+                { value: 'NO', label: 'Single State Projects Only' },
+              ]}
+            />
+
+            {/* Sort Metric */}
+            <FilterSelect
+              label="Rank Sectors By"
+              value={draftFilters.sortBy || 'cost'}
+              onChange={(v) => setDraftFilters(prev => ({ ...prev, sortBy: v }))}
+              options={[
+                { value: 'cost', label: 'Revised Outlay (Highest)' },
+                { value: 'projects', label: 'Project Count (Highest)' },
+                { value: 'escalation', label: 'Cost Escalation % (Highest)' },
+                { value: 'delay', label: 'Average Delay (Longest)' },
+                { value: 'risk', label: 'High/Critical Risk (Highest)' },
+                { value: 'name', label: 'Sector Name (A-Z)' },
+              ]}
+            />
+          </AnalyticalFilterPanel>
+
+          {/* Filtered KPI Summary Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-slate-500">Filtered Projects</p>
+              <p className="text-lg font-bold text-slate-900 mt-0.5">{kpi.totalProjects.toLocaleString()}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">{kpi.sectorsCount} Sectors Active</p>
             </div>
-
-            {/* Filter Dropdowns Grid */}
-            <div className="p-4 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                
-                {/* 1. State / Geography */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    State / Territory Filter
-                  </label>
-                  <select
-                    value={state}
-                    onChange={e => setState(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    <option value="ALL">All States & UTs (National)</option>
-                    {meta?.states?.map(st => (
-                      <option key={st} value={st}>{st}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 2. Ministry Filter */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    Administrative Ministry
-                  </label>
-                  <select
-                    value={ministry}
-                    onChange={e => setMinistry(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    <option value="ALL">All Ministries</option>
-                    {meta?.ministries?.map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 3. Risk Band */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    Project Risk Classification
-                  </label>
-                  <select
-                    value={riskBand}
-                    onChange={e => setRiskBand(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    <option value="ALL">All Risk Bands</option>
-                    <option value="CRITICAL">Critical Risk</option>
-                    <option value="HIGH">High Risk</option>
-                    <option value="MODERATE">Moderate Risk</option>
-                    <option value="LOW">Low Risk</option>
-                  </select>
-                </div>
-
-                {/* 4. Cost Escalation Profile */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    Budget Escalation Profile
-                  </label>
-                  <select
-                    value={costFilter}
-                    onChange={e => setCostFilter(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    <option value="ALL">All Budget Profiles</option>
-                    <option value="ESCALATED">Cost Overrun (&gt;0%)</option>
-                    <option value="HIGH_ESCALATION">High Escalation (&ge;20%)</option>
-                    <option value="SEVERE_ESCALATION">Severe Escalation (&ge;50%)</option>
-                    <option value="WITHIN_BUDGET">Within Sanctioned Budget</option>
-                  </select>
-                </div>
-
-                {/* 5. Schedule Delay Profile */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    Schedule Slippage Profile
-                  </label>
-                  <select
-                    value={delayFilter}
-                    onChange={e => setDelayFilter(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    <option value="ALL">All Schedule Profiles</option>
-                    <option value="DELAYED">Any Delay (&gt;0 mo)</option>
-                    <option value="SEVERE_DELAY">Severe Delay (&ge;12 mo)</option>
-                    <option value="CRITICAL_DELAY">Critical Delay (&ge;24 mo)</option>
-                    <option value="ON_TIME">On Schedule or Ahead</option>
-                  </select>
-                </div>
-
-                {/* 6. Active Warning Signals */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    Early Warning Alerts
-                  </label>
-                  <select
-                    value={warningFilter}
-                    onChange={e => setWarningFilter(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    <option value="ALL">All Alert Levels</option>
-                    <option value="HAS_WARNINGS">Active Warnings (&ge;1)</option>
-                    <option value="MULTI_WARNING">Multi-Warning Alerted (&ge;2)</option>
-                    <option value="NO_WARNINGS">Zero Warnings</option>
-                  </select>
-                </div>
-
-                {/* 7. Geographic Footprint */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    Geographic Footprint
-                  </label>
-                  <select
-                    value={multiState}
-                    onChange={e => setMultiState(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    <option value="ALL">All Geographies</option>
-                    <option value="YES">Multi-State Corridors Only</option>
-                    <option value="NO">Single State Projects Only</option>
-                  </select>
-                </div>
-
-                {/* 8. Metric Sort Order */}
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">
-                    Sector Sort & Rank Metric
-                  </label>
-                  <select
-                    value={sortBy}
-                    onChange={e => setSortBy(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-800 focus:ring-2 focus:ring-blue-500 transition"
-                  >
-                    <option value="cost">Total Revised Outlay (Highest First)</option>
-                    <option value="escalation">Cost Escalation % (Highest First)</option>
-                    <option value="delay">Average Delay (Most Delayed First)</option>
-                    <option value="progress">Physical Progress % (Lowest First)</option>
-                    <option value="risk">High / Critical Risk Projects Count</option>
-                    <option value="name">Sector Name (A to Z)</option>
-                  </select>
-                </div>
-
-              </div>
-
-              {/* Action Buttons Row */}
-              <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={fetchSectors}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow flex items-center gap-1.5"
-                  >
-                    <Filter className="w-3.5 h-3.5" />
-                    <span>Apply Sector Filters</span>
-                  </button>
-
-                  <button
-                    onClick={resetFilters}
-                    className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-300 flex items-center gap-1.5"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Reset All</span>
-                  </button>
-                </div>
-
-                {/* Active Filter Tags summary */}
-                <div className="text-xs text-slate-500">
-                  <span>Evaluating <strong>{sectors.length} sectors</strong> across <strong>{totalProjects.toLocaleString()} projects</strong></span>
-                </div>
-              </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-slate-500">Revised Outlay</p>
+              <p className="text-lg font-bold text-slate-900 mt-0.5">₹{Math.round(kpi.totalRevisedCost).toLocaleString()}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Cr Capital Exposure</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-slate-500">Expenditure</p>
+              <p className="text-lg font-bold text-blue-600 mt-0.5">₹{Math.round(kpi.totalSpend).toLocaleString()}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Cr Cumulative Burn</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-slate-500">Weighted Escalation</p>
+              <p className={`text-lg font-bold mt-0.5 ${kpi.portfolioCostEscalation > 15 ? 'text-amber-600' : 'text-slate-900'}`}>
+                +{kpi.portfolioCostEscalation.toFixed(1)}%
+              </p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Cost Growth vs Sanction</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-slate-500">Average Delay</p>
+              <p className={`text-lg font-bold mt-0.5 ${kpi.avgDelay > 12 ? 'text-orange-600' : 'text-slate-900'}`}>
+                {kpi.avgDelay.toFixed(1)} Mo
+              </p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Weighted Slippage</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-slate-500">High / Critical Risk</p>
+              <p className="text-lg font-bold text-rose-600 mt-0.5">{kpi.totalHighCritical.toLocaleString()}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Flagged Projects</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-slate-500">Active Warnings</p>
+              <p className="text-lg font-bold text-amber-500 mt-0.5">{kpi.totalWarnings.toLocaleString()}</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Rule Anomaly Signals</p>
             </div>
           </div>
 
-          {/* PORTFOLIO SNAPSHOT KPI CARDS */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Filtered Projects</span>
-              <div className="text-2xl font-extrabold text-slate-900 mt-1">{totalProjects.toLocaleString()}</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Across {sectors.length} Sectors</div>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Revised Capital Outlay</span>
-              <div className="text-2xl font-extrabold text-slate-900 mt-1 font-mono">₹{Math.round(totalRevisedCost).toLocaleString()} Cr</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Spend: ₹{Math.round(totalSpend).toLocaleString()} Cr</div>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Weighted Cost Growth</span>
-              <div className="text-2xl font-extrabold text-red-600 mt-1 font-mono">+{portfolioCostEscalation.toFixed(1)}%</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">₹{(totalRevisedCost - totalOrigCost).toLocaleString(undefined, { maximumFractionDigits: 0 })} Cr Overrun</div>
-            </div>
-
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">High / Critical Risk</span>
-              <div className="text-2xl font-extrabold text-rose-600 mt-1">{totalHighCritical.toLocaleString()}</div>
-              <div className="text-[11px] text-amber-600 mt-0.5">{totalWarnings.toLocaleString()} Active Warnings</div>
-            </div>
+          {/* Context statement */}
+          <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+            <span>
+              Comparing <strong className="text-slate-800">{sectors.length} sectors</strong> across <strong className="text-slate-800">{kpi.totalProjects.toLocaleString()} projects</strong> matching applied analytical scope.
+            </span>
+            <span className="text-[11px] text-slate-400">
+              Click any sector row or bar to inspect state breakdown & project cohort
+            </span>
           </div>
 
-          {/* MIDDLE SECTION: Pictorial & Graphical Comparison of Sectors */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            
-            {/* Visualizer Tab Navigation Bar */}
-            <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
-                  <BarChart3 className="w-4 h-4" />
-                  Pictorial Sector Comparison Suite
+          {/* Error Banner */}
+          {error && (
+            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-xs text-rose-700 flex items-center justify-between">
+              <span>{error}</span>
+              <button onClick={() => fetchSectors(appliedFilters)} className="underline hover:text-rose-900 font-semibold">
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* Graphical Pictorial Comparison Tabs */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+            <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-blue-600" />
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Sector Comparative Visual Analytics
                 </span>
-                <h2 className="text-base font-extrabold text-slate-800 tracking-tight mt-0.5">
-                  Multi-Factor Graphical Visualizations
-                </h2>
               </div>
 
-              <div className="flex flex-wrap items-center gap-1.5 bg-slate-200/70 p-1 rounded-lg">
+              {/* Chart Tabs */}
+              <div className="flex bg-slate-200/70 p-0.5 rounded-lg text-xs self-start sm:self-auto">
                 <button
                   onClick={() => setActiveChartTab('CAPITAL')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
-                    activeChartTab === 'CAPITAL'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-md font-medium transition ${
+                    activeChartTab === 'CAPITAL' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  1. Capital Allocation & Outlay
+                  Capital & Delivery
                 </button>
-
                 <button
                   onClick={() => setActiveChartTab('COST_DELAY')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
-                    activeChartTab === 'COST_DELAY'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-md font-medium transition ${
+                    activeChartTab === 'COST_DELAY' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  2. Cost Growth vs Delay Divergence
+                  Cost vs Schedule Delay
                 </button>
-
                 <button
                   onClick={() => setActiveChartTab('RISK')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
-                    activeChartTab === 'RISK'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-md font-medium transition ${
+                    activeChartTab === 'RISK' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  3. Risk Concentration & Warnings
+                  Risk Concentration & Alerts
                 </button>
-
                 <button
                   onClick={() => setActiveChartTab('PROGRESS')}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition ${
-                    activeChartTab === 'PROGRESS'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                  className={`px-3 py-1.5 rounded-md font-medium transition ${
+                    activeChartTab === 'PROGRESS' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  4. Progress vs Expenditure Burn
+                  Execution Progress
                 </button>
               </div>
             </div>
 
-            {/* Chart Canvas Area */}
-            <div className="p-5">
+            <div className="p-4 sm:p-6 h-[380px]">
               {loading ? (
-                <div className="flex items-center justify-center min-h-[380px]">
-                  <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                  Recomputing visual comparison across sectors...
                 </div>
               ) : sectors.length === 0 ? (
-                <div className="py-16 text-center text-slate-400 text-xs">
-                  No sector data matches the selected filter parameters.
+                <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                  No sectors match the selected criteria.
                 </div>
               ) : (
-                <>
-                  {/* CHART 1: Capital Allocation & Financial Exposure */}
-                  {activeChartTab === 'CAPITAL' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <span className="font-semibold text-slate-700">
-                          Comparison: Original Approved Outlay vs Revised Cost vs Cumulative Spend (₹ Crores)
-                        </span>
-                        <span>Unit: ₹ Crores</span>
-                      </div>
-                      <div className="h-96 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                            <XAxis 
-                              dataKey="shortName" 
-                              tick={{ fontSize: 11, fill: '#64748b' }} 
-                              angle={-30} 
-                              textAnchor="end"
-                              interval={0}
-                            />
-                            <YAxis 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
-                              tickFormatter={v => `₹${(v / 1000).toFixed(0)}k Cr`}
-                            />
-                            <Tooltip 
-                              formatter={(value: any) => [`₹${Number(value).toLocaleString()} Cr`, '']}
-                              labelStyle={{ fontWeight: 'bold', color: '#1e293b' }}
-                              contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '8px', fontSize: '12px' }}
-                            />
-                            <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                            <Bar dataKey="originalCost" name="Sanctioned Cost (₹ Cr)" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="revisedCost" name="Current Revised Cost (₹ Cr)" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="expenditure" name="Cumulative Expenditure (₹ Cr)" fill="#10b981" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
+                <ResponsiveContainer width="100%" height="100%">
+                  {activeChartTab === 'CAPITAL' ? (
+                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#64748b' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k Cr`} />
+                      <Tooltip 
+                        formatter={(val: any, name: any) => [`₹${Number(val).toLocaleString()} Cr`, name === 'revisedCost' ? 'Revised Outlay' : name === 'originalCost' ? 'Original Cost' : 'Cumulative Expenditure']}
+                        labelFormatter={(label) => `Sector: ${chartData.find(d => d.shortName === label)?.name || label}`}
+                      />
+                      <Legend verticalAlign="top" height={36} />
+                      <Bar dataKey="originalCost" name="Original Cost" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#2563eb" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
+                      <Bar dataKey="expenditure" name="Cumulative Expenditure" fill="#10b981" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  ) : activeChartTab === 'COST_DELAY' ? (
+                    <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#64748b' }} />
+                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `+${v}%`} />
+                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `${v} Mo`} />
+                      <Tooltip 
+                        formatter={(val: any, name: any) => [name === 'costEscalationPct' ? `+${val}%` : `${val} Months`, name === 'costEscalationPct' ? 'Weighted Cost Escalation' : 'Average Schedule Delay']}
+                        labelFormatter={(label) => `Sector: ${chartData.find(d => d.shortName === label)?.name || label}`}
+                      />
+                      <Legend verticalAlign="top" height={36} />
+                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation (%)" fill="#f59e0b" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
+                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Delay (Months)" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} />
+                    </ComposedChart>
+                  ) : activeChartTab === 'RISK' ? (
+                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#64748b' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                      <Tooltip 
+                        formatter={(val: any, name: any) => [`${val} projects`, name === 'criticalRiskCount' ? 'Critical Risk' : name === 'highRiskCount' ? 'High Risk' : 'Moderate / Low Risk']}
+                        labelFormatter={(label) => `Sector: ${chartData.find(d => d.shortName === label)?.name || label}`}
+                      />
+                      <Legend verticalAlign="top" height={36} />
+                      <Bar dataKey="criticalRiskCount" name="Critical Risk" stackId="a" fill="#e11d48" onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
+                      <Bar dataKey="highRiskCount" name="High Risk" stackId="a" fill="#ea580c" />
+                      <Bar dataKey="moderateLowRiskCount" name="Moderate / Low Risk" stackId="a" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  ) : (
+                    <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#64748b' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                      <Tooltip 
+                        formatter={(val: any, name: any) => [`${val}%`, name === 'physicalProgressPct' ? 'Average Physical Progress' : 'Weighted Expenditure Burn']}
+                        labelFormatter={(label) => `Sector: ${chartData.find(d => d.shortName === label)?.name || label}`}
+                      />
+                      <Legend verticalAlign="top" height={36} />
+                      <Bar dataKey="physicalProgressPct" name="Average Physical Progress (%)" fill="#10b981" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
+                      <Line type="monotone" dataKey="expenditurePct" name="Expenditure / Revised Outlay (%)" stroke="#6366f1" strokeWidth={3} dot={{ r: 4 }} />
+                    </ComposedChart>
                   )}
-
-                  {/* CHART 2: Cost Growth vs Schedule Delay Divergence */}
-                  {activeChartTab === 'COST_DELAY' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <span className="font-semibold text-slate-700">
-                          Dual-Axis Divergence: Weighted Cost Escalation % (Bar) vs Average Delay Months (Line)
-                        </span>
-                        <span className="text-red-600 font-semibold">Identifies Compounding Risk Sectors</span>
-                      </div>
-                      <div className="h-96 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                            <XAxis 
-                              dataKey="shortName" 
-                              tick={{ fontSize: 11, fill: '#64748b' }} 
-                              angle={-30} 
-                              textAnchor="end"
-                              interval={0}
-                            />
-                            <YAxis 
-                              yAxisId="left" 
-                              orientation="left" 
-                              tick={{ fontSize: 11, fill: '#ef4444' }}
-                              tickFormatter={v => `${v}%`}
-                              label={{ value: 'Cost Escalation %', angle: -90, position: 'insideLeft', fill: '#ef4444', fontSize: 11 }}
-                            />
-                            <YAxis 
-                              yAxisId="right" 
-                              orientation="right" 
-                              tick={{ fontSize: 11, fill: '#f59e0b' }}
-                              tickFormatter={v => `${v} mo`}
-                              label={{ value: 'Average Delay (Months)', angle: 90, position: 'insideRight', fill: '#f59e0b', fontSize: 11 }}
-                            />
-                            <Tooltip 
-                              formatter={(value: any, name: any) => [
-                                name.includes('Escalation') ? `${value}%` : `${value} months`,
-                                name
-                              ]}
-                              contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '8px', fontSize: '12px' }}
-                            />
-                            <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                            <Bar yAxisId="left" dataKey="costEscalationPct" name="Cost Escalation (%)" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                            <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Avg Delay (Months)" stroke="#f59e0b" strokeWidth={3} dot={{ r: 5, fill: '#f59e0b' }} />
-                          </ComposedChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* CHART 3: Risk Concentration & Alert Density */}
-                  {activeChartTab === 'RISK' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <span className="font-semibold text-slate-700">
-                          Sector Risk Classification Breakdown: Critical Risk vs High Risk vs Moderate/Low
-                        </span>
-                        <span className="text-purple-600 font-semibold">Priority Monitoring Focus</span>
-                      </div>
-                      <div className="h-96 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                            <XAxis 
-                              dataKey="shortName" 
-                              tick={{ fontSize: 11, fill: '#64748b' }} 
-                              angle={-30} 
-                              textAnchor="end"
-                              interval={0}
-                            />
-                            <YAxis 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
-                              label={{ value: 'Project Count', angle: -90, position: 'insideLeft', fill: '#64748b', fontSize: 11 }}
-                            />
-                            <Tooltip 
-                              formatter={(value: any) => [`${value} projects`, '']}
-                              contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '8px', fontSize: '12px' }}
-                            />
-                            <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                            <Bar dataKey="criticalRiskCount" name="Critical Risk Projects" stackId="risk" fill="#dc2626" />
-                            <Bar dataKey="highRiskCount" name="High Risk Projects" stackId="risk" fill="#f97316" />
-                            <Bar dataKey="moderateLowRiskCount" name="Moderate / Low Risk" stackId="risk" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* CHART 4: Progress vs Financial Burn % */}
-                  {activeChartTab === 'PROGRESS' && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs text-slate-500">
-                        <span className="font-semibold text-slate-700">
-                          Execution Divergence: Certified Physical Progress % vs Weighted Financial Expenditure %
-                        </span>
-                        <span className="text-blue-600 font-semibold">Flags Premature Capital Burn</span>
-                      </div>
-                      <div className="h-96 w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                            <XAxis 
-                              dataKey="shortName" 
-                              tick={{ fontSize: 11, fill: '#64748b' }} 
-                              angle={-30} 
-                              textAnchor="end"
-                              interval={0}
-                            />
-                            <YAxis 
-                              tick={{ fontSize: 11, fill: '#64748b' }}
-                              tickFormatter={v => `${v}%`}
-                              label={{ value: 'Percentage (%)', angle: -90, position: 'insideLeft', fill: '#64748b', fontSize: 11 }}
-                            />
-                            <Tooltip 
-                              formatter={(value: any) => [`${value}%`, '']}
-                              contentStyle={{ backgroundColor: '#ffffff', borderColor: '#cbd5e1', borderRadius: '8px', fontSize: '12px' }}
-                            />
-                            <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                            <Bar dataKey="physicalProgressPct" name="Avg Physical Progress (%)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="expenditurePct" name="Weighted Expenditure Burn (%)" fill="#059669" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  )}
-                </>
+                </ResponsiveContainer>
               )}
             </div>
           </div>
 
-          {/* BOTTOM SECTION: Sector Comparison Table */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Sector Comparison Matrix (Tabular View)
-                </span>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Detailed numerical data corresponding to the pictorial representations above
-                </p>
-              </div>
-
-              <div className="text-xs text-slate-500">
-                Showing <strong>{sectors.length} sectors</strong> sorted by {sortBy}
-              </div>
+          {/* Numerical Sector Comparison Table */}
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <div className="p-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                Detailed Sector Portfolio Comparison ({sectors.length})
+              </span>
+              <span className="text-xs text-slate-500">
+                Ordered by {appliedFilters.sortBy === 'cost' ? 'Revised Outlay' : appliedFilters.sortBy}
+              </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-slate-100/75 text-slate-600 uppercase text-[10px] tracking-wider font-bold border-b border-slate-200">
+              <table className="w-full text-left text-xs text-slate-700">
+                <thead className="bg-slate-100/70 border-b border-slate-200 uppercase text-[11px] font-semibold text-slate-500">
                   <tr>
-                    <th className="px-4 py-3.5">Sector Name</th>
-                    <th className="px-4 py-3.5 text-right">Projects</th>
-                    <th className="px-4 py-3.5 text-right">Sanctioned Outlay</th>
-                    <th className="px-4 py-3.5 text-right">Revised Cost</th>
-                    <th className="px-4 py-3.5 text-right">Cost Escalation</th>
-                    <th className="px-4 py-3.5 text-right">Expenditure</th>
-                    <th className="px-4 py-3.5 text-right">Physical Progress</th>
-                    <th className="px-4 py-3.5 text-center">Avg Delay</th>
-                    <th className="px-4 py-3.5 text-center">Risk Cohort</th>
-                    <th className="px-4 py-3.5 text-center">Alerts</th>
-                    <th className="px-4 py-3.5 text-right">Action</th>
+                    <th className="px-4 py-3">Sector Name</th>
+                    <th className="px-4 py-3 text-right">Projects</th>
+                    <th className="px-4 py-3 text-right">Approved (₹ Cr)</th>
+                    <th className="px-4 py-3 text-right">Revised (₹ Cr)</th>
+                    <th className="px-4 py-3 text-right">Escalation (%)</th>
+                    <th className="px-4 py-3 text-right">Expenditure (₹ Cr)</th>
+                    <th className="px-4 py-3 text-right">Avg Progress</th>
+                    <th className="px-4 py-3 text-right">Avg Delay</th>
+                    <th className="px-4 py-3 text-right">High / Critical</th>
+                    <th className="px-4 py-3 text-right">Warnings</th>
+                    <th className="px-4 py-3 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {sectors.map((s, idx) => (
-                    <tr 
-                      key={s.sectorName} 
-                      className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                      onClick={() => handleSelectSector(s.sectorName)}
-                    >
-                      {/* Sector Name */}
-                      <td className="px-4 py-3.5 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <span 
-                            className="w-2.5 h-2.5 rounded-full" 
-                            style={{ backgroundColor: SECTOR_COLORS[idx % SECTOR_COLORS.length] }} 
-                          />
-                          <span className="font-bold text-slate-900 group-hover:text-blue-600 transition">
-                            {s.sectorName}
-                          </span>
-                        </div>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={11} className="text-center py-12 text-slate-400">
+                        Querying sector portfolio cohort...
                       </td>
-
-                      {/* Project Count */}
-                      <td className="px-4 py-3.5 text-right font-mono font-bold text-slate-800">
-                        {s.projectCount.toLocaleString()}
-                      </td>
-
-                      {/* Sanctioned Cost */}
-                      <td className="px-4 py-3.5 text-right font-mono text-slate-500 whitespace-nowrap">
-                        ₹{Math.round(s.totalOriginalCostCr).toLocaleString()} Cr
-                      </td>
-
-                      {/* Revised Cost */}
-                      <td className="px-4 py-3.5 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
-                        ₹{Math.round(s.totalRevisedCostCr).toLocaleString()} Cr
-                      </td>
-
-                      {/* Cost Escalation */}
-                      <td className="px-4 py-3.5 text-right font-mono whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${
-                          s.weightedCostEscalationPct >= 20 ? 'bg-red-100 text-red-700' :
-                          s.weightedCostEscalationPct > 0 ? 'bg-amber-100 text-amber-800' :
-                          'bg-emerald-100 text-emerald-800'
-                        }`}>
-                          {s.weightedCostEscalationPct > 0 ? '+' : ''}{s.weightedCostEscalationPct.toFixed(1)}%
-                        </span>
-                      </td>
-
-                      {/* Cumulative Spend */}
-                      <td className="px-4 py-3.5 text-right font-mono text-slate-700 whitespace-nowrap">
-                        <div>₹{Math.round(s.totalCumulativeExpenditureCr).toLocaleString()} Cr</div>
-                        <div className="text-[10px] text-slate-400 font-normal">
-                          ({s.weightedExpenditurePct.toFixed(1)}% burn)
-                        </div>
-                      </td>
-
-                      {/* Physical Progress */}
-                      <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                        <div className="font-bold font-mono text-slate-800">
-                          {s.avgPhysicalProgressPct.toFixed(1)}%
-                        </div>
-                        <div className="w-20 ml-auto bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden">
-                          <div 
-                            className={`h-1.5 rounded-full ${
-                              s.avgPhysicalProgressPct >= 75 ? 'bg-emerald-500' :
-                              s.avgPhysicalProgressPct >= 40 ? 'bg-blue-500' : 'bg-amber-500'
-                            }`}
-                            style={{ width: `${Math.min(100, Math.max(0, s.avgPhysicalProgressPct))}%` }}
-                          />
-                        </div>
-                      </td>
-
-                      {/* Average Delay */}
-                      <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                        {(s.avgScheduleDelayMonths || 0) > 0 ? (
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
-                            (s.avgScheduleDelayMonths || 0) >= 24 ? 'bg-red-100 text-red-700' :
-                            (s.avgScheduleDelayMonths || 0) >= 12 ? 'bg-orange-100 text-orange-700' :
-                            'bg-amber-100 text-amber-700'
-                          }`}>
-                            +{(s.avgScheduleDelayMonths || 0).toFixed(1)} mo
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">
-                            On Time
-                          </span>
-                        )}
-                      </td>
-
-                      {/* High & Critical Risk Count */}
-                      <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1 font-bold">
-                          {s.criticalRiskCount > 0 && (
-                            <span className="px-1.5 py-0.5 rounded text-[10px] bg-red-100 text-red-700">
-                              {s.criticalRiskCount} Crit
-                            </span>
-                          )}
-                          <span className="px-1.5 py-0.5 rounded text-[10px] bg-orange-100 text-orange-700">
-                            {s.highRiskCount} High
-                          </span>
-                        </span>
-                      </td>
-
-                      {/* Warning Alerts */}
-                      <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                        {s.activeWarningCount > 0 ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-700">
-                            <AlertTriangle className="w-3 h-3" />
-                            {s.activeWarningCount}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400 text-xs">—</span>
-                        )}
-                      </td>
-
-                      {/* Action Explore Button */}
-                      <td className="px-4 py-3.5 text-right whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                    </tr>
+                  ) : sectors.length === 0 ? (
+                    <tr>
+                      <td colSpan={11} className="text-center py-12 space-y-2">
+                        <p className="text-sm font-medium text-slate-600">No sectors contain projects matching the selected scope.</p>
+                        <p className="text-xs text-slate-400">Broaden your filters or reset to national comparison.</p>
                         <button
-                          onClick={() => handleSelectSector(s.sectorName)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-lg font-semibold text-xs transition border border-blue-200 hover:border-blue-600 shadow-sm"
+                          onClick={handleReset}
+                          className="mt-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold"
                         >
-                          <span>Explore</span>
-                          <ChevronRight className="w-3.5 h-3.5" />
+                          Reset Filters
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    sectors.map((s) => (
+                      <tr key={s.sectorName} className="hover:bg-blue-50/40 transition">
+                        <td className="px-4 py-3 font-semibold text-slate-900 max-w-sm truncate" title={s.sectorName}>
+                          {s.sectorName}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-slate-700">{s.projectCount.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono text-slate-500">₹{Math.round(s.totalOriginalCostCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-slate-900">₹{Math.round(s.totalRevisedCostCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono">
+                          <span className={s.weightedCostEscalationPct > 15 ? 'text-amber-600 font-semibold' : 'text-slate-600'}>
+                            +{s.weightedCostEscalationPct.toFixed(1)}%
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-blue-600 font-medium">₹{Math.round(s.totalCumulativeExpenditureCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono font-medium text-slate-700">{s.avgPhysicalProgressPct.toFixed(1)}%</td>
+                        <td className="px-4 py-3 text-right font-mono">
+                          <span className={s.avgScheduleDelayMonths > 12 ? 'text-orange-600 font-semibold' : 'text-slate-600'}>
+                            {(s.avgScheduleDelayMonths || 0).toFixed(1)} Mo
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <span className={s.highRiskCount + s.criticalRiskCount > 0 ? 'text-rose-600 font-bold' : 'text-slate-400'}>
+                            {s.highRiskCount + s.criticalRiskCount}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-amber-600 font-medium">{s.activeWarningCount}</td>
+                        <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => handleSelectSector(s.sectorName)}
+                            className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-[11px] font-semibold transition flex items-center gap-1 mx-auto shadow-2xs"
+                          >
+                            Explore <ChevronRight className="w-3 h-3" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
-        </>
+
+        </div>
       )}
 
-      {/* INTERFACE 2 & 3: Sector Specific Drill-Down (State Distribution & Project List) */}
+      {/* ========================================================================= */}
+      {/* DRILL-DOWN MODE: DROPDOWN SELECTORS -> CONTEXT SUMMARY -> PROJECTS TABLE  */}
+      {/* ========================================================================= */}
       {selectedSector && (
         <div className="space-y-6">
           
-          {/* Top Quick Navigation Bar */}
-          <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div className="flex items-center gap-3">
+          {/* Top Drill-Down Selectors Panel */}
+          <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                  Detailed Sector Drill-Down
+                </span>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Scope inherited from overview: {activeChips.length > 0 ? activeChips.map(c => `${c.label}: ${c.value}`).join(' · ') : 'National Aggregate (All criteria)'}
+                </p>
+              </div>
+
               <button
-                onClick={() => { setSelectedSector(null); setSelectedState(null); }}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-300 flex items-center gap-1"
+                onClick={() => { setSelectedSector(null); setSelectedState(null); syncUrl(appliedFilters, null, null); }}
+                className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition flex items-center gap-1.5 self-start sm:self-auto"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Return to All Sectors Comparison</span>
+                <ArrowLeft className="w-3.5 h-3.5" /> Back to Overview
               </button>
-
-              <span className="text-slate-300">|</span>
-              <span className="text-xs text-slate-500">
-                Currently Inspecting: <strong className="text-slate-900">{selectedSector}</strong>
-              </span>
             </div>
 
-            <div className="text-xs text-slate-500">
-              Select a state below to filter projects within this sector
-            </div>
-          </div>
-
-          {/* Interface 2: State Performance Distribution Cards */}
-          <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-blue-600" />
-                State Distribution & Footprint for {selectedSector}
-              </h3>
-              <span className="text-[11px] text-slate-400">
-                Click any state card to filter the project cohort
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2.5">
-              <button
-                onClick={() => handleSelectState('')}
-                className={`p-3 rounded-lg border text-left text-xs transition ${
-                  !selectedState
-                    ? 'bg-blue-600 border-blue-700 text-white font-bold shadow'
-                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <div>All States</div>
-                <div className={`text-[11px] mt-1 ${!selectedState ? 'text-blue-100' : 'text-slate-400'}`}>
-                  {sectorStates.reduce((acc, c) => acc + c.project_count, 0)} Projects
-                </div>
-              </button>
-
-              {sectorStates.map(st => (
-                <button
-                  key={st.state_name}
-                  onClick={() => handleSelectState(st.state_name)}
-                  className={`p-3 rounded-lg border text-left text-xs transition truncate ${
-                    selectedState === st.state_name
-                      ? 'bg-blue-600 border-blue-700 text-white font-bold shadow'
-                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
-                  }`}
+            {/* Conventional Compact Selectors */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Sector Selector */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  Selected Sector
+                </label>
+                <select
+                  value={selectedSector}
+                  onChange={(e) => handleSelectSector(e.target.value)}
+                  className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
                 >
-                  <div className="truncate font-semibold">{st.state_name}</div>
-                  <div className={`text-[11px] mt-1 flex items-center justify-between ${
-                    selectedState === st.state_name ? 'text-blue-100' : 'text-slate-400'
-                  }`}>
-                    <span>{st.project_count} proj</span>
-                    {st.high_risk_count > 0 && (
-                      <span className={selectedState === st.state_name ? 'text-amber-200 font-bold' : 'text-red-600 font-bold'}>
-                        {st.high_risk_count} risk
-                      </span>
-                    )}
-                  </div>
-                </button>
-              ))}
+                  {(meta?.sectors && meta.sectors.length > 0 
+                    ? meta.sectors 
+                    : sectors.map(s => s.sectorName)
+                  ).map(secName => {
+                    const secObj = sectors.find(s => s.sectorName === secName);
+                    return (
+                      <option key={secName} value={secName}>
+                        {secName} {secObj ? `(${secObj.projectCount} projects)` : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              {/* State / Territory Selector */}
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                  State / Territory
+                </label>
+                <select
+                  value={selectedState || 'ALL'}
+                  onChange={(e) => handleSelectState(e.target.value)}
+                  className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                >
+                  <option value="ALL">All States & UTs ({sectorStates.reduce((acc, s) => acc + s.project_count, 0)})</option>
+                  {sectorStates.map(st => (
+                    <option key={st.state_name} value={st.state_name}>
+                      {st.state_name} ({st.project_count} projects{st.high_risk_count > 0 ? ` · ${st.high_risk_count} high-risk` : ''})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Scoped Entity Summary Pill */}
+              <div className="flex flex-col justify-end">
+                <div className="p-2 rounded-lg bg-blue-50/70 border border-blue-100 text-xs text-blue-900 flex items-center justify-between">
+                  <span className="font-semibold">Matching Sector Projects:</span>
+                  <span className="font-mono font-bold text-sm text-blue-700">
+                    {selectedState 
+                      ? sectorStates.find(s => s.state_name === selectedState)?.project_count || projects.length
+                      : sectorStates.reduce((acc, s) => acc + s.project_count, 0) || projects.length}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Interface 3: Projects Table in this Sector */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-800">
-                  Projects in {selectedSector} {selectedState ? `→ ${selectedState}` : '(All States)'}
+          {/* Project Cohort Table inheriting overview filters */}
+          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+            <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                  Project Cohort: {selectedSector} {selectedState ? `→ ${selectedState}` : '(All States)'}
                 </span>
-                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-700">
-                  {projects.length} Records
-                </span>
+                <p className="text-[11px] text-slate-500 mt-0.5">
+                  Displaying projects satisfying inherited overview filters
+                </p>
               </div>
-
-              <div className="text-xs text-slate-500">
-                Click <span className="font-semibold text-blue-600">"Inspect"</span> on any row to drill down into 15 analytical dimensions
-              </div>
+              <span className="text-xs text-slate-500 font-mono">
+                {projects.length} displayed on page {page}
+              </span>
             </div>
 
-            {loadingProjects ? (
-              <div className="p-12 text-center">
-                <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-                <span className="text-xs text-slate-400">Loading projects...</span>
-              </div>
-            ) : projects.length === 0 ? (
-              <div className="p-12 text-center text-xs text-slate-400">
-                No projects found in this sector for the selected state.
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-100/75 text-slate-600 uppercase text-[10px] tracking-wider font-bold border-b border-slate-200">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs text-slate-700">
+                <thead className="bg-slate-100/70 border-b border-slate-200 uppercase text-[11px] font-semibold text-slate-500">
+                  <tr>
+                    <th className="px-4 py-2.5">Project ID</th>
+                    <th className="px-4 py-2.5">Project Name</th>
+                    <th className="px-4 py-2.5">Agency</th>
+                    <th className="px-4 py-2.5">State</th>
+                    <th className="px-4 py-2.5 text-right">Revised Cost</th>
+                    <th className="px-4 py-2.5 text-right">Progress</th>
+                    <th className="px-4 py-2.5 text-right">Delay (Mos)</th>
+                    <th className="px-4 py-2.5 text-center">Risk</th>
+                    <th className="px-4 py-2.5 text-center">Intelligence</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {loadingDrilldown ? (
                     <tr>
-                      <th className="px-4 py-3">Project & Identity</th>
-                      <th className="px-4 py-3">Executing Agency</th>
-                      <th className="px-4 py-3">State</th>
-                      <th className="px-4 py-3 text-right">Revised Cost</th>
-                      <th className="px-4 py-3 text-right">Progress</th>
-                      <th className="px-4 py-3 text-center">Delay</th>
-                      <th className="px-4 py-3 text-center">Risk</th>
-                      <th className="px-4 py-3 text-right">Action</th>
+                      <td colSpan={9} className="text-center py-12 text-slate-400">
+                        Loading sector project cohort...
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {projects.map(p => (
-                      <tr 
-                        key={p.projectId} 
-                        className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
-                        onClick={() => navigate(`/projects/${p.projectId}`)}
-                      >
-                        <td className="px-4 py-3 max-w-xs">
-                          <div className="font-mono text-[11px] font-semibold text-blue-600 mb-0.5">
-                            {p.projectId}
-                          </div>
-                          <div className="font-bold text-slate-900 group-hover:text-blue-600 transition truncate" title={p.projectName}>
-                            {p.projectName}
-                          </div>
+                  ) : projects.length === 0 ? (
+                    <tr>
+                      <td colSpan={9} className="text-center py-12 text-slate-400">
+                        No projects found under this sector/state matching the applied filters.
+                      </td>
+                    </tr>
+                  ) : (
+                    projects.map((p) => (
+                      <tr key={p.projectId} className="hover:bg-slate-50/80 transition">
+                        <td className="px-4 py-2.5 font-mono text-slate-500">{p.projectId}</td>
+                        <td className="px-4 py-2.5 font-medium text-slate-900 max-w-xs truncate" title={p.projectName}>
+                          {p.projectName}
                         </td>
-
-                        <td className="px-4 py-3 text-slate-600 truncate max-w-[180px]" title={p.agencyName}>
-                          {p.agencyName}
-                        </td>
-
-                        <td className="px-4 py-3 text-slate-700 whitespace-nowrap">
-                          {p.stateName || 'Multi-State'}
-                        </td>
-
-                        <td className="px-4 py-3 text-right font-mono font-bold text-slate-900 whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-slate-600 truncate max-w-[150px]">{p.agencyName}</td>
+                        <td className="px-4 py-2.5 text-slate-600">{p.stateName}</td>
+                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-slate-900">
                           ₹{p.latestRevisedCostCr.toLocaleString()} Cr
                         </td>
-
-                        <td className="px-4 py-3 text-right font-mono whitespace-nowrap">
-                          {p.physicalProgressPct}%
+                        <td className="px-4 py-2.5 text-right font-mono text-slate-700">{p.physicalProgressPct}%</td>
+                        <td className="px-4 py-2.5 text-right font-mono">
+                          <span className={p.scheduleSlippageMonths > 0 ? 'text-amber-600 font-semibold' : 'text-slate-500'}>
+                            {p.scheduleSlippageMonths}
+                          </span>
                         </td>
-
-                        <td className="px-4 py-3 text-center whitespace-nowrap">
-                          {p.scheduleSlippageMonths > 0 ? (
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
-                              p.scheduleSlippageMonths >= 24 ? 'bg-red-100 text-red-700' :
-                              p.scheduleSlippageMonths >= 12 ? 'bg-orange-100 text-orange-700' :
-                              'bg-amber-100 text-amber-700'
-                            }`}>
-                              +{p.scheduleSlippageMonths} mo
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-700">
-                              On Time
-                            </span>
-                          )}
-                        </td>
-
-                        <td className="px-4 py-3 text-center whitespace-nowrap">
+                        <td className="px-4 py-2.5 text-center">
                           <RiskBadge band={p.riskBand} score={p.overallRiskScore} />
                         </td>
-
-                        <td className="px-4 py-3 text-right whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                        <td className="px-4 py-2.5 text-center">
                           <button
                             onClick={() => navigate(`/projects/${p.projectId}`)}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-lg font-semibold text-xs transition border border-blue-200 hover:border-blue-600 shadow-sm"
+                            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-xs font-semibold border border-blue-200 transition inline-flex items-center gap-1"
                           >
-                            <span>Inspect</span>
-                            <ChevronRight className="w-3.5 h-3.5" />
+                            Details <ExternalLink className="w-3 h-3" />
                           </button>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-            <Pagination
-              page={page}
-              totalPages={Math.ceil(projects.length / 20) || 1}
-              total={projects.length}
-              size={20}
-              onPageChange={setPage}
-            />
+            {/* Pagination */}
+            {projects.length > 0 && (
+              <Pagination
+                page={page}
+                totalPages={Math.ceil(projects.length / 20) || 1}
+                total={projects.length}
+                size={20}
+                onPageChange={handleDrilldownPageChange}
+              />
+            )}
           </div>
 
         </div>

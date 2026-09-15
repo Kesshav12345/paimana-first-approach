@@ -15,10 +15,18 @@ MONTH_MAP = {
 
 def load_external_wpi(workspace_dir: str):
     db_path = os.path.join(workspace_dir, "paimana_canonical.db")
-    wpi_file = r"c:\Users\kessh\OneDrive\Documents\PAIMANA INTEL\Secondary dataset\WPI and PPIs\wpi_monthly_index_202608.xlsx"
+    wpi_file = os.environ.get(
+        "WPI_FILE_PATH",
+        os.path.join(workspace_dir, "data", "secondary", "wpi_monthly_index_202608.xlsx")
+    )
+    if not os.path.exists(wpi_file):
+        # Secondary fallback if present in parent directory
+        parent_candidate = os.path.abspath(os.path.join(workspace_dir, "..", "PAIMANA INTEL", "Secondary dataset", "WPI and PPIs", "wpi_monthly_index_202608.xlsx"))
+        if os.path.exists(parent_candidate):
+            wpi_file = parent_candidate
     
     if not os.path.exists(wpi_file):
-        logger.warning(f"WPI file not found at {wpi_file}")
+        logger.warning(f"WPI file not found at {wpi_file}. Skipping external WPI load.")
         return
         
     wb = openpyxl.load_workbook(wpi_file, read_only=True)
@@ -60,4 +68,7 @@ def load_external_wpi(workspace_dir: str):
     logger.info(f"Loaded {inserted} external WPI monthly index observations into fact_external_macro_index.")
 
 if __name__ == "__main__":
-    load_external_wpi(r"c:\Users\kessh\OneDrive\Documents\paimana first approach")
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
+    load_external_wpi(workspace)
+

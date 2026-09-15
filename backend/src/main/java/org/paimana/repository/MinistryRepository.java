@@ -5,6 +5,7 @@ import org.paimana.dto.ProjectSummaryDto;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,17 +19,54 @@ public class MinistryRepository {
     }
 
     public List<MinistrySummaryDto> getAllMinistries() {
-        String sql = """
-            SELECT 
-                ministry_name, project_count, total_original_cost_cr, total_revised_cost_cr,
-                total_expenditure_cr, weighted_cost_escalation_pct, weighted_expenditure_pct,
-                avg_physical_progress_pct, projects_requiring_attention as high_risk_count,
-                0 as critical_risk_count, total_warnings as active_warning_count
-            FROM gold_ministry_summary
-            ORDER BY project_count DESC
-        """;
+        return getAllMinistries(null, null, null, null, null, null, null, null, null);
+    }
 
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+    public List<MinistrySummaryDto> getAllMinistries(
+            String state, String sector, String riskBand,
+            String trajectory, String costFilter, String delayFilter,
+            String warningFilter, String multiState, String sortBy
+    ) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT 
+                ministry_name,
+                COUNT(*) as project_count,
+                ROUND(SUM(original_cost_cr), 2) as total_original_cost_cr,
+                ROUND(SUM(latest_revised_cost_cr), 2) as total_revised_cost_cr,
+                ROUND(SUM(cumulative_expenditure_cr), 2) as total_expenditure_cr,
+                ROUND(CASE WHEN SUM(original_cost_cr) > 0 THEN ((SUM(latest_revised_cost_cr) - SUM(original_cost_cr)) / SUM(original_cost_cr)) * 100.0 ELSE 0.0 END, 2) as weighted_cost_escalation_pct,
+                ROUND(CASE WHEN SUM(latest_revised_cost_cr) > 0 THEN (SUM(cumulative_expenditure_cr) / SUM(latest_revised_cost_cr)) * 100.0 ELSE 0.0 END, 2) as weighted_expenditure_pct,
+                ROUND(AVG(physical_progress_pct), 1) as avg_physical_progress_pct,
+                ROUND(AVG(schedule_slippage_months), 1) as avg_schedule_delay_months,
+                SUM(CASE WHEN UPPER(risk_band) = 'HIGH' THEN 1 ELSE 0 END) as high_risk_count,
+                SUM(CASE WHEN UPPER(risk_band) = 'CRITICAL' THEN 1 ELSE 0 END) as critical_risk_count,
+                SUM(active_warning_count) as active_warning_count
+            FROM gold_project_current
+            WHERE ministry_name IS NOT NULL AND ministry_name != ''
+        """);
+
+        List<Object> params = new ArrayList<>();
+        appendFilters(sql, params, state, sector, riskBand, trajectory, costFilter, delayFilter, warningFilter, multiState);
+
+        sql.append(" GROUP BY ministry_name");
+
+        if ("cost".equalsIgnoreCase(sortBy)) {
+            sql.append(" ORDER BY total_revised_cost_cr DESC");
+        } else if ("escalation".equalsIgnoreCase(sortBy)) {
+            sql.append(" ORDER BY weighted_cost_escalation_pct DESC");
+        } else if ("delay".equalsIgnoreCase(sortBy)) {
+            sql.append(" ORDER BY avg_schedule_delay_months DESC");
+        } else if ("progress".equalsIgnoreCase(sortBy)) {
+            sql.append(" ORDER BY avg_physical_progress_pct ASC");
+        } else if ("risk".equalsIgnoreCase(sortBy)) {
+            sql.append(" ORDER BY (critical_risk_count * 2 + high_risk_count) DESC, total_revised_cost_cr DESC");
+        } else if ("name".equalsIgnoreCase(sortBy)) {
+            sql.append(" ORDER BY ministry_name ASC");
+        } else {
+            sql.append(" ORDER BY total_revised_cost_cr DESC");
+        }
+
+        return jdbcTemplate.query(sql.toString(), (rs, rowNum) -> {
             MinistrySummaryDto d = new MinistrySummaryDto();
             d.setMinistryName(rs.getString("ministry_name"));
             d.setProjectCount(rs.getInt("project_count"));
@@ -42,11 +80,80 @@ public class MinistryRepository {
             d.setCriticalRiskCount(rs.getInt("critical_risk_count"));
             d.setActiveWarningCount(rs.getInt("active_warning_count"));
             return d;
-        });
+        }, params.toArray());
+    }
+
+    private void appendFilters(
+            StringBuilder sql, List<Object> params,
+            String state, String sector, String riskBand,
+            String trajectory, String costFilter, String delayFilter,
+            String warningFilter, String multiState
+    ) {
+        if (state != null && !state.trim().isEmpty() && !"ALL".equalsIgnoreCase(state)) {
+            sql.append(" AND state_name = ?");
+            params.add(state.trim());
+        }
+        if (sector != null && !sector.trim().isEmpty() && !"ALL".equalsIgnoreCase(sector)) {
+            sql.append(" AND sector_name = ?");
+            params.add(sector.trim());
+        }
+        if (riskBand != null && !riskBand.trim().isEmpty() && !"ALL".equalsIgnoreCase(riskBand)) {
+            sql.append(" AND UPPER(risk_band) = ?");
+            params.add(riskBand.trim().toUpperCase());
+        }
+        if (trajectory != null && !trajectory.trim().isEmpty() && !"ALL".equalsIgnoreCase(trajectory)) {
+            sql.append(" AND UPPER(risk_trajectory) = ?");
+            params.add(trajectory.trim().toUpperCase());
+        }
+        if ("ESCALATED".equalsIgnoreCase(costFilter)) {
+            sql.append(" AND cost_escalation_pct > 0");
+        } else if ("HIGH_ESCALATION".equalsIgnoreCase(costFilter)) {
+            sql.append(" AND cost_escalation_pct >= 20");
+        } else if ("SEVERE_ESCALATION".equalsIgnoreCase(costFilter)) {
+            sql.append(" AND cost_escalation_pct >= 50");
+        } else if ("MODERATE_ESCALATION".equalsIgnoreCase(costFilter)) {
+            sql.append(" AND cost_escalation_pct > 0 AND cost_escalation_pct < 20");
+        } else if ("WITHIN_BUDGET".equalsIgnoreCase(costFilter)) {
+            sql.append(" AND cost_escalation_pct <= 0");
+        }
+
+        if ("DELAYED".equalsIgnoreCase(delayFilter)) {
+            sql.append(" AND schedule_slippage_months > 0");
+        } else if ("MODERATE_DELAY".equalsIgnoreCase(delayFilter)) {
+            sql.append(" AND schedule_slippage_months > 0 AND schedule_slippage_months < 12");
+        } else if ("SEVERE_DELAY".equalsIgnoreCase(delayFilter)) {
+            sql.append(" AND schedule_slippage_months >= 12");
+        } else if ("CRITICAL_DELAY".equalsIgnoreCase(delayFilter)) {
+            sql.append(" AND schedule_slippage_months >= 24");
+        } else if ("ON_TIME".equalsIgnoreCase(delayFilter) || "ON_SCHEDULE".equalsIgnoreCase(delayFilter)) {
+            sql.append(" AND schedule_slippage_months <= 0");
+        }
+
+        if ("HAS_WARNINGS".equalsIgnoreCase(warningFilter) || "ACTIVE_WARNINGS".equalsIgnoreCase(warningFilter)) {
+            sql.append(" AND active_warning_count > 0");
+        } else if ("MULTI_WARNING".equalsIgnoreCase(warningFilter) || "MULTIPLE_WARNINGS".equalsIgnoreCase(warningFilter)) {
+            sql.append(" AND active_warning_count >= 2");
+        } else if ("NO_WARNINGS".equalsIgnoreCase(warningFilter)) {
+            sql.append(" AND active_warning_count = 0");
+        }
+
+        if ("YES".equalsIgnoreCase(multiState)) {
+            sql.append(" AND is_multi_state = 1");
+        } else if ("NO".equalsIgnoreCase(multiState)) {
+            sql.append(" AND is_multi_state = 0");
+        }
     }
 
     public List<Map<String, Object>> getMinistryAgencyBreakdown(String ministryName) {
-        String sql = """
+        return getMinistryAgencyBreakdown(ministryName, null, null, null, null, null, null, null, null);
+    }
+
+    public List<Map<String, Object>> getMinistryAgencyBreakdown(
+            String ministryName, String state, String sector, String riskBand,
+            String trajectory, String costFilter, String delayFilter,
+            String warningFilter, String multiState
+    ) {
+        StringBuilder sql = new StringBuilder("""
             SELECT 
                 agency_name, COUNT(*) as project_count,
                 ROUND(SUM(latest_revised_cost_cr), 2) as total_revised_cost_cr,
@@ -54,13 +161,23 @@ public class MinistryRepository {
                 SUM(CASE WHEN UPPER(risk_band) IN ('HIGH', 'CRITICAL') THEN 1 ELSE 0 END) as high_risk_count
             FROM gold_project_current
             WHERE ministry_name = ?
-            GROUP BY agency_name
-            ORDER BY project_count DESC
-        """;
-        return jdbcTemplate.queryForList(sql, ministryName);
+        """);
+        List<Object> params = new ArrayList<>();
+        params.add(ministryName);
+        appendFilters(sql, params, state, sector, riskBand, trajectory, costFilter, delayFilter, warningFilter, multiState);
+        sql.append(" GROUP BY agency_name ORDER BY project_count DESC");
+        return jdbcTemplate.queryForList(sql.toString(), params.toArray());
     }
 
     public List<ProjectSummaryDto> getMinistryProjects(String ministryName, String agencyName, int limit, int offset) {
+        return getMinistryProjects(ministryName, agencyName, null, null, null, null, null, null, null, null, limit, offset);
+    }
+
+    public List<ProjectSummaryDto> getMinistryProjects(
+            String ministryName, String agencyName, String state, String sector, String riskBand,
+            String trajectory, String costFilter, String delayFilter,
+            String warningFilter, String multiState, int limit, int offset
+    ) {
         StringBuilder sql = new StringBuilder("""
             SELECT 
                 project_id, project_name, sector_name, ministry_name, agency_name, state_name,
@@ -72,14 +189,21 @@ public class MinistryRepository {
             WHERE ministry_name = ?
         """);
 
+        List<Object> params = new ArrayList<>();
+        params.add(ministryName);
+
         if (agencyName != null && !agencyName.trim().isEmpty() && !"ALL".equalsIgnoreCase(agencyName)) {
             sql.append(" AND agency_name = ?");
-            sql.append(" ORDER BY overall_risk_score DESC LIMIT ? OFFSET ?");
-            return queryProjects(sql.toString(), ministryName, agencyName.trim(), limit, offset);
-        } else {
-            sql.append(" ORDER BY overall_risk_score DESC LIMIT ? OFFSET ?");
-            return queryProjects(sql.toString(), ministryName, limit, offset);
+            params.add(agencyName.trim());
         }
+
+        appendFilters(sql, params, state, sector, riskBand, trajectory, costFilter, delayFilter, warningFilter, multiState);
+
+        sql.append(" ORDER BY overall_risk_score DESC LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        return queryProjects(sql.toString(), params.toArray());
     }
 
     private List<ProjectSummaryDto> queryProjects(String sql, Object... params) {

@@ -545,7 +545,10 @@ def extract_all_project_reports(workspace_dir: str, output_bronze_dir: str):
     return all_extracted_records
 
 if __name__ == "__main__":
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
     extract_all_project_reports(
-        r"c:\Users\kessh\OneDrive\Documents\paimana first approach",
-        r"c:\Users\kessh\OneDrive\Documents\paimana first approach\data\bronze"
+        workspace,
+        os.path.join(workspace, "data", "bronze")
     )
+

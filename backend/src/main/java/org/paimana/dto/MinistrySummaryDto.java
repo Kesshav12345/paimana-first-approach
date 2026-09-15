@@ -12,8 +12,12 @@ public class MinistrySummaryDto {
     private int highRiskCount;
     private int criticalRiskCount;
     private int activeWarningCount;
+    private double avgScheduleDelayMonths;
 
     // Getters and Setters
+    public double getAvgScheduleDelayMonths() { return avgScheduleDelayMonths; }
+    public void setAvgScheduleDelayMonths(double avgScheduleDelayMonths) { this.avgScheduleDelayMonths = avgScheduleDelayMonths; }
+
     public String getMinistryName() { return ministryName; }
     public void setMinistryName(String ministryName) { this.ministryName = ministryName; }
     public int getProjectCount() { return projectCount; }

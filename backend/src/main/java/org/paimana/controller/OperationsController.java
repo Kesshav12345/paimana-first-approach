@@ -25,6 +25,47 @@ public class OperationsController {
         return ApiResponse.ok(operationsService.getStatus());
     }
 
+    @PostMapping(value = "/intelligence-refresh", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Map<String, Object>> triggerIntelligenceRefresh(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "reporting_month", required = false) String reportingMonth,
+            @RequestParam(value = "force_reprocess", required = false, defaultValue = "false") Boolean forceReprocess
+    ) throws IOException {
+        if (file.isEmpty()) {
+            return ApiResponse.error("Uploaded report file is empty");
+        }
+        Map<String, Object> result = operationsService.triggerIntelligenceRefresh(file, reportingMonth, forceReprocess);
+        return ApiResponse.ok("Monthly report accepted and 12-stage Intelligence Refresh pipeline initiated", result);
+    }
+
+    @GetMapping("/jobs/{jobId}")
+    public ApiResponse<Map<String, Object>> getJobProgress(@PathVariable("jobId") String jobId) {
+        return ApiResponse.ok(operationsService.getJobProgress(jobId));
+    }
+
+    @GetMapping("/recent-runs")
+    public ApiResponse<java.util.List<Map<String, Object>>> getRecentPipelineRuns(
+            @RequestParam(value = "limit", required = false, defaultValue = "10") int limit
+    ) {
+        return ApiResponse.ok(operationsService.getRecentPipelineRuns(limit));
+    }
+
+    @PostMapping("/refresh-external-intelligence")
+    public ApiResponse<Map<String, Object>> refreshExternalIntelligence(
+            @RequestBody(required = false) Map<String, Object> body
+    ) {
+        String scope = body != null && body.containsKey("scope") ? String.valueOf(body.get("scope")) : "AFFECTED";
+        Integer limit = body != null && body.containsKey("limit") ? Integer.parseInt(String.valueOf(body.get("limit"))) : 15;
+        Map<String, Object> result = operationsService.refreshExternalIntelligence(scope, limit);
+        return ApiResponse.ok("External intelligence research initiated for scope: " + scope, result);
+    }
+
+    @PostMapping("/recalculate-derived")
+    public ApiResponse<Map<String, Object>> recalculateDerivedValues() {
+        Map<String, Object> result = operationsService.recalculateDerivedValues();
+        return ApiResponse.ok("Deterministic metrics, risk indices, and early warnings recalculation initiated", result);
+    }
+
     @PostMapping(value = "/upload-pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Map<String, Object>> uploadProjectPdf(
             @RequestParam("file") MultipartFile file,
@@ -55,3 +96,4 @@ public class OperationsController {
         return ApiResponse.ok("All portfolio predictions and risk scores refreshed", result);
     }
 }
+

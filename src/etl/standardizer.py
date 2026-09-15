@@ -283,8 +283,11 @@ def standardize_records(raw_observations_path: str, output_silver_path: str, qua
     return deduped_records, quarantined
 
 if __name__ == "__main__":
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
     standardize_records(
-        r"c:\Users\kessh\OneDrive\Documents\paimana first approach\data\bronze\raw_project_observations.json",
-        r"c:\Users\kessh\OneDrive\Documents\paimana first approach\data\silver\cleaned_project_observations.json",
-        r"c:\Users\kessh\OneDrive\Documents\paimana first approach\data\silver\quarantine_records.json"
+        os.path.join(workspace, "data", "bronze", "raw_project_observations.json"),
+        os.path.join(workspace, "data", "silver", "cleaned_project_observations.json"),
+        os.path.join(workspace, "data", "silver", "quarantine_records.json")
     )
+

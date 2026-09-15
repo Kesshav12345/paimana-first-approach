@@ -326,4 +326,7 @@ Evaluation was performed using a **strict temporal split**:
     logger.info(f"Model evaluation report written to {os.path.join(art_dir, 'model_evaluation_report.md')}")
 
 if __name__ == "__main__":
-    train_and_evaluate(r"c:\Users\kessh\OneDrive\Documents\paimana first approach")
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
+    train_and_evaluate(workspace)
+

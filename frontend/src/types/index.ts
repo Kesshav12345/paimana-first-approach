@@ -84,6 +84,7 @@ export interface EarlyWarningAlert {
   lastTriggerDate: string;
   interventionPriorityScore: number;
   recommendedIntervention: string;
+  projectInterventionStatus?: string;
 }
 
 export interface Intervention {
@@ -324,6 +325,7 @@ export interface MinistrySummary {
   weightedCostEscalationPct: number;
   weightedExpenditurePct: number;
   avgPhysicalProgressPct: number;
+  avgScheduleDelayMonths: number;
   highRiskCount: number;
   criticalRiskCount: number;
   activeWarningCount: number;
@@ -333,10 +335,13 @@ export interface StateSummary {
   stateName: string;
   projectCount: number;
   totalInvestmentCr: number;
+  totalOriginalCostCr?: number;
+  totalRevisedCostCr?: number;
   totalCumulativeExpenditureCr: number;
   weightedCostEscalationPct: number;
   weightedExpenditurePct: number;
   avgPhysicalProgressPct: number;
+  avgScheduleDelayMonths: number;
   highRiskCount: number;
   criticalRiskCount: number;
   activeWarningCount: number;
@@ -392,4 +397,108 @@ export interface FilterMetadata {
   delayFilters: Array<{ id: string; label: string }>;
   warningFilters: Array<{ id: string; label: string }>;
 }
+
+export interface PipelineJobProgress {
+  job_id: string;
+  trigger_type: string;
+  report_file?: string;
+  reporting_month?: string;
+  stage: string;
+  status: string;
+  total_projects: number;
+  affected_projects_count: number;
+  researched_count: number;
+  claims_count: number;
+  conflicts_count: number;
+  started_at?: string;
+  completed_at?: string;
+  elapsed_seconds: number;
+  error_summary?: string;
+  details?: Record<string, any>;
+}
+
+export interface PipelineRunHistoryItem {
+  job_id: string;
+  trigger_type: string;
+  report_file?: string;
+  reporting_month?: string;
+  stage: string;
+  status: string;
+  affected_projects: number;
+  researched_count: number;
+  claims_count: number;
+  conflicts_count: number;
+  started_at?: string;
+  completed_at?: string;
+  elapsed_seconds: number;
+}
+
+export interface MethodologyMetadata {
+  active_methodology_version: string;
+  production_model_version: string;
+  feature_version: string;
+  latest_dataset_period: string;
+  total_monitored_projects: number;
+  total_canonical_facts: number;
+  total_evidence_claims: number;
+  total_external_sources: number;
+  researched_projects_count: number;
+  quarantine_records_count: number;
+  last_intelligence_refresh: string;
+  search_provider: string;
+  model_family: string;
+  system_status: string;
+}
+
+export interface AnalyticalFilterParams {
+  state?: string;
+  ministry?: string;
+  sector?: string;
+  riskBand?: string;
+  trajectory?: string;
+  costFilter?: string;
+  delayFilter?: string;
+  warningFilter?: string;
+  multiState?: string;
+  sortBy?: string;
+}
+
+export interface EarlyWarningFilterParams {
+  sector?: string;
+  ministry?: string;
+  state?: string;
+  agency?: string;
+  warningType?: string;
+  severity?: string;
+  persistence?: string;
+  riskBand?: string;
+  interventionStatus?: string;
+  search?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface EarlyWarningSummary {
+  matchingProjects: number;
+  activeWarnings: number;
+  criticalSignals: number;
+  multiWarningProjects: number;
+  interventionCandidates: number;
+  activeInterventions: number;
+}
+
+export interface InterventionFilterParams {
+  sector?: string;
+  ministry?: string;
+  state?: string;
+  agency?: string;
+  riskBand?: string;
+  warningType?: string;
+  status?: string;
+  search?: string;
+  sortBy?: string;
+  page?: number;
+  size?: number;
+}
+
 

@@ -9,7 +9,15 @@ import fitz
 
 def generate_inventory(workspace_dir: str, output_dir: str):
     primary_dir = os.path.join(workspace_dir, "primary dataset")
-    sec_dir = r"c:\Users\kessh\OneDrive\Documents\PAIMANA INTEL\Secondary dataset\WPI and PPIs"
+    sec_dir = os.environ.get(
+        "SECONDARY_DATASET_DIR",
+        os.path.join(workspace_dir, "data", "secondary")
+    )
+    if not os.path.exists(sec_dir):
+        parent_candidate = os.path.abspath(os.path.join(workspace_dir, "..", "PAIMANA INTEL", "Secondary dataset", "WPI and PPIs"))
+        if os.path.exists(parent_candidate):
+            sec_dir = parent_candidate
+
     
     files = sorted(os.listdir(primary_dir))
     inventory = []
@@ -172,4 +180,7 @@ def generate_inventory(workspace_dir: str, output_dir: str):
     print(f"Generated data inventory: {len(inventory)} sources recorded at {csv_path} and {json_path}")
 
 if __name__ == "__main__":
-    generate_inventory(r"c:\Users\kessh\OneDrive\Documents\paimana first approach", "artifacts")
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
+    generate_inventory(workspace, os.path.join(workspace, "artifacts"))
+

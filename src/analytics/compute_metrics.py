@@ -232,4 +232,7 @@ def compute_all_metrics(workspace_dir: str):
     logger.info("Successfully populated gold_project_monthly_metrics!")
 
 if __name__ == "__main__":
-    compute_all_metrics(r"c:\Users\kessh\OneDrive\Documents\paimana first approach")
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
+    compute_all_metrics(workspace)
+

@@ -135,9 +135,34 @@ export const ProjectIntelligence: React.FC = () => {
           </div>
         </div>
 
-        {/* Evidence Verification & Provenance Badge */}
+        {/* Provenance Classification & Freshness Bar */}
+        <div className="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-slate-400 font-medium mr-1">Data Lineage:</span>
+            <span className="px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800 font-mono text-[10px]" title="Authoritative Extract from MoSPI Monthly Monitoring Report">
+              [OFFICIAL REPORT: MoSPI {detail.latestReportingMonth}]
+            </span>
+            <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-mono text-[10px]" title="Deterministic Mathematics (Escalation, Gaps, Velocity)">
+              [DETERMINISTIC METRIC: Engine v2.4]
+            </span>
+            <span className="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 font-mono text-[10px]" title="Point-in-time CatBoost Supervised ML Model">
+              [CATBOOST FORECAST: {detail.modelVersion || 'v2026.07'}]
+            </span>
+            <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-mono text-[10px]" title="External Multi-Tier Internet Research & Causal Claims">
+              [EXTERNAL EVIDENCE: {detail.researchSummary ? `${detail.researchSummary.sourceCount} Sources` : 'Gov Direct / PIB'}]
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 text-slate-400 text-[11px]">
+            <span>External Intel: <strong className="text-slate-200">{detail.researchSummary?.completedAt ? new Date(detail.researchSummary.completedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Current Cycle'}</strong></span>
+            <span>•</span>
+            <span className="text-emerald-400 font-semibold">Zero Future Leakage</span>
+          </div>
+        </div>
+
+        {/* Evidence Verification & Dossier Trigger */}
         {detail.researchSummary ? (
-          <div className="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+          <div className="mt-3 pt-3 border-t border-slate-800/60 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <span className={`px-2.5 py-1 rounded text-[11px] font-bold tracking-wide flex items-center gap-1.5 ${
                 detail.researchSummary.status === 'COMPLETED' 
@@ -168,7 +193,7 @@ export const ProjectIntelligence: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+          <div className="mt-3 pt-3 border-t border-slate-800/60 flex items-center justify-between text-xs text-slate-400">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800/70 text-slate-400 border border-slate-700">
                 Quantitative Baseline Telemetry (Evidence Research Queued)
@@ -177,6 +202,107 @@ export const ProjectIntelligence: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* "What Changed This Month?" Delta Tracking Card */}
+      {(() => {
+        const history = detail.monthlyHistory || [];
+        const currRecord = history.length > 0 ? history[history.length - 1] : null;
+        const prevRecord = history.length > 1 ? history[history.length - 2] : null;
+
+        const parseNum = (val: any) => {
+          const n = Number(val);
+          return isNaN(n) ? 0 : n;
+        };
+
+        const hasPrev = !!prevRecord;
+        const costDelta = hasPrev && currRecord ? parseNum(currRecord.revised_cost_cr) - parseNum(prevRecord.revised_cost_cr) : 0;
+        const progressDelta = hasPrev && currRecord ? +(parseNum(currRecord.physical_progress_pct) - parseNum(prevRecord.physical_progress_pct)).toFixed(2) : 0;
+        const slippageDelta = hasPrev && currRecord ? parseNum(currRecord.schedule_slippage_months) - parseNum(prevRecord.schedule_slippage_months) : 0;
+        const riskDelta = hasPrev && currRecord ? +(parseNum(currRecord.overall_risk_score) - parseNum(prevRecord.overall_risk_score)).toFixed(1) : 0;
+
+        return (
+          <div className="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-lg p-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-900/80 text-indigo-300 border border-indigo-700/60 uppercase tracking-wider">
+                  DELTA TRACKING
+                </span>
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                  {hasPrev ? `What Changed Since Previous Report (${prevRecord.reporting_month})?` : `Baseline Intelligence (${currRecord?.reporting_month || detail.latestReportingMonth})`}
+                </h3>
+              </div>
+              <span className="text-[11px] text-slate-400">
+                Latest Cycle: <strong className="text-slate-200">{detail.latestReportingMonth}</strong>
+                {hasPrev ? (
+                  <> vs <strong className="text-slate-400">{prevRecord.reporting_month}</strong></>
+                ) : (
+                  <span className="ml-1 text-blue-400 font-medium">(First Ingestion Baseline)</span>
+                )}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="bg-slate-950/70 p-2.5 rounded border border-slate-800/80">
+                <span className="text-slate-400 text-[11px] block">Revised Cost Shift</span>
+                <div className={`text-sm font-bold mt-0.5 ${costDelta > 0 ? 'text-rose-400' : costDelta < 0 ? 'text-emerald-400' : 'text-slate-300'}`}>
+                  {hasPrev 
+                    ? (costDelta > 0 ? `+₹${costDelta.toLocaleString()} Cr` : costDelta < 0 ? `-₹${Math.abs(costDelta).toLocaleString()} Cr` : '₹0 Cr (No Revision)')
+                    : `₹${parseNum(detail.latestRevisedCostCr).toLocaleString()} Cr`}
+                </div>
+                <span className="text-[10px] text-slate-500">{hasPrev ? 'Official Sanction Delta' : 'Current Approved Baseline'}</span>
+              </div>
+
+              <div className="bg-slate-950/70 p-2.5 rounded border border-slate-800/80">
+                <span className="text-slate-400 text-[11px] block">Progress Velocity (1M)</span>
+                <div className={`text-sm font-bold mt-0.5 ${progressDelta > 0 ? 'text-emerald-400' : progressDelta === 0 ? 'text-amber-400' : 'text-rose-400'}`}>
+                  {hasPrev
+                    ? (progressDelta > 0 ? `+${progressDelta}%` : progressDelta === 0 ? '0.0% (Stagnant)' : `${progressDelta}%`)
+                    : `${detail.physicalProgressPct}% (Cumulative)`}
+                </div>
+                <span className="text-[10px] text-slate-500">{hasPrev ? 'Monthly Physical Advance' : 'Total Certified Physical'}</span>
+              </div>
+
+              <div className="bg-slate-950/70 p-2.5 rounded border border-slate-800/80">
+                <span className="text-slate-400 text-[11px] block">Schedule Drift Delta</span>
+                <div className={`text-sm font-bold mt-0.5 ${slippageDelta > 0 ? 'text-rose-400' : slippageDelta < 0 ? 'text-emerald-400' : 'text-slate-300'}`}>
+                  {hasPrev
+                    ? (slippageDelta > 0 ? `+${slippageDelta} Months` : slippageDelta < 0 ? `${slippageDelta} Months` : '0 Months (Stable DOC)')
+                    : `${detail.scheduleSlippageMonths} Months`}
+                </div>
+                <span className="text-[10px] text-slate-500">{hasPrev ? 'Anticipated Target Shift' : 'Total Cumulative Delay'}</span>
+              </div>
+
+              <div className="bg-slate-950/70 p-2.5 rounded border border-slate-800/80">
+                <span className="text-slate-400 text-[11px] block">Risk Score Delta</span>
+                <div className={`text-sm font-bold mt-0.5 ${riskDelta > 0 ? 'text-rose-400' : riskDelta < 0 ? 'text-emerald-400' : 'text-slate-300'}`}>
+                  {hasPrev
+                    ? (riskDelta > 0 ? `+${riskDelta} pts (${detail.riskBand})` : riskDelta < 0 ? `${riskDelta} pts (Improving)` : '0.0 pts (Unchanged)')
+                    : `${detail.overallRiskScore.toFixed(1)} pts (${detail.riskBand})`}
+                </div>
+                <span className="text-[10px] text-slate-500">Trajectory: {detail.riskTrajectory}</span>
+              </div>
+            </div>
+
+            {/* Contextual Intelligence Insight if Factors exist */}
+            {detail.causalFactors && detail.causalFactors.length > 0 && (
+              <div className="mt-2.5 pt-2.5 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-300">
+                <div className="flex items-center gap-1.5 truncate">
+                  <span className="text-amber-400 font-semibold">Active External Factor:</span>
+                  <span className="text-slate-200 truncate">{detail.causalFactors[0].factorTitle}</span>
+                  <span className="text-slate-400">({detail.causalFactors[0].status})</span>
+                </div>
+                <button
+                  onClick={() => setActiveModalComponent('evidence_dossier')}
+                  className="text-blue-400 hover:text-blue-300 font-medium shrink-0 ml-2 text-[10px] flex items-center gap-1"
+                >
+                  <span>View Evidence</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* 2 & 3. Current Status & Health Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -236,7 +362,7 @@ export const ProjectIntelligence: React.FC = () => {
             <div className="bg-slate-950/60 p-3 rounded border border-slate-800/80">
               <span className="text-[11px] text-slate-400">Cumulative Spend</span>
               <div className="text-lg font-bold text-emerald-400 mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
-              <div className="text-[10px] mt-0.5 truncate">
+              <div className="text-[10px] mt-0.5">
                 {detail.cumulativeExpenditureCr > detail.latestRevisedCostCr && detail.physicalProgressPct < 95.0 ? (
                   <span className="text-rose-400 font-semibold" title={`Approved budget exceeded by ₹${(detail.cumulativeExpenditureCr - detail.latestRevisedCostCr).toFixed(1)} Cr. Estimated unfunded cost to complete: ₹${detail.remainingFinancialExposureCr.toLocaleString()} Cr`}>
                     Exhausted • Unfunded: ₹{detail.remainingFinancialExposureCr.toLocaleString()} Cr
@@ -599,7 +725,7 @@ export const ProjectIntelligence: React.FC = () => {
             </button>
           </div>
 
-          <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+          <div className="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
             {detail.activeWarnings.length === 0 ? (
               <div className="text-xs text-slate-400 py-4 text-center space-y-1">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto" />

@@ -410,7 +410,8 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
         json.dump(bridge_states, f, indent=2)
         
     # Save identity map CSV
-    id_map_csv = r"c:\Users\kessh\OneDrive\Documents\paimana first approach\artifacts\project_identity_map.csv"
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    id_map_csv = os.path.join(repo_root, "artifacts", "project_identity_map.csv")
     os.makedirs(os.path.dirname(id_map_csv), exist_ok=True)
     with open(id_map_csv, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=list(identity_map[0].keys()))
@@ -425,7 +426,10 @@ def resolve_entities(silver_observations_path: str, output_dir: str):
     return dim_projects, bridge_states
 
 if __name__ == "__main__":
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    workspace = os.environ.get("WORKSPACE_DIR", repo_root)
     resolve_entities(
-        r"c:\Users\kessh\OneDrive\Documents\paimana first approach\data\silver\cleaned_project_observations.json",
-        r"c:\Users\kessh\OneDrive\Documents\paimana first approach\data\silver"
+        os.path.join(workspace, "data", "silver", "cleaned_project_observations.json"),
+        os.path.join(workspace, "data", "silver")
     )
+

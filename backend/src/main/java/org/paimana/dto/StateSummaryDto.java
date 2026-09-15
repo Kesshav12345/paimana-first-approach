@@ -11,8 +11,18 @@ public class StateSummaryDto {
     private int highRiskCount;
     private int criticalRiskCount;
     private int activeWarningCount;
+    private double avgScheduleDelayMonths;
+    private double totalOriginalCostCr;
+    private double totalRevisedCostCr;
 
     // Getters and Setters
+    public double getAvgScheduleDelayMonths() { return avgScheduleDelayMonths; }
+    public void setAvgScheduleDelayMonths(double avgScheduleDelayMonths) { this.avgScheduleDelayMonths = avgScheduleDelayMonths; }
+    public double getTotalOriginalCostCr() { return totalOriginalCostCr; }
+    public void setTotalOriginalCostCr(double totalOriginalCostCr) { this.totalOriginalCostCr = totalOriginalCostCr; }
+    public double getTotalRevisedCostCr() { return totalRevisedCostCr; }
+    public void setTotalRevisedCostCr(double totalRevisedCostCr) { this.totalRevisedCostCr = totalRevisedCostCr; }
+
     public String getStateName() { return stateName; }
     public void setStateName(String stateName) { this.stateName = stateName; }
     public int getProjectCount() { return projectCount; }

@@ -21,8 +21,12 @@ public class EarlyWarningAlertDto {
     private String lastTriggerDate;
     private double interventionPriorityScore;
     private String recommendedIntervention;
+    private String projectInterventionStatus;
 
     // Getters and Setters
+    public String getProjectInterventionStatus() { return projectInterventionStatus; }
+    public void setProjectInterventionStatus(String projectInterventionStatus) { this.projectInterventionStatus = projectInterventionStatus; }
+
     public String getAlertId() { return alertId; }
     public void setAlertId(String alertId) { this.alertId = alertId; }
     public String getProjectId() { return projectId; }

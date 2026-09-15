@@ -1,13 +1,13 @@
 # PAIMANA-INTEL — Formal Leakage Audit & Temporal Verification Report
 
-**Audit Execution Timestamp**: 2026-09-13 13:16:08
+**Audit Execution Timestamp**: 2026-09-15 19:38:36
 **Audited Database**: `paimana_canonical.db`
 **Audited ML Datasets**: `data/ml/*.csv`
 
 ## 1. Executive Summary
 
-> [!NOTE]
-> **ALL LEAKAGE AUDITS PASSED**: The canonical feature pipeline strictly complies with temporal information boundary constraints. Zero future information, zero secondary target contamination, and zero retroactive backcasting were detected.
+> [!WARNING]
+> **AUDIT ISSUES DETECTED**: Review specific checks below.
 
 ## 2. Audit Matrix
 
@@ -17,7 +17,7 @@
 | `LEAK_02_FEATURE_TARGET_DISJOINTNESS` | Predictor feature column set strictly disjoint from target column set | ✅ PASS | 0 | Complete isolation |
 | `LEAK_03_CSV_TARGET_CONTAMINATION` | Individual ML training CSVs contain only their designated target and no secondary targets | ✅ PASS | 0 | All 4 training datasets isolate only their designated supervised label |
 | `LEAK_04_CHRONOLOGICAL_SPLIT_ORDER` | Strict temporal ordering: Train periods < Val periods < Test periods (No future shuffle) | ✅ PASS | 0 | Train: <= 2026-01 | Val: 2026-02 to 2026-04 | Test: >= 2026-05 |
-| `LEAK_05_POINT_IN_TIME_FEATURE_FREEZING` | Dynamic feature vector at snapshot T exactly matches observed values at T without forward revision pull | ✅ PASS | 0 | 0 discrepancies between snapshot vector and monthly fact state |
+| `LEAK_05_POINT_IN_TIME_FEATURE_FREEZING` | Dynamic feature vector at snapshot T exactly matches observed values at T without forward revision pull | ❌ FAIL | 1350 | 1350 discrepancies between snapshot vector and monthly fact state |
 | `LEAK_06_RIGHT_CENSORING_SEPARATION` | Projects with incomplete terminal status explicitly identified as censored to prevent false negatives | ✅ PASS | 0 | Total uncensored training candidates: 18,256 | Right-censored snapshots: 5,468 |
 
 ## 3. Methodological Enforcements
