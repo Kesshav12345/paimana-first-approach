@@ -522,7 +522,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                   </div>
 
                   <div className="flex items-center gap-4 text-right">
-                    <div>
+                    <div className="w-20 text-right">
                       <div className="font-bold text-[#173F35] tabular-nums">
                         {st.project_count} prjs
                       </div>
@@ -531,17 +531,19 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                       </div>
                     </div>
 
-                    {(st.critical_risk_count > 0 || st.high_risk_count > 0) && (
-                      st.critical_risk_count > 0 ? (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F5E7E4] text-[#B74436] border border-[#E8C6C1] whitespace-nowrap">
-                          {st.critical_risk_count} crit · {st.high_risk_count} high
-                        </span>
-                      ) : (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F5EEDB] text-[#C89432] border border-[#DFCBB0] whitespace-nowrap">
-                          {st.high_risk_count} high
-                        </span>
-                      )
-                    )}
+                    <div className="w-[104px] flex justify-end">
+                      {(st.critical_risk_count > 0 || st.high_risk_count > 0) && (
+                        st.critical_risk_count > 0 ? (
+                          <span className="w-full text-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F5E7E4] text-[#B74436] border border-[#E8C6C1] whitespace-nowrap">
+                            {st.critical_risk_count} crit · {st.high_risk_count} high
+                          </span>
+                        ) : (
+                          <span className="w-full text-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F5EEDB] text-[#C89432] border border-[#DFCBB0] whitespace-nowrap">
+                            {st.high_risk_count} high
+                          </span>
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
