@@ -59,6 +59,8 @@ export const SectorAnalytics: React.FC = () => {
 
   // Active chart visualization tab
   const [activeChartTab, setActiveChartTab] = useState<'CAPITAL' | 'COST_DELAY' | 'RISK' | 'PROGRESS'>('CAPITAL');
+  const [chartCohort, setChartCohort] = useState<'ALL' | 'MEGA' | 'SPECIALIZED'>('ALL');
+  const [riskViewMode, setRiskViewMode] = useState<'COUNT' | 'PERCENT'>('COUNT');
 
   // Filter State: Draft vs Applied
   const [draftFilters, setDraftFilters] = useState<AnalyticalFilterParams>(() => ({
@@ -263,25 +265,39 @@ export const SectorAnalytics: React.FC = () => {
     };
   }, [sectors]);
 
-  // Chart Data preparation
+  // Chart Data preparation with Cohort filtering & Risk normalization
   const chartData = useMemo(() => {
-    return sectors.map(s => ({
-      name: s.sectorName,
-      shortName: s.sectorName.length > 14 ? s.sectorName.substring(0, 12) + '...' : s.sectorName,
-      projects: s.projectCount,
-      originalCost: Math.round(s.totalOriginalCostCr),
-      revisedCost: Math.round(s.totalRevisedCostCr),
-      expenditure: Math.round(s.totalCumulativeExpenditureCr),
-      costEscalationPct: Number(s.weightedCostEscalationPct.toFixed(1)),
-      expenditurePct: Number(s.weightedExpenditurePct.toFixed(1)),
-      physicalProgressPct: Number(s.avgPhysicalProgressPct.toFixed(1)),
-      scheduleDelayMonths: Number((s.avgScheduleDelayMonths || 0).toFixed(1)),
-      criticalRiskCount: s.criticalRiskCount,
-      highRiskCount: s.highRiskCount,
-      moderateLowRiskCount: Math.max(0, s.projectCount - (s.highRiskCount + s.criticalRiskCount)),
-      warningCount: s.activeWarningCount,
-    }));
-  }, [sectors]);
+    let cohortSectors = sectors;
+    if (chartCohort === 'MEGA') {
+      cohortSectors = sectors.filter(s => s.totalRevisedCostCr >= 100000);
+    } else if (chartCohort === 'SPECIALIZED') {
+      cohortSectors = sectors.filter(s => s.totalRevisedCostCr < 100000);
+    }
+
+    return cohortSectors.map(s => {
+      const totalPrjs = Math.max(1, s.projectCount);
+      const modLow = Math.max(0, s.projectCount - (s.highRiskCount + s.criticalRiskCount));
+      return {
+        name: s.sectorName,
+        shortName: s.sectorName.length > 14 ? s.sectorName.substring(0, 12) + '...' : s.sectorName,
+        projects: s.projectCount,
+        originalCost: Math.round(s.totalOriginalCostCr),
+        revisedCost: Math.round(s.totalRevisedCostCr),
+        expenditure: Math.round(s.totalCumulativeExpenditureCr),
+        costEscalationPct: Number(s.weightedCostEscalationPct.toFixed(1)),
+        expenditurePct: Number(s.weightedExpenditurePct.toFixed(1)),
+        physicalProgressPct: Number(s.avgPhysicalProgressPct.toFixed(1)),
+        scheduleDelayMonths: Number((s.avgScheduleDelayMonths || 0).toFixed(1)),
+        criticalRiskCount: s.criticalRiskCount,
+        highRiskCount: s.highRiskCount,
+        moderateLowRiskCount: modLow,
+        criticalRiskPct: Number(((s.criticalRiskCount / totalPrjs) * 100).toFixed(1)),
+        highRiskPct: Number(((s.highRiskCount / totalPrjs) * 100).toFixed(1)),
+        moderateLowRiskPct: Number(((modLow / totalPrjs) * 100).toFixed(1)),
+        warningCount: s.activeWarningCount,
+      };
+    });
+  }, [sectors, chartCohort]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -553,7 +569,65 @@ export const SectorAnalytics: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-4 sm:p-6 h-[380px]">
+            {/* Sub-controls: Cohort Selection & View Mode */}
+            <div className="px-4 sm:px-6 py-2.5 bg-[#FAF8F5] border-b border-[#EAE6DF] flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="text-[#66736D] text-[11px] font-medium flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#267A69]" />
+                {activeChartTab === 'CAPITAL' && 'Fiscal commitment comparison: Original Sanction vs Revised Outlay vs Certified Spend.'}
+                {activeChartTab === 'COST_DELAY' && 'Dual-axis comparison: Weighted Cost Escalation (% left) vs Average Schedule Delay (Months right).'}
+                {activeChartTab === 'RISK' && (riskViewMode === 'COUNT' ? 'Volume distribution: Absolute project count in each risk category.' : 'Normalized risk exposure: Percentage share of sector portfolio in each risk band.')}
+                {activeChartTab === 'PROGRESS' && 'Delivery pace: Certified physical progress (%) vs financial expenditure ratio (%).'}
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Cohort Selector */}
+                <div className="flex items-center gap-1 bg-white border border-[#DDD9D0] p-0.5 rounded-lg text-[11px]">
+                  <span className="px-2 py-0.5 text-[#8C9893] font-semibold uppercase text-[9px] tracking-wider">Cohort:</span>
+                  <button
+                    onClick={() => setChartCohort('ALL')}
+                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'ALL' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                  >
+                    All ({sectors.length})
+                  </button>
+                  <button
+                    onClick={() => setChartCohort('MEGA')}
+                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'MEGA' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    title="Sectors with Revised Outlay ≥ ₹1 Lakh Cr"
+                  >
+                    Mega (≥₹1L Cr)
+                  </button>
+                  <button
+                    onClick={() => setChartCohort('SPECIALIZED')}
+                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'SPECIALIZED' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    title="Sectors with Revised Outlay < ₹1 Lakh Cr (Zoom into smaller units)"
+                  >
+                    Specialized (&lt;₹1L Cr)
+                  </button>
+                </div>
+
+                {/* Risk Mode Toggle */}
+                {activeChartTab === 'RISK' && (
+                  <div className="flex items-center gap-1 bg-white border border-[#DDD9D0] p-0.5 rounded-lg text-[11px]">
+                    <span className="px-2 py-0.5 text-[#8C9893] font-semibold uppercase text-[9px] tracking-wider">Metric:</span>
+                    <button
+                      onClick={() => setRiskViewMode('COUNT')}
+                      className={`px-2 py-0.5 rounded-md font-medium transition ${riskViewMode === 'COUNT' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    >
+                      Project Count (#)
+                    </button>
+                    <button
+                      onClick={() => setRiskViewMode('PERCENT')}
+                      className={`px-2 py-0.5 rounded-md font-medium transition ${riskViewMode === 'PERCENT' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                      title="100% Stacked Bar: Risk share percentage"
+                    >
+                      Risk Share (%)
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="p-4 sm:p-6 h-[420px]">
               {loading ? (
                 <div className="h-full flex items-center justify-center text-xs text-[#8C9893]">
                   Recomputing visual comparison across sectors...
@@ -565,59 +639,97 @@ export const SectorAnalytics: React.FC = () => {
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   {activeChartTab === 'CAPITAL' ? (
-                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#64748b' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k Cr`} />
+                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => v >= 1000 ? `₹${(v/1000).toFixed(0)}k Cr` : `₹${v} Cr`} />
                       <Tooltip 
-                        formatter={(val: any, name: any) => [`₹${Number(val).toLocaleString()} Cr`, name === 'revisedCost' ? 'Revised Outlay' : name === 'originalCost' ? 'Original Cost' : 'Cumulative Expenditure']}
+                        formatter={(val: any, name: any) => [`₹${Number(val).toLocaleString()} Cr`, name]}
                         labelFormatter={(label) => `Sector: ${chartData.find(d => d.shortName === label)?.name || label}`}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="originalCost" name="Original Cost" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#2563eb" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
-                      <Bar dataKey="expenditure" name="Cumulative Expenditure" fill="#10b981" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="originalCost" name="Original Sanction" fill="#DDD9D0" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#173F35" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
+                      <Bar dataKey="expenditure" name="Cumulative Expenditure" fill="#267A69" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   ) : activeChartTab === 'COST_DELAY' ? (
-                    <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#64748b' }} />
-                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `+${v}%`} />
-                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `${v} Mo`} />
+                    <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
+                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}%`} />
+                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v} Mo`} />
                       <Tooltip 
-                        formatter={(val: any, name: any) => [name === 'costEscalationPct' ? `+${val}%` : `${val} Months`, name === 'costEscalationPct' ? 'Weighted Cost Escalation' : 'Average Schedule Delay']}
+                        formatter={(val: any, name: any, item: any) => [
+                          item?.dataKey === 'costEscalationPct' 
+                            ? `${Number(val) > 0 ? '+' : ''}${Number(val).toFixed(1)}%` 
+                            : `${Number(val).toFixed(1)} Months`,
+                          name
+                        ]}
                         labelFormatter={(label) => `Sector: ${chartData.find(d => d.shortName === label)?.name || label}`}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation (%)" fill="#f59e0b" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
-                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Delay (Months)" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} />
+                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation" fill="#C89432" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
+                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Schedule Delay" stroke="#B74436" strokeWidth={3} dot={{ r: 4, fill: '#B74436' }} />
                     </ComposedChart>
                   ) : activeChartTab === 'RISK' ? (
-                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#64748b' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+                    <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
+                      <YAxis 
+                        tick={{ fontSize: 11, fill: '#66736D' }} 
+                        domain={riskViewMode === 'PERCENT' ? [0, 100] : ['auto', 'auto']}
+                        tickFormatter={riskViewMode === 'PERCENT' ? (v) => `${v}%` : undefined}
+                      />
                       <Tooltip 
-                        formatter={(val: any, name: any) => [`${val} projects`, name === 'criticalRiskCount' ? 'Critical Risk' : name === 'highRiskCount' ? 'High Risk' : 'Moderate / Low Risk']}
+                        formatter={(val: any, name: any, item: any) => {
+                          if (riskViewMode === 'PERCENT') {
+                            const countKey = name.includes('Critical') ? 'criticalRiskCount' : name.includes('High') ? 'highRiskCount' : 'moderateLowRiskCount';
+                            const rawCount = item?.payload?.[countKey] || 0;
+                            return [`${val}% (${rawCount} prjs)`, name];
+                          }
+                          return [`${val} projects`, name];
+                        }}
                         labelFormatter={(label) => `Sector: ${chartData.find(d => d.shortName === label)?.name || label}`}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="criticalRiskCount" name="Critical Risk" stackId="a" fill="#e11d48" onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
-                      <Bar dataKey="highRiskCount" name="High Risk" stackId="a" fill="#ea580c" />
-                      <Bar dataKey="moderateLowRiskCount" name="Moderate / Low Risk" stackId="a" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                      <Bar 
+                        dataKey={riskViewMode === 'PERCENT' ? 'criticalRiskPct' : 'criticalRiskCount'} 
+                        name={riskViewMode === 'PERCENT' ? 'Critical Risk (%)' : 'Critical Risk'} 
+                        stackId="a" 
+                        fill="#B74436" 
+                        onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} 
+                        className="cursor-pointer" 
+                      />
+                      <Bar 
+                        dataKey={riskViewMode === 'PERCENT' ? 'highRiskPct' : 'highRiskCount'} 
+                        name={riskViewMode === 'PERCENT' ? 'High Risk (%)' : 'High Risk'} 
+                        stackId="a" 
+                        fill="#C89432" 
+                      />
+                      <Bar 
+                        dataKey={riskViewMode === 'PERCENT' ? 'moderateLowRiskPct' : 'moderateLowRiskCount'} 
+                        name={riskViewMode === 'PERCENT' ? 'Moderate / Low Risk (%)' : 'Moderate / Low Risk'} 
+                        stackId="a" 
+                        fill="#8C9893" 
+                        radius={[4, 4, 0, 0]} 
+                      />
                     </BarChart>
                   ) : (
-                    <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#64748b' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                    <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
                       <Tooltip 
-                        formatter={(val: any, name: any) => [`${val}%`, name === 'physicalProgressPct' ? 'Average Physical Progress' : 'Weighted Expenditure Burn']}
+                        formatter={(val: any, name: any) => [`${val}%`, name]}
                         labelFormatter={(label) => `Sector: ${chartData.find(d => d.shortName === label)?.name || label}`}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="physicalProgressPct" name="Average Physical Progress (%)" fill="#10b981" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
-                      <Line type="monotone" dataKey="expenditurePct" name="Expenditure / Revised Outlay (%)" stroke="#6366f1" strokeWidth={3} dot={{ r: 4 }} />
+                      <Bar dataKey="physicalProgressPct" name="Average Certified Physical Progress" fill="#267A69" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectSector(d.name); }} className="cursor-pointer" />
+                      <Line type="monotone" dataKey="expenditurePct" name="Cumulative Expenditure / Revised Outlay" stroke="#173F35" strokeWidth={3} dot={{ r: 4, fill: '#173F35' }} />
                     </ComposedChart>
                   )}
                 </ResponsiveContainer>
