@@ -16,7 +16,7 @@ import type {
   InterventionFilterParams,
 } from '../types';
 
-const BASE_URL = '/api/v1';
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL ? import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '') : '') + '/api/v1';
 
 function appendAnalyticalFilters(sp: URLSearchParams, params?: AnalyticalFilterParams) {
   if (!params) return;

@@ -10,11 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY ml-service/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application source, models, and analytical scripts
+# Copy application source, models, and canonical database
 COPY ml-service/ ml-service/
 COPY models/ models/
-COPY src/ src/
-COPY run_pipeline.py run_pipeline.py
 COPY paimana_canonical.db paimana_canonical.db
 
 EXPOSE 8000
