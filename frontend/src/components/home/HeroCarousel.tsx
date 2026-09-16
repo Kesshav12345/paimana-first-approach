@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, 
   ChevronRight, 
-  Play, 
-  Pause, 
   ArrowRight,
   ShieldAlert,
   FolderKanban
@@ -52,7 +50,6 @@ const SLIDES: Slide[] = [
 export const HeroCarousel: React.FC = () => {
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
 
   const nextSlide = useCallback(() => {
     setCurrent((prev) => (prev + 1) % SLIDES.length);
@@ -63,12 +60,11 @@ export const HeroCarousel: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!isPlaying) return;
     const timer = setInterval(() => {
       nextSlide();
-    }, 7000);
+    }, 4200);
     return () => clearInterval(timer);
-  }, [isPlaying, nextSlide]);
+  }, [nextSlide]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -87,27 +83,25 @@ export const HeroCarousel: React.FC = () => {
       className="relative w-full overflow-hidden bg-[#173F35] text-white border-b border-[#DDD9D0]"
       aria-roledescription="carousel"
       aria-label="National Infrastructure Highlights"
-      onMouseEnter={() => setIsPlaying(false)}
-      onMouseLeave={() => setIsPlaying(true)}
     >
       {/* Full-bleed Cinematic Viewport */}
-      <div className="relative w-full h-[450px] sm:h-[490px] lg:h-[530px]">
+      <div className="relative w-full h-[470px] sm:h-[510px] lg:h-[550px]">
         {SLIDES.map((slide, index) => {
           const isActive = index === current;
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
               }`}
               aria-hidden={!isActive}
             >
-              {/* Natural Infrastructure Photography with subtle pan */}
+              {/* Natural Infrastructure Photography with subtle zoom/pan */}
               <img
                 src={slide.image}
                 alt={slide.sectorTag}
-                className={`w-full h-full object-cover transition-transform duration-[8000ms] ease-out ${
-                  isActive ? 'scale-105 translate-x-1.5' : 'scale-100 translate-x-0'
+                className={`w-full h-full object-cover transition-transform duration-[6000ms] ease-out ${
+                  isActive ? 'scale-105 translate-x-1' : 'scale-100 translate-x-0'
                 }`}
                 style={{ objectPosition: slide.objectPosition }}
                 loading={index === 0 ? 'eager' : 'lazy'}
@@ -141,18 +135,18 @@ export const HeroCarousel: React.FC = () => {
             </div>
           </div>
 
-          {/* Center Text Block: Editorial & Authoritative */}
-          <div className="max-w-2xl space-y-3.5 my-auto">
-            <div className="inline-flex items-center gap-2 text-xs text-[#F5EEDB] font-bold tracking-wide drop-shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-[#C89432]" />
+          {/* Center Text Block: Editorial, Authoritative & Increased Font Size */}
+          <div className="max-w-3xl space-y-4 my-auto">
+            <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#F5EEDB] font-bold tracking-wide drop-shadow-sm">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#C89432]" />
               <span>{activeSlide.sectorTag}</span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15] drop-shadow-md">
               Infrastructure Intelligence for Evidence-Based Governance
             </h1>
 
-            <p className="text-xs sm:text-sm text-[#F6F3EC] leading-relaxed drop-shadow-sm max-w-xl font-normal">
+            <p className="text-sm sm:text-base text-[#F6F3EC] leading-relaxed drop-shadow-sm max-w-2xl font-normal">
               Monitor progress, detect emerging risk, understand underlying drivers and prioritize intervention across India&apos;s major infrastructure portfolio.
             </p>
 
@@ -179,13 +173,13 @@ export const HeroCarousel: React.FC = () => {
             </div>
           </div>
 
-          {/* Bottom Bar: Caption & Controls */}
+          {/* Bottom Bar: Indicators & Controls (Caption removed as requested) */}
           <div className="flex items-center justify-between pt-4 border-t border-white/20 text-xs text-[#E8F0EC]">
-            <div className="hidden sm:block text-[11px] text-[#C5D4CD] max-w-md truncate drop-shadow-xs">
-              {activeSlide.caption}
+            <div className="text-[11px] text-[#C5D4CD] font-medium tracking-wide">
+              {activeSlide.sectorTag}
             </div>
 
-            <div className="flex items-center gap-3 ml-auto">
+            <div className="flex items-center gap-3">
               {/* Slide Indicator Dots */}
               <div className="flex items-center gap-1.5" role="tablist">
                 {SLIDES.map((_, idx) => (
@@ -202,16 +196,6 @@ export const HeroCarousel: React.FC = () => {
                   />
                 ))}
               </div>
-
-              {/* Play/Pause Button */}
-              <button
-                type="button"
-                onClick={() => setIsPlaying(!isPlaying)}
-                aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
-                className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 text-[#E8F0EC] border border-white/20 transition cursor-pointer"
-              >
-                {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              </button>
 
               {/* Prev / Next Arrows */}
               <div className="flex items-center gap-1">

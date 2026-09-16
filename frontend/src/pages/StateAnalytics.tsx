@@ -305,19 +305,29 @@ export const StateAnalytics: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header & Analytical Orientation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DDD9D0] pb-4">
-        <div>
-          <div className="flex items-center gap-2 text-emerald-600 font-semibold text-xs uppercase tracking-wider mb-1">
+      <div className="bg-[#FAF8F5] border border-[#DDD9D0] rounded-xl p-5 sm:p-6 shadow-xs relative overflow-hidden border-l-4 border-l-[#173F35] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Subtle authentic infrastructure contextual backdrop */}
+        <div 
+          className="absolute right-0 top-0 bottom-0 w-1/3 opacity-15 pointer-events-none bg-cover bg-center hidden md:block"
+          style={{ 
+            backgroundImage: 'url(/banner1-1razA4xw.jpeg)',
+            maskImage: 'linear-gradient(to right, transparent, black 80%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 80%)'
+          }} 
+        />
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 text-[#267A69] font-semibold text-xs uppercase tracking-wider mb-1">
             {selectedState ? (
               <button
                 onClick={() => { setSelectedState(null); setSelectedSector(null); syncUrl(appliedFilters, null, null); }}
-                className="flex items-center gap-1 hover:underline text-[#66736D] hover:text-emerald-600"
+                className="flex items-center gap-1 hover:underline text-[#52605B] hover:text-[#267A69]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to State Overview
               </button>
             ) : (
               <>
-                <MapPin className="w-4 h-4" />
+                <MapPin className="w-4 h-4 text-[#267A69]" />
                 <span>Regional & State Portfolio</span>
               </>
             )}
@@ -325,16 +335,16 @@ export const StateAnalytics: React.FC = () => {
           <h1 className="text-2xl font-extrabold text-[#173F35] tracking-tight">
             {selectedState ? `${selectedState} Regional Analytics` : 'State & Regional Infrastructure Analytics'}
           </h1>
-          <p className="text-xs text-[#66736D] mt-1 max-w-3xl leading-relaxed">
+          <p className="text-xs text-[#52605B] mt-1 max-w-3xl leading-relaxed">
             {selectedState
               ? `Sectoral distribution, capital delivery, and project triage within ${selectedState}.`
               : 'Formulate an analytical cohort across states and Union Territories to compare regional capital allocation, delivery delays, and risk concentration.'}
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="px-3.5 py-2 rounded-lg bg-white border border-[#DDD9D0] text-[#173F35] text-xs font-semibold flex items-center gap-2 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-[#267A69]" />
             <span>{states.length} States / UTs Active</span>
           </div>
         </div>

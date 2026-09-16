@@ -156,7 +156,7 @@ export const ProjectIntelligence: React.FC = () => {
           <div className="flex items-center gap-3 text-[#66736D] text-[11px]">
             <span>External Intel: <strong className="text-[#26312D]">{detail.researchSummary?.completedAt ? new Date(detail.researchSummary.completedAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Current Cycle'}</strong></span>
             <span>•</span>
-            <span className="text-emerald-400 font-semibold">Zero Future Leakage</span>
+            <span className="text-[#173F35] font-semibold">Zero Future Leakage</span>
           </div>
         </div>
 
@@ -166,20 +166,20 @@ export const ProjectIntelligence: React.FC = () => {
             <div className="flex flex-wrap items-center gap-2">
               <span className={`px-2.5 py-1 rounded text-[11px] font-bold tracking-wide flex items-center gap-1.5 ${
                 detail.researchSummary.status === 'COMPLETED' 
-                  ? 'bg-emerald-950/80 text-[#173F35] border border-emerald-700/60' 
-                  : 'bg-amber-950/80 text-[#C89432] border border-amber-700/60'
+                  ? 'bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB]' 
+                  : 'bg-[#FFF7ED] text-[#C85A32] border border-[#FED7AA]'
               }`}>
-                <Globe className="w-3.5 h-3.5" />
+                <Globe className="w-3.5 h-3.5 text-[#267A69]" />
                 DEEP-DIVE EVIDENCE: {detail.researchSummary.status} ({Math.round(detail.researchSummary.completenessScore)}% COMPLETE)
               </span>
               <span className="text-[11px] text-[#66736D] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#DDD9D0]">
-                Confidence: <strong className="text-emerald-400 font-semibold">{detail.researchSummary.causalConfidence}</strong>
+                Confidence: <strong className="text-[#173F35] font-bold">{detail.researchSummary.causalConfidence}</strong>
               </span>
               <span className="text-[11px] text-[#66736D] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#DDD9D0]">
                 Verified Sources: <strong className="text-[#26312D] font-semibold">{detail.researchSummary.sourceCount}</strong>
               </span>
               <span className="text-[11px] text-[#66736D] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#DDD9D0]">
-                Causal Factors: <strong className="text-[#C89432] font-semibold">{detail.researchSummary.causalFactorCount}</strong>
+                Causal Factors: <strong className="text-[#C85A32] font-semibold">{detail.researchSummary.causalFactorCount}</strong>
               </span>
             </div>
 
@@ -444,10 +444,10 @@ export const ProjectIntelligence: React.FC = () => {
 
             <div className="bg-[#FAF8F5] p-3 rounded border border-[#DDD9D0]">
               <span className="text-[11px] text-[#66736D]">Cumulative Spend</span>
-              <div className="text-lg font-bold text-emerald-400 mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
+              <div className="text-lg font-bold text-[#173F35] mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
               <div className="text-[10px] mt-0.5">
                 {detail.cumulativeExpenditureCr > detail.latestRevisedCostCr && detail.physicalProgressPct < 95.0 ? (
-                  <span className="text-rose-400 font-semibold" title={`Approved budget exceeded by ₹${(detail.cumulativeExpenditureCr - detail.latestRevisedCostCr).toFixed(1)} Cr. Estimated unfunded cost to complete: ₹${detail.remainingFinancialExposureCr.toLocaleString()} Cr`}>
+                  <span className="text-rose-600 font-semibold" title={`Approved budget exceeded by ₹${(detail.cumulativeExpenditureCr - detail.latestRevisedCostCr).toFixed(1)} Cr. Estimated unfunded cost to complete: ₹${detail.remainingFinancialExposureCr.toLocaleString()} Cr`}>
                     Exhausted • Unfunded: ₹{detail.remainingFinancialExposureCr.toLocaleString()} Cr
                   </span>
                 ) : (
@@ -482,11 +482,11 @@ export const ProjectIntelligence: React.FC = () => {
             </div>
             <div>
               <span className="text-[#66736D] block">Anticipated DOC</span>
-              <span className="text-[#26312D] font-mono text-amber-400">{detail.anticipatedDoc || 'N/A'}</span>
+              <span className="text-[#C85A32] font-mono font-semibold">{detail.anticipatedDoc || 'N/A'}</span>
             </div>
             <div>
               <span className="text-[#66736D] block">Schedule Slippage</span>
-              <span className={`font-mono font-bold ${detail.scheduleSlippageMonths > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+              <span className={`font-mono font-bold ${detail.scheduleSlippageMonths > 0 ? 'text-[#C85A32]' : 'text-[#173F35]'}`}>
                 {detail.scheduleSlippageMonths > 0 ? `+${detail.scheduleSlippageMonths} Months` : 'On Schedule'}
               </span>
             </div>
@@ -498,7 +498,7 @@ export const ProjectIntelligence: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-[#66736D] flex items-center gap-1.5">
-                <ShieldAlert className="w-4 h-4 text-emerald-400" />
+                <ShieldAlert className="w-4 h-4 text-[#267A69]" />
                 3. Project Health Summary
               </h2>
               <button
@@ -515,16 +515,16 @@ export const ProjectIntelligence: React.FC = () => {
               <div>
                 <span className="text-[11px] text-[#66736D]">Implementation Health</span>
                 <div className={`text-sm font-bold flex items-center gap-1.5 mt-0.5 ${
-                  detail.healthStatus.includes('CRITICAL') ? 'text-rose-400' :
-                  detail.healthStatus.includes('HIGH RISK') ? 'text-amber-400' :
-                  detail.healthStatus.includes('MODERATE') ? 'text-yellow-300' :
-                  detail.healthStatus.includes('COMPLETED') ? 'text-emerald-400' :
+                  detail.healthStatus.includes('CRITICAL') ? 'text-rose-600' :
+                  detail.healthStatus.includes('HIGH RISK') ? 'text-amber-600' :
+                  detail.healthStatus.includes('MODERATE') ? 'text-amber-700' :
+                  detail.healthStatus.includes('COMPLETED') ? 'text-[#173F35]' :
                   detail.healthStatus.includes('COMMISSIONING') ? 'text-[#267A69]' :
-                  detail.healthStatus.includes('HEALTHY') || detail.healthStatus === 'IMPROVING' ? 'text-emerald-400' : 'text-[#26312D]'
+                  detail.healthStatus.includes('HEALTHY') || detail.healthStatus === 'IMPROVING' ? 'text-[#173F35]' : 'text-[#26312D]'
                 }`}>
                   {detail.healthStatus.includes('COMPLETED') ? (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-[#267A69] flex-shrink-0" />
                       <span>{detail.healthStatus}</span>
                     </>
                   ) : detail.healthStatus.includes('COMMISSIONING') ? (
@@ -534,17 +534,17 @@ export const ProjectIntelligence: React.FC = () => {
                     </>
                   ) : detail.healthStatus.includes('CRITICAL') ? (
                     <>
-                      <AlertOctagon className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                      <AlertOctagon className="w-4 h-4 text-rose-600 flex-shrink-0" />
                       <span>{detail.healthStatus}</span>
                     </>
                   ) : detail.healthStatus.includes('HIGH RISK') ? (
                     <>
-                      <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                      <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
                       <span>{detail.healthStatus}</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-[#267A69] flex-shrink-0" />
                       <span>{detail.healthStatus}</span>
                     </>
                   )}
@@ -556,9 +556,9 @@ export const ProjectIntelligence: React.FC = () => {
             <div className="space-y-2 text-xs">
               <span className="text-[11px] font-semibold text-[#66736D] uppercase tracking-wider">Observed Signals</span>
               {detail.positiveSignals.map((s, i) => (
-                <div key={i} className="flex items-center gap-1.5 text-emerald-400">
-                  <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span className="line-clamp-1">{s}</span>
+                <div key={i} className="flex items-center gap-1.5 text-[#173F35]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#267A69] flex-shrink-0" />
+                  <span className="line-clamp-1 font-medium">{s}</span>
                 </div>
               ))}
               {detail.negativeSignals.map((s, i) => (
@@ -826,7 +826,7 @@ export const ProjectIntelligence: React.FC = () => {
           <div className="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
             {detail.activeWarnings.length === 0 ? (
               <div className="text-xs text-[#66736D] py-4 text-center space-y-1">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto" />
+                <CheckCircle2 className="w-5 h-5 text-[#267A69] mx-auto" />
                 <p className="font-semibold text-[#26312D]">Zero active warning alerts</p>
                 <p className="text-[11px] text-[#66736D] max-w-xs mx-auto">
                   {detail.projectLifecycleStatus === 'Completed' || detail.physicalProgressPct >= 98.0
@@ -844,7 +844,7 @@ export const ProjectIntelligence: React.FC = () => {
                   <p className="text-[11px] text-[#66736D] mt-1">{w.triggerCondition}</p>
                   <div className="mt-1.5 flex justify-between text-[10px] text-[#66736D]">
                     <span>Persistence: {w.persistencePeriods} mos</span>
-                    <span className="text-amber-400 font-semibold">Alert Severity: {w.interventionPriorityScore.toFixed(0)} / 100</span>
+                    <span className="text-amber-600 font-semibold">Alert Severity: {w.interventionPriorityScore.toFixed(0)} / 100</span>
                   </div>
                 </div>
               ))
@@ -872,7 +872,7 @@ export const ProjectIntelligence: React.FC = () => {
           <div className="space-y-2.5">
             {detail.flaggingReasons.map((f, idx) => (
               <div key={idx} className="p-2.5 rounded bg-[#FAF8F5]/70 border border-[#DDD9D0] text-xs">
-                <span className="font-semibold text-amber-400 block">{f.signal_type}</span>
+                <span className="font-semibold text-amber-600 block">{f.signal_type}</span>
                 <p className="text-[11px] text-[#26312D] mt-1 leading-relaxed whitespace-pre-line">{f.detail}</p>
               </div>
             ))}
@@ -914,8 +914,8 @@ export const ProjectIntelligence: React.FC = () => {
                 <div key={idx} className="p-2 rounded bg-[#FAF8F5] border border-[#DDD9D0] flex items-center justify-between">
                   <div>
                     <span className="font-mono text-[#26312D]">{d.feature}</span>
-                    <span className={`block text-[10px] ${
-                      d.direction === 'INCREASES_RISK' ? 'text-rose-400' : 'text-emerald-400'
+                    <span className={`block text-[10px] font-semibold ${
+                      d.direction === 'INCREASES_RISK' ? 'text-rose-600' : 'text-[#173F35]'
                     }`}>
                       {d.direction.replace(/_/g, ' ')}
                     </span>
@@ -1082,13 +1082,13 @@ export const ProjectIntelligence: React.FC = () => {
             {detail.interventions.length > 0 ? (
               <StatusChip status={detail.interventionEffectivenessStatus} />
             ) : (detail.projectLifecycleStatus === 'Completed' || detail.healthStatus === 'COMPLETED' || detail.physicalProgressPct >= 98.0) ? (
-              <span className="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="px-2.5 py-1 rounded text-xs font-semibold bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB] flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#267A69]" />
                 PROJECT COMPLETED & COMMISSIONED
               </span>
             ) : (
               <span className="px-2.5 py-1 rounded text-xs font-semibold bg-[#FAF8F5] text-[#26312D] border border-[#DDD9D0] flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-amber-400" />
+                <Clock className="w-3.5 h-3.5 text-amber-600" />
                 NO INTERVENTION SCHEDULED
               </span>
             )}
@@ -1097,29 +1097,29 @@ export const ProjectIntelligence: React.FC = () => {
 
         {detail.interventions.length === 0 ? (
           (detail.projectLifecycleStatus === 'Completed' || detail.healthStatus === 'COMPLETED' || detail.physicalProgressPct >= 98.0) ? (
-            <div className="bg-white/60 border border-emerald-800/50 rounded-lg p-5">
+            <div className="bg-white/60 border border-[#BED6CB] rounded-lg p-5">
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="space-y-1.5 max-w-2xl">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <CheckCircle2 className="w-5 h-5 text-[#267A69]" />
                     <h3 className="text-xs font-bold text-[#173F35] uppercase tracking-wider">
                       Physical Implementation Completed & Commissioned
                     </h3>
                   </div>
                   <p className="text-xs text-[#26312D] leading-relaxed">
-                    This project has successfully completed physical construction and commercial commissioning (Current Progress: <strong className="text-emerald-400">{detail.physicalProgressPct}%</strong>). Zero active construction delays or operational bottlenecks remain. Official actions are limited to routine contractor final bill reconciliations, asset capitalization, and formal Project Completion Report (PCR) submission.
+                    This project has successfully completed physical construction and commercial commissioning (Current Progress: <strong className="text-[#173F35] font-bold">{detail.physicalProgressPct}%</strong>). Zero active construction delays or operational bottlenecks remain. Official actions are limited to routine contractor final bill reconciliations, asset capitalization, and formal Project Completion Report (PCR) submission.
                   </p>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1 text-[11px] text-[#66736D]">
-                    <span>Lifecycle Status: <strong className="text-emerald-400 font-semibold">Completed & Commissioned</strong></span>
+                    <span>Lifecycle Status: <strong className="text-[#173F35] font-semibold">Completed & Commissioned</strong></span>
                     <span>•</span>
-                    <span>Active Warnings: <strong className="text-emerald-400 font-bold">0</strong></span>
+                    <span>Active Warnings: <strong className="text-[#173F35] font-bold">0</strong></span>
                     <span>•</span>
                     <span>Post-Commissioning Measure: <strong className="text-[#26312D]">{detail.recommendedInterventions[0]?.measure || 'Final Commercial Settlement & PCR Submission'}</strong></span>
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 px-4 py-2.5 bg-emerald-950/80 border border-emerald-800 text-[#173F35] rounded text-xs font-semibold flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <div className="flex-shrink-0 px-4 py-2.5 bg-[#E8F0EC] border border-[#BED6CB] text-[#173F35] rounded text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#267A69]" />
                   <span>Asset Operational</span>
                 </div>
               </div>
@@ -1242,7 +1242,7 @@ const EvaluationModal: React.FC<EvaluationModalProps> = ({
           <div className="flex items-center gap-2">
             {componentKey === 'evidence_dossier' ? (
               <>
-                <Globe className="w-4 h-4 text-emerald-400" />
+                <Globe className="w-4 h-4 text-[#267A69]" />
                 <span className="text-xs font-bold uppercase tracking-wider text-[#173F35]">
                   Project Evidence Dossier & Non-CUF Provenance
                 </span>
@@ -1333,7 +1333,7 @@ function renderEvaluationDetails(
               </div>
               <div className="bg-[#FAF8F5] p-3 rounded border border-[#DDD9D0]">
                 <span className="text-[#66736D] block">Schedule Slippage</span>
-                <div className={`text-base font-bold mt-1 ${detail.scheduleSlippageMonths > 0 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                <div className={`text-base font-bold mt-1 ${detail.scheduleSlippageMonths > 0 ? 'text-[#C85A32]' : 'text-[#173F35]'}`}>
                   +{detail.scheduleSlippageMonths} Months
                 </div>
                 <span className="text-[10px] text-[#66736D]">Against original DOC</span>
@@ -1345,12 +1345,12 @@ function renderEvaluationDetails(
               </div>
               <div className="bg-[#FAF8F5] p-3 rounded border border-[#DDD9D0]">
                 <span className="text-[#66736D] block">Latest Central Revised</span>
-                <div className="text-sm font-bold text-amber-400 mt-1">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</div>
+                <div className="text-sm font-bold text-[#C85A32] mt-1">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</div>
                 <span className="text-[10px] text-[#66736D] font-mono">Escalation: +{detail.costEscalationPct.toFixed(1)}%</span>
               </div>
               <div className="bg-[#FAF8F5] p-3 rounded border border-[#DDD9D0]">
                 <span className="text-[#66736D] block">Cumulative Spend</span>
-                <div className="text-sm font-bold text-emerald-400 mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
+                <div className="text-sm font-bold text-[#173F35] mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
                 <span className="text-[10px] text-[#66736D] font-mono">Burn to date</span>
               </div>
               <div className="bg-[#FAF8F5] p-3 rounded border border-[#DDD9D0]">
@@ -1428,17 +1428,17 @@ function renderEvaluationDetails(
 
           {/* Section C: Dual-Baseline Accounting & Governance Reconciliation */}
           <div className="bg-[#FAF8F5] p-4 rounded-lg border border-[#DDD9D0] space-y-3">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Calculator className="w-3.5 h-3.5" />
+            <span className="text-xs font-bold text-[#173F35] uppercase tracking-wider flex items-center gap-1.5">
+              <Calculator className="w-3.5 h-3.5 text-[#267A69]" />
               C. Dual-Lens Accounting & Governance Reconciliation
             </span>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-[#26312D]">
               <div className="p-3 rounded bg-[#FAF8F5] border border-[#DDD9D0] space-y-1.5">
-                <div className="font-bold text-amber-400 flex items-center gap-1">
+                <div className="font-bold text-[#C85A32] flex items-center gap-1">
                   <span>Lens 1: Central Ministry (MoSPI OCMS) Governance</span>
                 </div>
                 <p className="text-[#66736D] leading-relaxed text-[11px]">
-                  Central statutory records benchmark against the approved central ceiling of <strong className="text-[#26312D]">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</strong>. With cumulative disbursements of <strong className="text-emerald-400">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</strong>, budget utilization is <strong className="text-rose-400">{detail.financialProgressPct}%</strong>.
+                  Central statutory records benchmark against the approved central ceiling of <strong className="text-[#26312D]">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</strong>. With cumulative disbursements of <strong className="text-[#173F35]">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</strong>, budget utilization is <strong className="text-rose-600">{detail.financialProgressPct}%</strong>.
                 </p>
                 <p className="text-[#66736D] leading-relaxed text-[11px]">
                   Until formal central Revised Cost Committee (RCC) ratification is gazetted, the surplus spend of ₹{(detail.cumulativeExpenditureCr - detail.latestRevisedCostCr).toFixed(1)} Cr is treated as central budget exhaustion with estimated unfunded completion exposure of ₹{detail.remainingFinancialExposureCr.toLocaleString()} Cr.
@@ -1446,13 +1446,13 @@ function renderEvaluationDetails(
               </div>
 
               <div className="p-3 rounded bg-[#FAF8F5] border border-[#DDD9D0] space-y-1.5">
-                <div className="font-bold text-indigo-400 flex items-center gap-1">
+                <div className="font-bold text-indigo-700 flex items-center gap-1">
                   <span>Lens 2: Ground Execution & Administrative Ceiling (RAA / Multi-Tier Sanction)</span>
                 </div>
                 {detail.latestCabinetRaaCostCr && detail.latestCabinetRaaCostCr > detail.latestRevisedCostCr ? (
                   <>
                     <p className="text-[#66736D] leading-relaxed text-[11px]">
-                      Statutory authorization has been accorded by <strong className="text-[#26312D] font-semibold">{detail.costRevisions && detail.costRevisions.length > 0 ? detail.costRevisions[detail.costRevisions.length - 1].approvingAuthority : 'the Competent Administrative Authority'}</strong> up to <strong className="text-indigo-300 font-bold">₹{detail.latestCabinetRaaCostCr.toLocaleString()} Cr</strong> under {detail.costRevisions && detail.costRevisions.length > 0 ? detail.costRevisions[detail.costRevisions.length - 1].revisionTitle : 'Revised Administrative Approval (RAA)'}.
+                      Statutory authorization has been accorded by <strong className="text-[#26312D] font-semibold">{detail.costRevisions && detail.costRevisions.length > 0 ? detail.costRevisions[detail.costRevisions.length - 1].approvingAuthority : 'the Competent Administrative Authority'}</strong> up to <strong className="text-indigo-900 font-bold">₹{detail.latestCabinetRaaCostCr.toLocaleString()} Cr</strong> under {detail.costRevisions && detail.costRevisions.length > 0 ? detail.costRevisions[detail.costRevisions.length - 1].revisionTitle : 'Revised Administrative Approval (RAA)'}.
                     </p>
                     {detail.costRevisions && detail.costRevisions.length > 0 && detail.costRevisions[detail.costRevisions.length - 1].scopeAndReasons && (
                       <p className="text-[#66736D] leading-relaxed text-[11px] italic bg-[#FAF8F5] p-2 rounded border border-[#DDD9D0]">
@@ -1460,7 +1460,7 @@ function renderEvaluationDetails(
                       </p>
                     )}
                     <p className="text-[#66736D] leading-relaxed text-[11px]">
-                      Against this comprehensive administrative ceiling, cumulative spend to date represents <strong className="text-emerald-400 font-bold">{((detail.cumulativeExpenditureCr / detail.latestCabinetRaaCostCr) * 100).toFixed(1)}% financial progress</strong>, aligning with <strong className="text-[#26312D]">{detail.physicalProgressPct}% physical progress</strong> and validating targeted commissioning by <strong className="text-[#26312D]">{detail.anticipatedDoc || 'scheduled completion date'}</strong>.
+                      Against this comprehensive administrative ceiling, cumulative spend to date represents <strong className="text-[#173F35] font-bold">{((detail.cumulativeExpenditureCr / detail.latestCabinetRaaCostCr) * 100).toFixed(1)}% financial progress</strong>, aligning with <strong className="text-[#26312D]">{detail.physicalProgressPct}% physical progress</strong> and validating targeted commissioning by <strong className="text-[#26312D]">{detail.anticipatedDoc || 'scheduled completion date'}</strong>.
                     </p>
                   </>
                 ) : (
@@ -1479,7 +1479,7 @@ function renderEvaluationDetails(
         <div className="space-y-4">
           <div>
             <h3 className="text-base font-bold text-[#173F35] flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-emerald-400" />
+              <ShieldAlert className="w-5 h-5 text-[#267A69]" />
               Dimension 3: Project Health & Signal Evaluation
             </h3>
             <p className="text-xs text-[#66736D] mt-1">
@@ -1490,7 +1490,7 @@ function renderEvaluationDetails(
           <div className="bg-[#FAF8F5] p-4 rounded-lg border border-[#DDD9D0] space-y-2">
             <span className="text-xs font-bold text-[#267A69] uppercase tracking-wider">Evaluation Methodology</span>
             <p className="text-xs leading-relaxed text-[#26312D]">
-              Implementation Health is evaluated independently of trajectory to reflect absolute distress severity: <strong className="text-rose-400">CRITICAL DISTRESS</strong> (Risk &ge; 70.0 or budget exhausted with physical milestones incomplete), <strong className="text-amber-400">HIGH RISK / VULNERABLE</strong> (50.0–69.9), <strong className="text-yellow-400">MODERATE / WATCHLIST</strong> (25.0–49.9), or <strong className="text-emerald-400">HEALTHY / ON TRACK</strong> (&lt; 25.0). Completed projects are tagged <strong className="text-[#173F35]">COMPLETED & COMMISSIONED</strong>.
+              Implementation Health is evaluated independently of trajectory to reflect absolute distress severity: <strong className="text-rose-600">CRITICAL DISTRESS</strong> (Risk &ge; 70.0 or budget exhausted with physical milestones incomplete), <strong className="text-amber-600">HIGH RISK / VULNERABLE</strong> (50.0–69.9), <strong className="text-amber-700">MODERATE / WATCHLIST</strong> (25.0–49.9), or <strong className="text-[#173F35]">HEALTHY / ON TRACK</strong> (&lt; 25.0). Completed projects are tagged <strong className="text-[#173F35]">COMPLETED & COMMISSIONED</strong>.
             </p>
             <p className="text-xs leading-relaxed text-[#66736D] pt-1 border-t border-[#DDD9D0]">
               <strong className="text-[#26312D]">Risk Trajectory</strong> monitors momentum: projects stalled at high risk without progress are classified as <strong className="text-rose-300">Chronic Stagnation</strong>, preventing severe distress projects from erroneously appearing benign or "Stable".
@@ -1526,8 +1526,8 @@ function renderEvaluationDetails(
                 </div>
               ))}
               {detail.positiveSignals.map((s, i) => (
-                <div key={i} className="p-2.5 rounded bg-emerald-950/20 border border-emerald-900/50 text-[#173F35] flex items-start gap-2">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400 mt-0.5" />
+                <div key={i} className="p-2.5 rounded bg-[#E8F0EC] border border-[#BED6CB] text-[#173F35] flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#267A69] mt-0.5" />
                   <span><strong>Mitigating Factor:</strong> {s}</span>
                 </div>
               ))}
@@ -1551,7 +1551,7 @@ function renderEvaluationDetails(
 
           <div className="bg-[#FAF8F5] p-4 rounded-lg border border-[#DDD9D0] space-y-2">
             <span className="text-xs font-bold text-[#267A69] uppercase tracking-wider">Algorithmic Formulation</span>
-            <pre className="text-[11px] font-mono bg-white p-2.5 rounded text-[#C89432] overflow-x-auto">
+            <pre className="text-[11px] font-mono bg-white p-2.5 rounded text-[#C85A32] overflow-x-auto">
               Predicted Final Cost = RevisedCost + f_CatBoost(ExpenditureVelocity, TimeElapsedRatio, SectorEscalationRate, ApprovedCostTier)
             </pre>
             <p className="text-xs leading-relaxed text-[#26312D]">
@@ -1566,11 +1566,11 @@ function renderEvaluationDetails(
             </div>
             <div className="bg-[#FAF8F5]/70 p-3 rounded border border-[#DDD9D0]">
               <span className="text-[#66736D]">Latest Revised Sanction</span>
-              <div className="text-sm font-bold text-amber-400 mt-1">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</div>
+              <div className="text-sm font-bold text-[#C85A32] mt-1">₹{detail.latestRevisedCostCr.toLocaleString()} Cr</div>
             </div>
             <div className="bg-[#FAF8F5]/70 p-3 rounded border border-[#DDD9D0]">
               <span className="text-[#66736D]">Current Cumulative Spend</span>
-              <div className="text-sm font-bold text-emerald-400 mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
+              <div className="text-sm font-bold text-[#173F35] mt-1">₹{detail.cumulativeExpenditureCr.toLocaleString()} Cr</div>
             </div>
             <div className="bg-[#FAF8F5]/70 p-3 rounded border border-[#DDD9D0]">
               <span className="text-[#66736D]">Predicted Final Cost</span>
@@ -1662,14 +1662,14 @@ function renderEvaluationDetails(
 
           <div className="bg-[#FAF8F5] p-4 rounded-lg border border-[#DDD9D0] space-y-2">
             <span className="text-xs font-bold text-[#267A69] uppercase tracking-wider">Canonical Weighting Formula</span>
-            <div className="p-3 bg-white rounded font-mono text-xs text-emerald-400">
+            <div className="p-3 bg-white rounded font-mono text-xs text-[#173F35] font-semibold">
               Composite Risk = (0.35 × CostRisk) + (0.35 × ScheduleRisk) + (0.30 × ProgressRisk)
             </div>
             <div className="text-xs text-[#26312D] space-y-1">
               <p>• <strong>Cost Risk (35%):</strong> Normalized from cost escalation percentage and remaining exposure.</p>
               <p>• <strong>Schedule Risk (35%):</strong> Evaluated from schedule slippage months against project baseline duration.</p>
               <p>• <strong>Progress Risk (30%):</strong> Evaluated from physical-financial divergence gap and monthly velocity stagnation.</p>
-              <p className="pt-1 text-emerald-400 font-medium">• <strong>Lifecycle-Aware Modulation:</strong> Projects with &ge; 98% progress or verified commercial commissioning have schedule and execution risks attenuated to 0.0 with construction alerts retired, focusing purely on final audited cost variance.</p>
+              <p className="pt-1 text-[#173F35] font-semibold">• <strong>Lifecycle-Aware Modulation:</strong> Projects with &ge; 98% progress or verified commercial commissioning have schedule and execution risks attenuated to 0.0 with construction alerts retired, focusing purely on final audited cost variance.</p>
             </div>
           </div>
 
@@ -1678,11 +1678,11 @@ function renderEvaluationDetails(
             <div className="space-y-2 text-xs">
               <div className="flex justify-between items-center">
                 <span>Cost Component (Escalation: {detail.costEscalationPct.toFixed(1)}%)</span>
-                <span className="font-mono text-amber-400 font-bold">{detail.costRiskScore.toFixed(1)} × 0.35 = {(detail.costRiskScore * 0.35).toFixed(1)} pts</span>
+                <span className="font-mono text-[#C85A32] font-bold">{detail.costRiskScore.toFixed(1)} × 0.35 = {(detail.costRiskScore * 0.35).toFixed(1)} pts</span>
               </div>
               <div className="flex justify-between items-center">
                 <span>Schedule Component (Slippage: {detail.scheduleSlippageMonths} mos)</span>
-                <span className="font-mono text-rose-400 font-bold">{detail.scheduleRiskScore.toFixed(1)} × 0.35 = {(detail.scheduleRiskScore * 0.35).toFixed(1)} pts</span>
+                <span className="font-mono text-rose-600 font-bold">{detail.scheduleRiskScore.toFixed(1)} × 0.35 = {(detail.scheduleRiskScore * 0.35).toFixed(1)} pts</span>
               </div>
               <div className="flex justify-between items-center">
                 <span>Progress Component (Gap: {detail.physicalFinancialGap}%)</span>
@@ -1690,7 +1690,7 @@ function renderEvaluationDetails(
               </div>
               <div className="pt-2 border-t border-[#DDD9D0] flex justify-between items-center text-sm font-bold text-[#173F35]">
                 <span>Total Evaluated Risk Score</span>
-                <span className="text-rose-400 font-mono">{detail.overallRiskScore.toFixed(1)} / 100 ({detail.riskBand} Band)</span>
+                <span className="text-rose-600 font-mono">{detail.overallRiskScore.toFixed(1)} / 100 ({detail.riskBand} Band)</span>
               </div>
             </div>
           </div>
@@ -1713,7 +1713,7 @@ function renderEvaluationDetails(
           <div className="bg-[#FAF8F5] p-4 rounded-lg border border-[#DDD9D0] space-y-2">
             <span className="text-xs font-bold text-[#267A69] uppercase tracking-wider">Trajectory Evaluation Logic</span>
             <p className="text-xs leading-relaxed text-[#26312D]">
-              Assesses the directional velocity of implementation over the trailing 6 to 12 cycles. If physical progress delta continues to fall below 0.2% per month while cost claims continue to grow, the trajectory is stamped <strong className="text-rose-400">DETERIORATING</strong>. If monthly physical completion exceeds historical velocity, the project qualifies as <strong className="text-emerald-400">IMPROVING</strong>.
+              Assesses the directional velocity of implementation over the trailing 6 to 12 cycles. If physical progress delta continues to fall below 0.2% per month while cost claims continue to grow, the trajectory is stamped <strong className="text-rose-600">DETERIORATING</strong>. If monthly physical completion exceeds historical velocity, the project qualifies as <strong className="text-[#173F35]">IMPROVING</strong>.
             </p>
           </div>
 
@@ -1732,7 +1732,7 @@ function renderEvaluationDetails(
         <div className="space-y-4">
           <div>
             <h3 className="text-base font-bold text-[#173F35] flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-amber-400" />
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
               Dimension 8: Active Early Warning Heuristics & Persistence
             </h3>
             <p className="text-xs text-[#66736D] mt-1">
@@ -1755,7 +1755,7 @@ function renderEvaluationDetails(
             <span className="text-xs font-bold uppercase tracking-wider text-[#66736D]">Active Alert Triggers ({detail.activeWarnings.length})</span>
             {detail.activeWarnings.length === 0 ? (
               <div className="p-4 rounded-lg bg-[#FAF8F5] border border-[#DDD9D0] text-center space-y-1">
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 mx-auto" />
+                <CheckCircle2 className="w-5 h-5 text-[#267A69] mx-auto" />
                 <p className="font-semibold text-[#26312D]">Zero Active Alert Triggers</p>
                 <p className="text-xs text-[#66736D]">
                   {detail.projectLifecycleStatus === 'Completed' || detail.physicalProgressPct >= 98.0
@@ -1843,7 +1843,7 @@ function renderEvaluationDetails(
               <div key={idx} className="p-2.5 rounded bg-[#FAF8F5] border border-[#DDD9D0] flex justify-between items-center text-xs">
                 <div>
                   <span className="font-mono font-bold text-[#26312D]">{d.feature}</span>
-                  <span className={`block text-[10px] ${d.direction === 'INCREASES_RISK' ? 'text-rose-400' : 'text-emerald-400'}`}>
+                  <span className={`block text-[10px] ${d.direction === 'INCREASES_RISK' ? 'text-rose-400' : 'text-[#267A69]'}`}>
                     {d.direction.replace(/_/g, ' ')}
                   </span>
                 </div>
@@ -2002,7 +2002,7 @@ function renderEvaluationDetails(
         <div className="space-y-4">
           <div>
             <h3 className="text-base font-bold text-[#173F35] flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-emerald-400" />
+              <CheckCircle className="w-5 h-5 text-[#267A69]" />
               Dimensions 14 & 15: Intervention Governance & Lifecycle
             </h3>
             <p className="text-xs text-[#66736D] mt-1">
@@ -2068,7 +2068,7 @@ function renderEvaluationDetails(
         <div className="space-y-6">
           <div>
             <h3 className="text-base font-bold text-[#173F35] flex items-center gap-2">
-              <Globe className="w-5 h-5 text-emerald-400" />
+              <Globe className="w-5 h-5 text-[#267A69]" />
               Project Evidence Dossier & Non-CUF Provenance
             </h3>
             <p className="text-xs text-[#66736D] mt-1">
@@ -2088,8 +2088,8 @@ function renderEvaluationDetails(
             <>
               {/* Section A: Investigation Metadata & Confidence Decomposition */}
               <div className="space-y-3">
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5" />
+                <span className="text-xs font-bold text-[#173F35] uppercase tracking-wider flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5 text-[#267A69]" />
                   A. Investigation Metadata & 3-Way Confidence Decomposition
                 </span>
                 
@@ -2099,8 +2099,8 @@ function renderEvaluationDetails(
                     <div className="mt-1">
                       <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                         detail.researchSummary.status === 'COMPLETED' 
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                          : 'bg-amber-950 text-[#C89432] border border-amber-800'
+                          ? 'bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB]' 
+                          : 'bg-[#FFF7ED] text-[#C85A32] border border-[#FED7AA]'
                       }`}>
                         {detail.researchSummary.status}
                       </span>
@@ -2109,11 +2109,11 @@ function renderEvaluationDetails(
 
                   <div className="bg-[#FAF8F5] p-3 rounded border border-[#DDD9D0]">
                     <span className="text-[#66736D]">Completeness Score</span>
-                    <div className="text-sm font-bold text-slate-100 mt-1 flex items-center gap-2">
+                    <div className="text-sm font-bold text-[#26312D] mt-1 flex items-center gap-2">
                       <span>{Math.round(detail.researchSummary.completenessScore)}%</span>
-                      <div className="w-16 h-1.5 bg-[#FAF8F5] rounded-full overflow-hidden">
+                      <div className="w-16 h-1.5 bg-[#DDD9D0] rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-emerald-500 rounded-full" 
+                          className="h-full bg-[#267A69] rounded-full" 
                           style={{ width: `${detail.researchSummary.completenessScore}%` }} 
                         />
                       </div>
@@ -2139,19 +2139,19 @@ function renderEvaluationDetails(
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   <div className="bg-white/60 p-2.5 rounded border border-[#DDD9D0] flex items-center justify-between">
                     <span className="text-[#66736D]">Data Confidence (Primary Telemetry):</span>
-                    <span className="font-bold text-[#267A69] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#DDD9D0]">
+                    <span className="font-bold text-[#173F35] bg-[#E8F0EC] px-2 py-0.5 rounded border border-[#BED6CB]">
                       {detail.researchSummary.dataConfidence}
                     </span>
                   </div>
                   <div className="bg-white/60 p-2.5 rounded border border-[#DDD9D0] flex items-center justify-between">
                     <span className="text-[#66736D]">External Evidence Confidence:</span>
-                    <span className="font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-900/60">
+                    <span className="font-bold text-[#173F35] bg-[#E8F0EC] px-2 py-0.5 rounded border border-[#BED6CB]">
                       {detail.researchSummary.researchConfidence}
                     </span>
                   </div>
                   <div className="bg-white/60 p-2.5 rounded border border-[#DDD9D0] flex items-center justify-between">
                     <span className="text-[#66736D]">Causal Attribution Confidence:</span>
-                    <span className="font-bold text-amber-400 bg-amber-950/60 px-2 py-0.5 rounded border border-amber-900/60">
+                    <span className="font-bold text-[#C85A32] bg-[#FFF7ED] px-2 py-0.5 rounded border border-[#FED7AA]">
                       {detail.researchSummary.causalConfidence}
                     </span>
                   </div>
@@ -2220,7 +2220,7 @@ function renderEvaluationDetails(
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                               factor.status === 'UNRESOLVED' 
                                 ? 'bg-rose-50 text-rose-700 border border-rose-200' 
-                                : 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                                : 'bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB]'
                             }`}>
                               {factor.status}
                             </span>
@@ -2259,8 +2259,8 @@ function renderEvaluationDetails(
               {/* Section D: Claim-Level Provenance & Source Ledger */}
               {detail.evidenceClaims && detail.evidenceClaims.length > 0 && (
                 <div className="space-y-3 pt-2 border-t border-[#DDD9D0]">
-                  <span className="text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" />
+                  <span className="text-xs font-bold text-purple-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-purple-600" />
                     D. Claim-Level Provenance & Authoritative Document Ledger ({detail.evidenceClaims.length} Claims)
                   </span>
 
@@ -2272,7 +2272,7 @@ function renderEvaluationDetails(
                             "{claim.claimText}"
                           </span>
                           <div className="flex items-center gap-1.5">
-                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB]">
                               {claim.evidenceStrength}
                             </span>
                             <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
@@ -2295,7 +2295,7 @@ function renderEvaluationDetails(
                                 {claim.source.title}
                               </div>
                               <div className="text-[11px] text-[#66736D]">
-                                Publisher: <strong className="text-[#26312D]">{claim.source.publisher}</strong> • Type: <strong className="text-[#26312D]">{claim.source.sourceType}</strong> • Quality: <strong className="text-emerald-400">{claim.source.sourceQuality.toFixed(2)}</strong>
+                                Publisher: <strong className="text-[#26312D]">{claim.source.publisher}</strong> • Type: <strong className="text-[#26312D]">{claim.source.sourceType}</strong> • Quality: <strong className="text-[#173F35] font-bold">{claim.source.sourceQuality.toFixed(2)}</strong>
                               </div>
                             </div>
 

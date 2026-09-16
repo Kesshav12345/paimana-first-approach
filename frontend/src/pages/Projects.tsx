@@ -615,12 +615,8 @@ export const Projects: React.FC = () => {
               </button>
             </div>
 
-            <div className="text-xs text-[#66736D]">
-              {hasApplied ? (
-                <span>Found <strong className="text-[#26312D] font-bold">{total.toLocaleString()}</strong> matching projects</span>
-              ) : (
-                <span className="text-[#8C9893] italic">Configure filters above and click Apply to view projects</span>
-              )}
+            <div className="text-xs text-[#52605B]">
+              <span>Showing <strong className="text-[#173F35] font-bold">{total.toLocaleString()}</strong> central sector projects</span>
             </div>
           </div>
         </div>

@@ -1,102 +1,107 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Database, Layers } from 'lucide-react';
+import { Phone, Mail } from 'lucide-react';
 
 export const AppFooter: React.FC = () => {
   return (
-    <footer className="border-t border-[#DDD9D0] bg-[#173F35] text-[#E8F0EC] mt-auto">
-      {/* Top Institutional Context Strip */}
-      <div className="border-b border-[#1F4E42] py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-xs">
-            
-            {/* Col 1: Institutional Authority */}
-            <div className="md:col-span-2 space-y-2.5">
-              <div className="flex items-center gap-3">
-                <img src="/emblem.png" alt="India Emblem" className="h-9 w-auto invert brightness-200" />
-                <div>
-                  <div className="font-bold text-white text-sm tracking-tight">PAIMANA Intelligence Atlas</div>
-                  <div className="text-[#A3B8B0] text-[11px]">
-                    Infrastructure & Project Monitoring Division (IPMD)
-                  </div>
-                </div>
+    <footer className="border-t border-[#DDD9D0] bg-white text-[#26312D] mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        
+        {/* Top Section: Official Emblems & Authority */}
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <img 
+              src="/emblem.png" 
+              alt="National Emblem of India" 
+              className="h-14 w-auto object-contain" 
+            />
+            <div className="text-left leading-tight">
+              <div className="font-bold text-[#173F35] text-sm tracking-tight">
+                Ministry of Statistics and
               </div>
-              <p className="text-[#C5D4CD] text-[11px] leading-relaxed max-w-lg mt-2">
-                PAIMANA is an institutional infrastructure intelligence and decision-support platform designed to monitor Central Sector Infrastructure Projects (₹150 Cr and above) under the Ministry of Statistics and Programme Implementation (MoSPI), Government of India.
-              </p>
+              <div className="font-bold text-[#173F35] text-sm tracking-tight">
+                Programme Implementation
+              </div>
+              <div className="text-xs text-[#52605B] font-medium">
+                Government of India
+              </div>
             </div>
+          </div>
 
-            {/* Col 2: Navigation Links */}
-            <div>
-              <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-2.5">
-                Analytical Portals
-              </h4>
-              <ul className="space-y-2 text-[11px] text-[#C5D4CD]">
-                <li>
-                  <Link to="/projects" className="hover:text-white hover:underline transition-colors">
-                    Central Projects Registry
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/early-warning" className="hover:text-white hover:underline transition-colors">
-                    Early Warning & Intervention Center
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/sectors" className="hover:text-white hover:underline transition-colors">
-                    Sectoral Performance Analytics
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/states" className="hover:text-white hover:underline transition-colors">
-                    Geographic & State Density
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          <div className="h-10 w-[1px] bg-[#DDD9D0]" />
 
-            {/* Col 3: Technical & Compliance */}
-            <div>
-              <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-2.5">
-                Platform Architecture
-              </h4>
-              <ul className="space-y-2 text-[11px] text-[#C5D4CD]">
-                <li>
-                  <Link to="/methodology" className="hover:text-white hover:underline flex items-center gap-1.5 transition-colors">
-                    <Layers className="w-3.5 h-3.5 text-[#6BB8A6]" />
-                    <span>Technical Methodology</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/operations" className="hover:text-white hover:underline flex items-center gap-1.5 transition-colors">
-                    <Database className="w-3.5 h-3.5 text-[#DFCBB0]" />
-                    <span>Operations & MLOps Engine</span>
-                  </Link>
-                </li>
-                <li className="pt-2 text-[#A3B8B0] text-[10px]">
-                  <span>Analytical Stack: <strong>Deterministic + CatBoost ML</strong></span>
-                </li>
-              </ul>
-            </div>
+          <img 
+            src="/data-for-dev.png" 
+            alt="Data for Development" 
+            className="h-12 w-auto object-contain" 
+          />
+        </div>
 
+        {/* Section 2: Get in Touch */}
+        <div className="space-y-2 pt-2">
+          <h3 className="font-bold text-sm text-[#173F35]">
+            Get in touch
+          </h3>
+          <p className="text-xs text-[#404D47] leading-relaxed max-w-4xl">
+            Ministry of Statistics and Programme Implementation, Government of India, Khurshid Lal Bhawan, Janpath, New Delhi-110001 (India).
+          </p>
+          <div className="flex flex-wrap items-center gap-6 pt-1 text-xs text-[#26312D]">
+            <a 
+              href="tel:011-23455604" 
+              className="inline-flex items-center gap-2 text-[#C85A32] hover:text-[#A34320] font-medium transition-colors"
+            >
+              <Phone className="w-4 h-4 text-[#C85A32]" />
+              <span>011-23455604</span>
+            </a>
+            <a 
+              href="mailto:dir-ipmd@mospi.gov.in" 
+              className="inline-flex items-center gap-2 text-[#C85A32] hover:text-[#A34320] font-medium transition-colors"
+            >
+              <Mail className="w-4 h-4 text-[#C85A32]" />
+              <span>dir-ipmd[at]mospi[dot]gov[dot]in</span>
+            </a>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Copyright & Disclaimer Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#A3B8B0]">
-        <div>
-          <span>PAIMANA Intelligence Atlas &copy; {new Date().getFullYear()} — Government of India / MoSPI IPMD. All rights reserved.</span>
+        {/* Section 3: Divider & Quick Links */}
+        <div className="border-t border-[#E5E0D8] pt-4">
+          <h4 className="font-bold text-xs text-[#173F35] mb-2.5">
+            Quick Links
+          </h4>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#404D47]">
+            <Link to="/" className="hover:text-[#173F35] hover:underline font-medium transition-colors">
+              Home
+            </Link>
+            <a href="#contact" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); }} className="hover:text-[#173F35] hover:underline font-medium transition-colors">
+              Contact Us
+            </a>
+            <Link to="/methodology" className="hover:text-[#173F35] hover:underline font-medium transition-colors">
+              FAQs
+            </Link>
+            <Link to="/projects" className="hover:text-[#173F35] hover:underline font-medium transition-colors">
+              Site Map
+            </Link>
+            <span className="hover:text-[#173F35] cursor-pointer hover:underline font-medium transition-colors">
+              Hyperlinking Policy
+            </span>
+            <span className="hover:text-[#173F35] cursor-pointer hover:underline font-medium transition-colors">
+              Privacy Policy
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-3 text-[11px]">
-          <span className="flex items-center gap-1 text-[#86EFAC] font-medium">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>National Infrastructure Monitoring</span>
-          </span>
-          <span>•</span>
-          <span>Official Decision Support System</span>
+
+        {/* Section 4: Divider & Content Ownership / Copyright */}
+        <div className="border-t border-[#E5E0D8] pt-4 space-y-1 text-xs text-[#52605B]">
+          <p>
+            <strong className="text-[#26312D] font-semibold">Content owned and maintained by:</strong> Infrastructure & Project Monitoring Division(IPMD) | Ministry of Statistics and Programme Implementation.
+          </p>
+          <p>
+            Copyright &copy; 2025 Ministry of Statistics and Programme Implementation
+          </p>
         </div>
+
       </div>
     </footer>
   );
 };
+

@@ -659,19 +659,37 @@ export const Methodology: React.FC = () => {
     }
   };
 
+  const formatSearchProvider = (provider?: string) => {
+    if (!provider) return 'Composite Gov Direct';
+    if (provider.toLowerCase().includes('composite')) return 'Composite Gov Direct';
+    if (provider.toLowerCase().includes('duckduckgo')) return 'Public Web Intel';
+    if (provider.toLowerCase().includes('serp')) return 'SerpAPI Search';
+    return provider.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()).slice(0, 22);
+  };
+
   return (
     <div id="methodology-content-root" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      {/* Header Banner - Institutional Light Government Theme */}
-      <div className="bg-white border border-[#DDD9D0] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
-        <div className="max-w-4xl space-y-2.5">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#E8F0EC] text-[#267A69] border border-[#BED6CB] text-xs font-bold uppercase tracking-wider">
-            <BookOpen className="w-3.5 h-3.5" />
+      {/* Header Banner - Institutional Warm Editorial Theme with authentic engineering context */}
+      <div className="bg-[#FAF8F5] border border-[#DDD9D0] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden border-l-4 border-l-[#173F35]">
+        {/* Subtle authentic infrastructure contextual backdrop */}
+        <div 
+          className="absolute right-0 top-0 bottom-0 w-1/2 opacity-15 pointer-events-none bg-cover bg-right hidden md:block"
+          style={{ 
+            backgroundImage: 'url(/banner4-BesNf3Ns.png)',
+            maskImage: 'linear-gradient(to right, transparent, black 70%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 70%)'
+          }} 
+        />
+
+        <div className="relative z-10 max-w-4xl space-y-2.5">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB] text-xs font-bold uppercase tracking-wider">
+            <BookOpen className="w-3.5 h-3.5 text-[#267A69]" />
             <span>Decision Support Methodology & Engineering Specification</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#173F35]">
             Systems Architecture & Analytical Methodology
           </h1>
-          <p className="text-xs sm:text-sm text-[#66736D] leading-relaxed max-w-4xl">
+          <p className="text-xs sm:text-sm text-[#52605B] leading-relaxed max-w-3xl">
             PAIMANA Intelligence fuses official infrastructure monitoring records, historical project trajectories, 
             deterministic analytics, predictive CatBoost ML models, and multi-tier external intelligence to surface 
             early-warning signals and explain why they matter for governance and timely intervention.
@@ -679,41 +697,41 @@ export const Methodology: React.FC = () => {
         </div>
 
         {/* Dynamic Telemetry Strip */}
-        <div className="mt-6 pt-5 border-t border-[#DDD9D0] grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#DDD9D0]">
+        <div className="relative z-10 mt-6 pt-5 border-t border-[#E5E0D8] grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#267A69]">
             <span className="text-[11px] text-[#66736D] block font-medium">Methodology Version</span>
-            <span className="text-sm font-bold text-[#267A69]">
+            <span className="text-sm font-bold text-[#173F35]">
               {loadingTelemetry ? '...' : telemetry?.active_methodology_version || 'v2.4.0'}
             </span>
           </div>
-          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#DDD9D0]">
+          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#173F35]">
             <span className="text-[11px] text-[#66736D] block font-medium">Production ML</span>
             <span className="text-sm font-bold text-[#173F35]">
               {loadingTelemetry ? '...' : telemetry?.production_model_version || 'CatBoost v2026.07'}
             </span>
           </div>
-          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#DDD9D0]">
+          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#C85A32]">
             <span className="text-[11px] text-[#66736D] block font-medium">Reporting Cycle</span>
-            <span className="text-sm font-bold text-amber-700">
+            <span className="text-sm font-bold text-[#C85A32]">
               {loadingTelemetry ? '...' : telemetry?.latest_dataset_period || 'Jul 2026'}
             </span>
           </div>
-          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#DDD9D0]">
+          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#173F35]">
             <span className="text-[11px] text-[#66736D] block font-medium">Monitored Projects</span>
             <span className="text-sm font-bold text-[#173F35]">
               {loadingTelemetry ? '...' : (telemetry?.total_monitored_projects?.toLocaleString() || '1,892')}
             </span>
           </div>
-          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#DDD9D0]">
+          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#267A69]">
             <span className="text-[11px] text-[#66736D] block font-medium">Evidence Claims</span>
-            <span className="text-sm font-bold text-[#16804B]">
+            <span className="text-sm font-bold text-[#267A69]">
               {loadingTelemetry ? '...' : (telemetry?.total_evidence_claims?.toLocaleString() || '4,280')}
             </span>
           </div>
-          <div className="bg-[#F8FAFC] rounded-lg p-3 border border-[#DDD9D0]">
+          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#52605B]">
             <span className="text-[11px] text-[#66736D] block font-medium">Search Provider</span>
-            <span className="text-sm font-bold text-[#26312D]">
-              {loadingTelemetry ? '...' : telemetry?.search_provider || 'Composite / Gov Direct'}
+            <span className="text-sm font-bold text-[#26312D] truncate block" title={telemetry?.search_provider}>
+              {loadingTelemetry ? '...' : formatSearchProvider(telemetry?.search_provider)}
             </span>
           </div>
         </div>

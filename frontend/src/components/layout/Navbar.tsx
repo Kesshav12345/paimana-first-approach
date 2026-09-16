@@ -7,32 +7,17 @@ import {
   Building2, 
   MapPin, 
   AlertTriangle, 
-  Activity, 
   Database,
   BookOpen,
   Menu,
   X,
   ChevronDown
 } from 'lucide-react';
-import { api } from '../../services/api';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [reportingCycle, setReportingCycle] = useState<string>('Live Canonical');
   const [exploreOpen, setExploreOpen] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    api.getHomeSummary()
-      .then(res => {
-        if (res?.latestReportingPeriod) {
-          setReportingCycle(res.latestReportingPeriod);
-        }
-      })
-      .catch(() => {
-        // Fallback gracefully
-      });
-  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -173,19 +158,6 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Right: Dynamic Reporting Cycle & System Health */}
-          <div className="hidden lg:flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs text-[#E8F0EC] bg-[#1E5246] px-3 py-1.5 rounded-full border border-[#276657]">
-              <Activity className="w-3.5 h-3.5 text-[#C89432]" />
-              <span className="text-[11px] text-[#A3B8B0]">Reporting Cycle:</span>
-              <strong className="text-white font-semibold tabular-nums">{reportingCycle}</strong>
-            </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-[#86EFAC]">
-              <span className="w-2 h-2 rounded-full bg-[#86EFAC]" />
-              <span className="font-medium">System Active</span>
-            </div>
-          </div>
-
           {/* Mobile Menu Toggle Button */}
           <div className="flex md:hidden items-center">
             <button
@@ -239,11 +211,6 @@ export const Navbar: React.FC = () => {
             <BookOpen className="w-4 h-4 text-[#DFCBB0]" />
             <span>Technical Methodology</span>
           </NavLink>
-
-          <div className="pt-3 border-t border-[#1F4E42] mt-2 text-xs text-[#E8F0EC] flex items-center justify-between px-3">
-            <span className="text-[#A3B8B0]">Cycle:</span>
-            <span className="font-semibold text-white tabular-nums">{reportingCycle}</span>
-          </div>
         </div>
       )}
     </nav>
