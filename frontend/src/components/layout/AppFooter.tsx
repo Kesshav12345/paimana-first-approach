@@ -106,22 +106,16 @@ export const AppFooter: React.FC = () => {
 
         {/* Legal, Policy & Attribution Bar */}
         <div className="border-t-2 border-[#D8EBF8] pt-4 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-[#4B647D]">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-semibold">
-              <span className="hover:text-[#0A365C] cursor-pointer">Hyperlinking Policy</span>
-              <span>•</span>
-              <span className="hover:text-[#0A365C] cursor-pointer">Privacy Policy</span>
-              <span>•</span>
-              <span className="hover:text-[#0A365C] cursor-pointer">Terms of Use</span>
-              <span>•</span>
-              <span className="hover:text-[#0A365C] cursor-pointer">Disclaimer</span>
-              <span>•</span>
-              <span className="hover:text-[#0A365C] cursor-pointer">Accessibility Statement</span>
-            </div>
-
-            <div className="text-right font-mono text-[11px] text-[#7E97B0]">
-              PAIMANA-INTEL v2.4.2 • Jul 2026 Reporting Cycle
-            </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-semibold text-[#4B647D]">
+            <span className="hover:text-[#0A365C] cursor-pointer">Hyperlinking Policy</span>
+            <span>•</span>
+            <span className="hover:text-[#0A365C] cursor-pointer">Privacy Policy</span>
+            <span>•</span>
+            <span className="hover:text-[#0A365C] cursor-pointer">Terms of Use</span>
+            <span>•</span>
+            <span className="hover:text-[#0A365C] cursor-pointer">Disclaimer</span>
+            <span>•</span>
+            <span className="hover:text-[#0A365C] cursor-pointer">Accessibility Statement</span>
           </div>
 
           <div className="text-center sm:text-left text-xs text-[#4B647D] pt-1">
