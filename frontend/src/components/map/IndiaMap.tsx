@@ -43,6 +43,8 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
 }) => {
   const navigate = useNavigate();
   const [hoveredState, setHoveredState] = useState<string | null>(null);
+  const [metricMode, setMetricMode] = useState<'PORTFOLIO' | 'RISK' | 'WARNINGS'>('PORTFOLIO');
+  const [viewMode, setViewMode] = useState<'MAP' | 'TABLE'>('MAP');
 
   // Map state data by normalized name for fast lookup
   const stateDataMap = useMemo(() => {
@@ -82,12 +84,7 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
     return sorted[0] || null;
   }, [hoveredState, selectedState, stateDataMap, states]);
 
-  // Color generator for SVG paths according to Atlas Guidelines:
-  // - Critical concentration: Terracotta (#B74436)
-  // - Elevated attention / High risk: Muted Ochre (#C89432)
-  // - Healthy base / High density: Forest Green (#267A69) / Deep Forest (#173F35)
-  // - Moderate: Soft Forest / Sage (#6BB8A6 / #9ECAC0)
-  // - Low / No data: Warm Neutral (#EAE6DF)
+  // Semantic color generator driven explicitly by active metric mode:
   const getStateColor = (stateName: string, isHovered: boolean, isSelected: boolean) => {
     const item = stateDataMap.get(normalizeName(stateName));
     if (!item || item.project_count === 0) {
@@ -95,27 +92,46 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
     }
 
     if (isSelected) {
-      return '#173F35'; // Highlighted in deep institutional forest
+      return '#173F35'; // Selected state highlighted in deep institutional forest
     }
 
     if (isHovered) {
-      return '#267A69'; // Primary forest green on hover
+      return '#267A69'; // Hover feedback in primary forest
     }
 
-    // Risk-aware & density-aware semantic coloring
-    if (item.critical_risk_count >= 5) {
-      return '#B74436'; // Terracotta for critical concentration
-    }
-    if (item.high_risk_count >= 6 || item.critical_risk_count >= 2) {
-      return '#C89432'; // Muted Ochre for elevated attention
+    // Explicit metric mode coloring:
+    if (metricMode === 'PORTFOLIO') {
+      const ratio = item.project_count / maxProjects;
+      if (ratio > 0.50) return '#173F35'; // Deep Forest (Major Concentration)
+      if (ratio > 0.25) return '#267A69'; // Forest Green (High Density)
+      if (ratio > 0.10) return '#519E8F'; // Medium Sage (Moderate Density)
+      if (ratio > 0.03) return '#86BDB1'; // Soft Sage (Developing Footprint)
+      return '#BED6CB'; // Light Sage (Regional Footprint)
     }
 
-    const ratio = item.project_count / maxProjects;
-    if (ratio > 0.6) return '#173F35'; // Deep Forest
-    if (ratio > 0.35) return '#267A69'; // Forest Green
-    if (ratio > 0.18) return '#519E8F'; // Medium Sage
-    if (ratio > 0.08) return '#86BDB1'; // Soft Sage
-    return '#BED6CB'; // Light Sage
+    if (metricMode === 'RISK') {
+      if (item.critical_risk_count >= 3 || (item.critical_risk_count + item.high_risk_count) >= 20) {
+        return '#B74436'; // Terracotta (Severe Risk Concentration)
+      }
+      if (item.critical_risk_count >= 1 || item.high_risk_count >= 8) {
+        return '#C89432'; // Dark Ochre (Elevated Risk Exposure)
+      }
+      if (item.high_risk_count >= 1) {
+        return '#E6BA67'; // Muted Ochre (Moderate Exposure)
+      }
+      return '#BED6CB'; // Soft Sage (Managed / Low Risk)
+    }
+
+    if (metricMode === 'WARNINGS') {
+      const warnings = item.active_warning_count || 0;
+      if (warnings >= 150) return '#B74436'; // High Warning Intensity
+      if (warnings >= 50) return '#C89432';  // Elevated Warning Signals
+      if (warnings >= 10) return '#E6BA67';  // Emerging Warning Signals
+      if (warnings >= 1) return '#BED6CB';   // Isolated Warnings
+      return '#E8F0EC';                      // Clean (0 Active Warnings)
+    }
+
+    return '#BED6CB';
   };
 
   // Handle state click
@@ -156,24 +172,80 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
           </p>
         </div>
 
-        {selectedState && (
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-md bg-[#E8F0EC] border border-[#BED6CB] text-xs font-semibold text-[#173F35]">
-              Active Filter: {selectedState}
-            </span>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Metric Selector Buttons */}
+          <div className="flex bg-[#FAF8F5] border border-[#DDD9D0] p-0.5 rounded-lg text-xs">
             <button
               type="button"
-              onClick={() => onSelectState && onSelectState('')}
-              className="text-xs text-[#66736D] hover:text-[#173F35] underline cursor-pointer"
+              onClick={() => setMetricMode('PORTFOLIO')}
+              className={`px-3 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                metricMode === 'PORTFOLIO' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'
+              }`}
             >
-              Clear Filter
+              Portfolio Density
+            </button>
+            <button
+              type="button"
+              onClick={() => setMetricMode('RISK')}
+              className={`px-3 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                metricMode === 'RISK' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'
+              }`}
+            >
+              Risk Concentration
+            </button>
+            <button
+              type="button"
+              onClick={() => setMetricMode('WARNINGS')}
+              className={`px-3 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                metricMode === 'WARNINGS' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'
+              }`}
+            >
+              Active Warnings
             </button>
           </div>
-        )}
+
+          {/* View Mode Toggle: Map vs Table */}
+          <div className="flex bg-[#FAF8F5] border border-[#DDD9D0] p-0.5 rounded-lg text-xs">
+            <button
+              type="button"
+              onClick={() => setViewMode('MAP')}
+              className={`px-2.5 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                viewMode === 'MAP' ? 'bg-white text-[#173F35] shadow-2xs border border-[#DDD9D0]' : 'text-[#66736D] hover:text-[#173F35]'
+              }`}
+            >
+              Map
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('TABLE')}
+              className={`px-2.5 py-1 rounded-md font-semibold transition-colors cursor-pointer ${
+                viewMode === 'TABLE' ? 'bg-white text-[#173F35] shadow-2xs border border-[#DDD9D0]' : 'text-[#66736D] hover:text-[#173F35]'
+              }`}
+            >
+              Table View
+            </button>
+          </div>
+
+          {selectedState && (
+            <div className="flex items-center gap-1.5 pl-2 border-l border-[#DDD9D0]">
+              <span className="px-2 py-0.5 rounded bg-[#E8F0EC] text-[11px] font-semibold text-[#173F35]">
+                {selectedState}
+              </span>
+              <button
+                type="button"
+                onClick={() => onSelectState && onSelectState('')}
+                className="text-[11px] text-[#66736D] hover:text-[#173F35] underline cursor-pointer"
+              >
+                Clear
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Main Grid: SVG Map Container + Telemetry Brief Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5 items-start">
+      {viewMode === 'MAP' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5 items-start">
         
         {/* SVG India Map Container on Warm Sandstone Canvas */}
         <div className="lg:col-span-7 flex flex-col items-center justify-center relative bg-[#F6F3EC] border border-[#DDD9D0] rounded-xl p-4 sm:p-6">
@@ -215,41 +287,127 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
             </svg>
 
             {/* Hover Floating Pill on Map */}
-            {hoveredState && (
-              <div className="absolute top-2 left-2 pointer-events-none bg-[#173F35]/95 text-white px-3 py-1.5 rounded-md shadow-md border border-[#267A69] text-xs font-semibold backdrop-blur-xs flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-[#C89432]" />
-                <span>{hoveredState}</span>
-                <span className="text-[#A3B8B0] text-[11px] tabular-nums">
-                  ({stateDataMap.get(normalizeName(hoveredState))?.project_count || 0} projects)
-                </span>
-              </div>
-            )}
+            {hoveredState && (() => {
+              const hData = stateDataMap.get(normalizeName(hoveredState));
+              return (
+                <div className="absolute top-3 left-3 pointer-events-none bg-[#173F35]/95 text-white p-3 rounded-lg shadow-xl border border-[#267A69] text-xs backdrop-blur-xs max-w-xs transition-all z-20">
+                  <div className="flex items-center gap-1.5 font-bold text-sm text-white pb-1.5 border-b border-[#267A69]">
+                    <MapPin className="w-3.5 h-3.5 text-[#C89432]" />
+                    <span>{hoveredState}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 mt-2 text-[11px]">
+                    <div>
+                      <span className="text-[#A3B8B0] block text-[10px] uppercase font-bold">Projects</span>
+                      <span className="font-extrabold text-white tabular-nums">{hData?.project_count || 0}</span>
+                    </div>
+                    <div>
+                      <span className="text-[#A3B8B0] block text-[10px] uppercase font-bold">Outlay</span>
+                      <span className="font-extrabold text-[#C89432] tabular-nums">
+                        ₹{(((hData?.total_investment_cr || 0)) / 1000).toFixed(1)}k Cr
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[#A3B8B0] block text-[10px] uppercase font-bold">Critical / High</span>
+                      <span className="font-extrabold text-[#B74436] tabular-nums">
+                        {(hData?.critical_risk_count || 0)} crit · {(hData?.high_risk_count || 0)} high
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[#A3B8B0] block text-[10px] uppercase font-bold">Active Warnings</span>
+                      <span className="font-extrabold text-[#E6BA67] tabular-nums">{hData?.active_warning_count || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
 
-          {/* Map Legend: Restrained Semantic Atlas Palette */}
+          {/* Map Legend: Dynamic Restrained Semantic Atlas Palette */}
           <div className="w-full mt-4 pt-3 border-t border-[#DDD9D0] flex flex-wrap items-center justify-between gap-3 text-xs text-[#66736D]">
-            <span className="font-semibold text-[#26312D]">Portfolio Density & Risk:</span>
+            <span className="font-semibold text-[#26312D]">
+              {metricMode === 'PORTFOLIO' && 'Portfolio Concentration Scale:'}
+              {metricMode === 'RISK' && 'Composite Risk Exposure Scale:'}
+              {metricMode === 'WARNINGS' && 'Active Warning Intensity Scale:'}
+            </span>
             <div className="flex flex-wrap items-center gap-3 text-[11px]">
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-xs bg-[#173F35]" />
-                <span>High Density</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-xs bg-[#267A69]" />
-                <span>Moderate Density</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-xs bg-[#C89432]" />
-                <span>Elevated Risk</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-xs bg-[#B74436]" />
-                <span>Critical Risk</span>
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-xs bg-[#EAE6DF] border border-[#DDD9D0]" />
-                <span>Low / Nil</span>
-              </span>
+              {metricMode === 'PORTFOLIO' && (
+                <>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#173F35]" />
+                    <span>Major (&gt;50%)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#267A69]" />
+                    <span>High (25-50%)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#519E8F]" />
+                    <span>Moderate (10-25%)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#86BDB1]" />
+                    <span>Developing (3-10%)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#BED6CB]" />
+                    <span>Regional (&lt;3%)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#EAE6DF] border border-[#DDD9D0]" />
+                    <span>Nil</span>
+                  </span>
+                </>
+              )}
+
+              {metricMode === 'RISK' && (
+                <>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#B74436]" />
+                    <span>Severe (≥3 Crit / ≥20 High)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#C89432]" />
+                    <span>Elevated (≥1 Crit / ≥8 High)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#E6BA67]" />
+                    <span>Moderate (≥1 High)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#BED6CB]" />
+                    <span>Managed</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#EAE6DF] border border-[#DDD9D0]" />
+                    <span>Nil</span>
+                  </span>
+                </>
+              )}
+
+              {metricMode === 'WARNINGS' && (
+                <>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#B74436]" />
+                    <span>High (≥150)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#C89432]" />
+                    <span>Elevated (50-149)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#E6BA67]" />
+                    <span>Emerging (10-49)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#BED6CB]" />
+                    <span>Isolated (1-9)</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-3 h-3 rounded-xs bg-[#E8F0EC] border border-[#DDD9D0]" />
+                    <span>Clean (0)</span>
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -393,6 +551,134 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
         </div>
 
       </div>
+      ) : (
+        /* Table View Mode: Full National State & Union Territory Registry */
+        <div className="mt-5 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF8F5] p-3 rounded-lg border border-[#DDD9D0]">
+            <div className="text-xs text-[#66736D]">
+              Displaying <strong className="text-[#173F35]">{states.length}</strong> States and Union Territories with central monitoring coverage.
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-[#66736D]">Sort By:</span>
+              <button
+                type="button"
+                onClick={() => setMetricMode('PORTFOLIO')}
+                className={`px-2 py-0.5 rounded text-xs font-semibold cursor-pointer ${
+                  metricMode === 'PORTFOLIO' ? 'bg-[#173F35] text-white' : 'bg-white border border-[#DDD9D0] text-[#66736D]'
+                }`}
+              >
+                Project Count
+              </button>
+              <button
+                type="button"
+                onClick={() => setMetricMode('RISK')}
+                className={`px-2 py-0.5 rounded text-xs font-semibold cursor-pointer ${
+                  metricMode === 'RISK' ? 'bg-[#173F35] text-white' : 'bg-white border border-[#DDD9D0] text-[#66736D]'
+                }`}
+              >
+                Risk Exposure
+              </button>
+              <button
+                type="button"
+                onClick={() => setMetricMode('WARNINGS')}
+                className={`px-2 py-0.5 rounded text-xs font-semibold cursor-pointer ${
+                  metricMode === 'WARNINGS' ? 'bg-[#173F35] text-white' : 'bg-white border border-[#DDD9D0] text-[#66736D]'
+                }`}
+              >
+                Active Warnings
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-white border border-[#DDD9D0] rounded-xl overflow-hidden shadow-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse atlas-table">
+                <thead>
+                  <tr>
+                    <th className="w-10 text-center">#</th>
+                    <th>State / Union Territory</th>
+                    <th className="text-right">Monitored Projects</th>
+                    <th className="text-right">Total Outlay (₹ Cr)</th>
+                    <th className="text-center">Critical Risk</th>
+                    <th className="text-center">High Risk</th>
+                    <th className="text-center">Active Warnings</th>
+                    <th className="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#EAE6DF]">
+                  {[...states]
+                    .sort((a, b) => {
+                      if (metricMode === 'PORTFOLIO') return b.project_count - a.project_count;
+                      if (metricMode === 'RISK') return ((b.critical_risk_count * 3) + b.high_risk_count) - ((a.critical_risk_count * 3) + a.high_risk_count);
+                      return (b.active_warning_count || 0) - (a.active_warning_count || 0);
+                    })
+                    .map((st, idx) => (
+                      <tr 
+                        key={st.state_name}
+                        className="hover:bg-[#FAF8F5] transition-colors cursor-pointer"
+                        onClick={() => navigate(`/states?state=${encodeURIComponent(st.state_name)}`)}
+                      >
+                        <td className="text-center font-mono text-[#8C9893] text-xs">{idx + 1}</td>
+                        <td className="font-semibold text-[#173F35]">
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="w-3.5 h-3.5 text-[#267A69]" />
+                            <span>{st.state_name}</span>
+                          </div>
+                        </td>
+                        <td className="text-right font-extrabold text-[#173F35] tabular-nums">
+                          {st.project_count.toLocaleString()}
+                        </td>
+                        <td className="text-right font-semibold text-[#26312D] tabular-nums">
+                          ₹{st.total_investment_cr.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                        </td>
+                        <td className="text-center">
+                          {st.critical_risk_count > 0 ? (
+                            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#F5E7E4] text-[#B74436] border border-[#E8C6C1]">
+                              {st.critical_risk_count}
+                            </span>
+                          ) : (
+                            <span className="text-[#8C9893] text-xs font-mono">0</span>
+                          )}
+                        </td>
+                        <td className="text-center">
+                          {st.high_risk_count > 0 ? (
+                            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#F5EEDB] text-[#C89432] border border-[#DFCBB0]">
+                              {st.high_risk_count}
+                            </span>
+                          ) : (
+                            <span className="text-[#8C9893] text-xs font-mono">0</span>
+                          )}
+                        </td>
+                        <td className="text-center">
+                          {st.active_warning_count > 0 ? (
+                            <span className="font-semibold text-[#C89432] tabular-nums">
+                              {st.active_warning_count}
+                            </span>
+                          ) : (
+                            <span className="text-[#8C9893] text-xs font-mono">0</span>
+                          )}
+                        </td>
+                        <td className="text-right">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/states?state=${encodeURIComponent(st.state_name)}`);
+                            }}
+                            className="px-2.5 py-1 rounded bg-white border border-[#DDD9D0] hover:border-[#173F35] text-[11px] font-semibold text-[#173F35] inline-flex items-center gap-1 shadow-2xs"
+                          >
+                            <span>Dossier</span>
+                            <ChevronRight className="w-3 h-3 text-[#267A69]" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

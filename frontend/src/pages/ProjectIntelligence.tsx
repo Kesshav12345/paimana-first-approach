@@ -64,7 +64,7 @@ export const ProjectIntelligence: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-2">
-          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#267A69] border-t-transparent rounded-full animate-spin" />
           <span className="text-xs text-[#66736D]">Loading Project Intelligence (15 Dimensions)...</span>
         </div>
       </div>
@@ -80,7 +80,7 @@ export const ProjectIntelligence: React.FC = () => {
           <p className="text-xs text-[#66736D] mt-1">{error || 'Unable to locate project record in canonical database'}</p>
           <button
             onClick={() => navigate(-1)}
-            className="mt-4 px-4 py-2 bg-[#267A69] hover:bg-blue-600 rounded text-xs font-semibold text-white"
+            className="mt-4 px-4 py-2 bg-[#173F35] hover:bg-[#267A69] rounded text-xs font-semibold text-white transition-colors cursor-pointer"
           >
             Go Back
           </button>
@@ -139,16 +139,16 @@ export const ProjectIntelligence: React.FC = () => {
         <div className="mt-4 pt-3 border-t border-[#DDD9D0] flex flex-wrap items-center justify-between gap-2 text-[11px]">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[#66736D] font-medium mr-1">Data Lineage:</span>
-            <span className="px-2 py-0.5 rounded bg-[#E8F0EC] text-blue-700 border border-[#BED6CB] font-mono text-[10px]" title="Authoritative Extract from MoSPI Monthly Monitoring Report">
+            <span className="px-2 py-0.5 rounded bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB] font-mono text-[10px]" title="Authoritative Extract from MoSPI Monthly Monitoring Report">
               [OFFICIAL REPORT: MoSPI {detail.latestReportingMonth}]
             </span>
-            <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono text-[10px]" title="Deterministic Mathematics (Escalation, Gaps, Velocity)">
+            <span className="px-2 py-0.5 rounded bg-[#FAF8F5] text-[#267A69] border border-[#DDD9D0] font-mono text-[10px]" title="Deterministic Mathematics (Escalation, Gaps, Velocity)">
               [DETERMINISTIC METRIC: Engine v2.4]
             </span>
-            <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 font-mono text-[10px]" title="Point-in-time CatBoost Supervised ML Model">
+            <span className="px-2 py-0.5 rounded bg-[#F5EEDB] text-[#C89432] border border-[#DFCBB0] font-mono text-[10px]" title="Point-in-time CatBoost Supervised ML Model">
               [CATBOOST FORECAST: {detail.modelVersion || 'v2026.07'}]
             </span>
-            <span className="px-2 py-0.5 rounded bg-amber-950 text-[#C89432] border border-amber-800 font-mono text-[10px]" title="External Multi-Tier Internet Research & Causal Claims">
+            <span className="px-2 py-0.5 rounded bg-[#FAF8F5] text-[#26312D] border border-[#DDD9D0] font-mono text-[10px]" title="External Multi-Tier Internet Research & Causal Claims">
               [EXTERNAL EVIDENCE: {detail.researchSummary ? `${detail.researchSummary.sourceCount} Sources` : 'Gov Direct / PIB'}]
             </span>
           </div>
@@ -201,6 +201,21 @@ export const ProjectIntelligence: React.FC = () => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* ========================================================================= */}
+      {/* TIER 2: DIAGNOSTIC INTELLIGENCE & LONGITUDINAL TRACKING */}
+      {/* ========================================================================= */}
+      <div className="flex items-center justify-between pt-2 border-b border-[#DDD9D0] pb-2">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded text-[10px] font-extrabold bg-[#267A69] text-white uppercase tracking-wider">
+            TIER 2
+          </span>
+          <h2 className="text-xs sm:text-sm font-extrabold text-[#173F35] uppercase tracking-wider">
+            Diagnostic Intelligence & Longitudinal Tracking
+          </h2>
+        </div>
+        <span className="text-[11px] text-[#66736D]">Monthly Deltas · Bottleneck Signals · Root Cause Evidence</span>
       </div>
 
       {/* "What Changed This Month?" Delta Tracking Card */}
@@ -563,6 +578,21 @@ export const ProjectIntelligence: React.FC = () => {
 
       </div>
 
+      {/* ========================================================================= */}
+      {/* TIER 3: PREDICTIVE SUPERVISED MACHINE LEARNING & RISK PROJECTIONS */}
+      {/* ========================================================================= */}
+      <div className="flex items-center justify-between pt-4 border-b border-[#DDD9D0] pb-2">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded text-[10px] font-extrabold bg-[#C89432] text-white uppercase tracking-wider">
+            TIER 3
+          </span>
+          <h2 className="text-xs sm:text-sm font-extrabold text-[#173F35] uppercase tracking-wider">
+            Predictive Machine Learning & Forward Risk Projections
+          </h2>
+        </div>
+        <span className="text-[11px] text-[#66736D]">CatBoost Ensembles · Cost & Schedule Forecasts · Risk Attribution</span>
+      </div>
+
       {/* 4 & 5. Supervised Machine Learning Forecasts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         
@@ -753,14 +783,14 @@ export const ProjectIntelligence: React.FC = () => {
             {detail.monthlyHistory && detail.monthlyHistory.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={detail.monthlyHistory} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                  <XAxis dataKey="reporting_month" stroke="#64748b" textAnchor="end" tick={{ fontSize: 10 }} />
-                  <YAxis stroke="#64748b" domain={[0, 100]} tick={{ fontSize: 10 }} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', fontSize: '11px' }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
+                  <XAxis dataKey="reporting_month" stroke="#8C9893" textAnchor="end" tick={{ fontSize: 10 }} />
+                  <YAxis stroke="#8C9893" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#FAF8F5', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', color: '#173F35', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }} />
                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
-                  <Line type="monotone" dataKey="physical_progress_pct" name="Physical Progress (%)" stroke="#3b82f6" strokeWidth={2} dot={{ r: 2 }} />
-                  <Line type="monotone" dataKey="overall_risk_score" name="Risk Score (0-100)" stroke="#ef4444" strokeWidth={2} dot={{ r: 2 }} />
-                  <Line type="monotone" dataKey="cost_escalation_pct" name="Cost Escalation (%)" stroke="#f59e0b" strokeWidth={1.5} strokeDasharray="3 3" />
+                  <Line type="monotone" dataKey="physical_progress_pct" name="Physical Progress (%)" stroke="#267A69" strokeWidth={2.2} dot={{ r: 2 }} />
+                  <Line type="monotone" dataKey="overall_risk_score" name="Risk Score (0-100)" stroke="#B74436" strokeWidth={2.2} dot={{ r: 2 }} />
+                  <Line type="monotone" dataKey="cost_escalation_pct" name="Cost Escalation (%)" stroke="#C89432" strokeWidth={1.8} strokeDasharray="3 3" />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
@@ -861,17 +891,17 @@ export const ProjectIntelligence: React.FC = () => {
           </div>
         </div>
 
-        {/* 10. Key Risk Drivers (SHAP / Statistical) */}
+        {/* 10. Key Risk Drivers (Feature Importance & Direction) */}
         <div className="bg-white border border-[#DDD9D0] rounded-lg p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-xs font-bold uppercase tracking-wider text-[#66736D] flex items-center gap-1.5">
-              <BarChart2 className="w-4 h-4 text-purple-400" />
-              10. Key Model Risk Drivers (SHAP)
+              <BarChart2 className="w-4 h-4 text-[#C89432]" />
+              10. CatBoost Feature Importance & Risk Direction
             </h2>
             <button
               onClick={() => setActiveModalComponent('shap_drivers')}
               className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
-              title="Inspect SHAP Additive Feature Contributions"
+              title="Inspect Feature Attribution Methodology"
             >
               <span>Inspect</span>
               <ExternalLink className="w-3 h-3" />
@@ -901,6 +931,21 @@ export const ProjectIntelligence: React.FC = () => {
           </div>
         </div>
 
+      </div>
+
+      {/* ========================================================================= */}
+      {/* TIER 4: OPERATIONAL ACTION PLAN, INTERVENTIONS & GOVERNANCE DOSSIER */}
+      {/* ========================================================================= */}
+      <div className="flex items-center justify-between pt-4 border-b border-[#DDD9D0] pb-2">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-0.5 rounded text-[10px] font-extrabold bg-[#173F35] text-white uppercase tracking-wider">
+            TIER 4
+          </span>
+          <h2 className="text-xs sm:text-sm font-extrabold text-[#173F35] uppercase tracking-wider">
+            Operational Action Plan, Interventions & Governance Dossier
+          </h2>
+        </div>
+        <span className="text-[11px] text-[#66736D]">Peer Cohorts · Executive Measures · Audit Trails</span>
       </div>
 
       {/* 11, 12, 13. Peer Benchmarks, Official Attention, Recommended Measures */}
@@ -1103,7 +1148,7 @@ export const ProjectIntelligence: React.FC = () => {
 
                 <button
                   onClick={() => navigate('/early-warning')}
-                  className="flex-shrink-0 px-4 py-2.5 bg-blue-600 hover:bg-[#267A69] text-[#173F35] rounded text-xs font-semibold flex items-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
+                  className="flex-shrink-0 px-4 py-2.5 bg-[#173F35] hover:bg-[#267A69] text-white rounded text-xs font-semibold flex items-center gap-2 transition-colors shadow-xs cursor-pointer"
                 >
                   <span>Schedule in Early Warning</span>
                   <ArrowRight className="w-3.5 h-3.5" />

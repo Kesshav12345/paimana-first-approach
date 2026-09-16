@@ -74,35 +74,54 @@ export const Operations: React.FC = () => {
     };
   }, []);
 
-  // Poll active job progress
+  // Confirmation Modal state for privileged operations
+  const [pendingConfirm, setPendingConfirm] = useState<{
+    action: 'recalc' | 'retrain' | 'promote' | 'refresh';
+    title: string;
+    description: string;
+  } | null>(null);
+
+  // Poll active job progress with progressive backoff
   useEffect(() => {
     if (!activeJobId) return;
 
+    let timeoutId: any = null;
+    let pollInterval = 1500;
+    let isCancelled = false;
+
     const poll = async () => {
+      if (isCancelled) return;
       try {
         const prog = await api.getJobProgress(activeJobId);
+        if (isCancelled) return;
         setJobProgress(prog);
 
-        if (prog.status === 'COMPLETED' || prog.status === 'COMPLETED_WITH_WARNINGS' || prog.status === 'FAILED' || prog.status === 'ALREADY_PROCESSED') {
-          if (pollingRef.current) {
-            clearInterval(pollingRef.current);
-            pollingRef.current = null;
-          }
+        if (
+          prog.status === 'COMPLETED' || 
+          prog.status === 'COMPLETED_WITH_WARNINGS' || 
+          prog.status === 'FAILED' || 
+          prog.status === 'ALREADY_PROCESSED'
+        ) {
           fetchStatusAndRuns();
+          return;
         }
+
+        // Exponential backoff up to 5s
+        pollInterval = Math.min(pollInterval * 1.3, 5000);
+        timeoutId = setTimeout(poll, pollInterval);
       } catch (err) {
-        // Continue polling or clear
+        if (!isCancelled) {
+          pollInterval = Math.min(pollInterval * 1.5, 6000);
+          timeoutId = setTimeout(poll, pollInterval);
+        }
       }
     };
 
     poll();
-    pollingRef.current = setInterval(poll, 1500);
 
     return () => {
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current);
-        pollingRef.current = null;
-      }
+      isCancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, [activeJobId]);
 
@@ -554,9 +573,13 @@ export const Operations: React.FC = () => {
           </div>
 
           <button
-            onClick={handleRecalculateDerived}
+            onClick={() => setPendingConfirm({
+              action: 'recalc',
+              title: 'Recalculate Whole-Portfolio Derived Values',
+              description: 'This will recompute deterministic progress metrics, velocity, slippages, composite risk indices, and early-warning alerts across all 3,414 monitored projects without external web calls.'
+            })}
             disabled={actionLoading === 'recalc' || (jobProgress?.status === 'IN_PROGRESS')}
-            className="w-full py-2.5 px-4 bg-[#E8F0EC] hover:bg-blue-100 text-[#173F35] border border-blue-300 font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
+            className="w-full py-2.5 px-4 bg-[#E8F0EC] hover:bg-[#BED6CB] text-[#173F35] border border-[#BED6CB] font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-2xs disabled:opacity-50 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${actionLoading === 'recalc' ? 'animate-spin' : ''}`} />
             Recalculate Deterministic Metrics & Risks
@@ -569,7 +592,7 @@ export const Operations: React.FC = () => {
         <div className="p-6 border-b border-[#DDD9D0] bg-[#FAF8F5]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="text-lg font-bold text-[#173F35] flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-indigo-600" />
+              <Cpu className="w-5 h-5 text-[#267A69]" />
               Machine Learning Operations (MLOps)
             </h2>
             <p className="text-xs text-[#66736D] mt-0.5">
@@ -580,7 +603,7 @@ export const Operations: React.FC = () => {
 
         <div className="p-6 space-y-6">
           {actionMessage && (
-            <div className="p-4 bg-[#E8F0EC] border border-[#BED6CB] rounded-xl text-blue-900 text-sm flex items-center gap-3">
+            <div className="p-4 bg-[#E8F0EC] border border-[#BED6CB] rounded-xl text-[#173F35] text-sm flex items-center gap-3">
               <Activity className="w-5 h-5 text-[#267A69] shrink-0" />
               <span>{actionMessage}</span>
             </div>
@@ -588,9 +611,9 @@ export const Operations: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Active Production Model */}
-            <div className="p-5 rounded-xl border border-emerald-200 bg-emerald-50/30 space-y-3">
+            <div className="p-5 rounded-xl border border-[#BED6CB] bg-[#E8F0EC]/30 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#173F35] bg-[#E8F0EC] px-2.5 py-1 rounded-full border border-[#BED6CB]">
                   Active Production Model
                 </span>
                 <span className="text-xs text-[#66736D]">Status: Serving</span>
@@ -601,7 +624,7 @@ export const Operations: React.FC = () => {
                   Targets: Cost Overrun (PR-AUC 0.94), Final Cost (MAE ₹88Cr), Delay Duration (MAE 3.8mo)
                 </p>
               </div>
-              <div className="text-xs text-[#66736D] space-y-1 pt-2 border-t border-emerald-200/60">
+              <div className="text-xs text-[#66736D] space-y-1 pt-2 border-t border-[#BED6CB]/60">
                 <div className="flex justify-between">
                   <span>Feature Schema:</span>
                   <span className="font-semibold text-[#26312D]">v2.1-temporal-features</span>
@@ -612,7 +635,7 @@ export const Operations: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>Temporal Integrity:</span>
-                  <span className="font-semibold text-emerald-700">Point-in-Time Safe (Zero Leakage)</span>
+                  <span className="font-semibold text-[#267A69]">Point-in-Time Safe (Zero Leakage)</span>
                 </div>
               </div>
             </div>
@@ -633,27 +656,39 @@ export const Operations: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
                 <button
-                  onClick={handleRetrain}
+                  onClick={() => setPendingConfirm({
+                    action: 'retrain',
+                    title: 'Train Candidate ML Models',
+                    description: 'Initiates background training of CatBoost cost and schedule models on latest canonical facts to produce an evaluated candidate model.'
+                  })}
                   disabled={actionLoading !== null}
-                  className="px-3 py-2 text-xs font-semibold text-[#26312D] bg-white border border-[#DDD9D0] rounded-lg hover:bg-[#FAF8F5] transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  className="px-3 py-2 text-xs font-semibold text-[#26312D] bg-white border border-[#DDD9D0] rounded-lg hover:bg-[#FAF8F5] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${actionLoading === 'retrain' ? 'animate-spin' : ''}`} />
                   Train Candidate
                 </button>
 
                 <button
-                  onClick={handlePromote}
+                  onClick={() => setPendingConfirm({
+                    action: 'promote',
+                    title: 'Promote Candidate Model to Production',
+                    description: 'Promotes candidate model to active serving. All subsequent project predictions will use this newly calibrated model version.'
+                  })}
                   disabled={actionLoading !== null}
-                  className="px-3 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-300 rounded-lg hover:bg-emerald-100 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  className="px-3 py-2 text-xs font-semibold text-[#173F35] bg-[#E8F0EC] border border-[#BED6CB] rounded-lg hover:bg-[#BED6CB] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <ArrowUpRight className="w-3.5 h-3.5" />
+                  <ArrowUpRight className="w-3.5 h-3.5 text-[#267A69]" />
                   Promote Candidate
                 </button>
 
                 <button
-                  onClick={handleRefreshPredictions}
+                  onClick={() => setPendingConfirm({
+                    action: 'refresh',
+                    title: 'Refresh All Production Predictions',
+                    description: 'Reruns CatBoost production model inference and risk scoring across all active projects in the canonical database.'
+                  })}
                   disabled={actionLoading !== null}
-                  className="px-3 py-2 text-xs font-semibold text-[#173F35] bg-[#E8F0EC] border border-blue-300 rounded-lg hover:bg-blue-100 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  className="px-3 py-2 text-xs font-semibold text-white bg-[#173F35] border border-[#173F35] rounded-lg hover:bg-[#267A69] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Activity className={`w-3.5 h-3.5 ${actionLoading === 'refresh' ? 'animate-spin' : ''}`} />
                   Refresh Predictions
@@ -723,6 +758,66 @@ export const Operations: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Privileged Mutation Confirmation Modal */}
+      {pendingConfirm && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-xs animate-fadeIn"
+          onClick={() => setPendingConfirm(null)}
+        >
+          <div 
+            className="bg-white border border-[#DDD9D0] rounded-xl max-w-lg w-full p-6 shadow-2xl space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3">
+              <div className="p-2.5 rounded-lg bg-[#FAF8F5] border border-[#DDD9D0] text-[#173F35]">
+                <ShieldCheck className="w-5 h-5 text-[#267A69]" />
+              </div>
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#C89432]">
+                  Authorized Operator Confirmation
+                </span>
+                <h3 className="text-base font-bold text-[#173F35] leading-tight">
+                  {pendingConfirm.title}
+                </h3>
+              </div>
+            </div>
+
+            <p className="text-xs text-[#66736D] leading-relaxed bg-[#FAF8F5] p-3 rounded-lg border border-[#DDD9D0]">
+              {pendingConfirm.description}
+            </p>
+
+            <div className="text-[11px] text-[#66736D] space-y-1 pt-1">
+              <p>• Action will be recorded in the canonical pipeline audit history.</p>
+              <p>• Point-in-time safety and dataset idempotency are guaranteed.</p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#DDD9D0]">
+              <button
+                type="button"
+                onClick={() => setPendingConfirm(null)}
+                className="px-4 py-2 rounded-lg border border-[#DDD9D0] hover:bg-[#FAF8F5] text-xs font-semibold text-[#66736D] transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const act = pendingConfirm.action;
+                  setPendingConfirm(null);
+                  if (act === 'recalc') handleRecalculateDerived();
+                  else if (act === 'retrain') handleRetrain();
+                  else if (act === 'promote') handlePromote();
+                  else if (act === 'refresh') handleRefreshPredictions();
+                }}
+                className="px-4 py-2 rounded-lg bg-[#173F35] hover:bg-[#267A69] text-xs font-semibold text-white shadow-xs transition-colors cursor-pointer"
+              >
+                Confirm &amp; Execute
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

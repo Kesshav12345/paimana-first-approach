@@ -100,10 +100,13 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+cors_origins_env = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080,http://localhost:3000")
+cors_origins = [o.strip() for o in cors_origins_env.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=cors_origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -305,21 +308,39 @@ def predict_project_outcomes(req: PredictRequest):
             pred_completion_date = (current_baseline + pd.DateOffset(months=future_months)).strftime("%B %Y")
                 
         drivers = []
-        importances = models.cost_cls.get_feature_importance()
-        for feat_name, imp in sorted(zip(ALL_FEATURES, importances), key=lambda x: x[1], reverse=True)[:5]:
-            val = df_feat[feat_name].iloc[0]
-            if feat_name in ["progress_velocity", "physical_progress_pct"]:
-                direction = "REDUCES_RISK" if val > 20 else "INCREASES_RISK"
-            elif feat_name in ["cost_escalation_pct", "schedule_slippage_months", "overall_risk_score"]:
+        try:
+            from catboost import Pool
+            pool = Pool(df_feat, cat_features=CAT_FEATURES)
+            shap_raw = models.cost_cls.get_feature_importance(pool, type='ShapValues')[0][:-1]
+            shap_pairs = []
+            for feat_name, val in zip(ALL_FEATURES, shap_raw):
                 direction = "INCREASES_RISK" if val > 0 else "REDUCES_RISK"
-            else:
-                direction = "INCREASES_RISK" if imp > 5.0 else "NEUTRAL"
-                
-            drivers.append(FeatureDriver(
-                feature=feat_name,
-                contribution=round(float(imp), 2),
-                direction=direction
-            ))
+                shap_pairs.append((feat_name, abs(val), direction))
+            
+            total_impact = sum(x[1] for x in shap_pairs) or 1.0
+            for feat_name, impact, direction in sorted(shap_pairs, key=lambda x: x[1], reverse=True)[:5]:
+                drivers.append(FeatureDriver(
+                    feature=feat_name,
+                    contribution=round(float((impact / total_impact) * 100.0), 1),
+                    direction=direction
+                ))
+        except Exception as shap_err:
+            logger.debug(f"Native TreeSHAP fallback to global importance: {shap_err}")
+            importances = models.cost_cls.get_feature_importance()
+            for feat_name, imp in sorted(zip(ALL_FEATURES, importances), key=lambda x: x[1], reverse=True)[:5]:
+                val = df_feat[feat_name].iloc[0]
+                if feat_name in ["progress_velocity", "physical_progress_pct"]:
+                    direction = "REDUCES_RISK" if val > 20 else "INCREASES_RISK"
+                elif feat_name in ["cost_escalation_pct", "schedule_slippage_months", "overall_risk_score"]:
+                    direction = "INCREASES_RISK" if val > 0 else "REDUCES_RISK"
+                else:
+                    direction = "INCREASES_RISK" if imp > 5.0 else "NEUTRAL"
+                    
+                drivers.append(FeatureDriver(
+                    feature=feat_name,
+                    contribution=round(float(imp), 2),
+                    direction=direction
+                ))
             
         confidence = "HIGH" if req.physical_progress_pct is not None and req.time_elapsed_pct is not None else "MODERATE"
 
@@ -376,7 +397,7 @@ def get_operations_status():
     
     return OperationsStatusResponse(
         status="HEALTHY",
-        current_dataset_version="v2026.07-canonical",
+        current_dataset_version=f"v{latest_month or '2026-07'}-canonical",
         latest_reporting_period=latest_month or "2026-07",
         total_projects=total_proj,
         total_facts=total_facts,

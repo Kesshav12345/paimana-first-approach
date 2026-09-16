@@ -29,13 +29,23 @@ export const Home: React.FC = () => {
     setLoading(true);
     Promise.all([
       api.getHomeSummary(),
-      api.getProjects({ riskBand: 'CRITICAL', sortBy: 'risk', size: 6 }).catch(() => null),
+      api.getProjects({ riskBand: 'CRITICAL', sortBy: 'risk', size: 10 }).catch(() => null),
+      api.getProjects({ riskBand: 'HIGH', sortBy: 'risk', size: 10 }).catch(() => null),
       api.getSectors().catch(() => [])
     ])
-      .then(([homeData, criticalPrjs, sectorsData]) => {
+      .then(([homeData, criticalPrjs, highPrjs, sectorsData]) => {
         setData(homeData);
-        if (criticalPrjs?.projects && criticalPrjs.projects.length > 0) {
-          setPriorityProjects(criticalPrjs.projects);
+        const combined = [
+          ...(criticalPrjs?.projects || []),
+          ...(highPrjs?.projects || [])
+        ];
+        const map = new Map<string, ProjectSummary>();
+        combined.forEach(p => map.set(p.projectId, p));
+        const sorted = Array.from(map.values())
+          .sort((a, b) => (b.overallRiskScore || 0) - (a.overallRiskScore || 0))
+          .slice(0, 6);
+        if (sorted.length > 0) {
+          setPriorityProjects(sorted);
         }
         if (sectorsData && Array.isArray(sectorsData)) {
           setSectors(sectorsData.slice(0, 8));

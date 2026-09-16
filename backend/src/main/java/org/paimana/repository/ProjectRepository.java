@@ -154,8 +154,19 @@ public class ProjectRepository {
             params.add(state.trim());
         }
         if (riskBand != null && !riskBand.trim().isEmpty() && !"ALL".equalsIgnoreCase(riskBand)) {
-            sql.append(" AND UPPER(risk_band) = ?");
-            params.add(riskBand.trim().toUpperCase());
+            if (riskBand.contains(",")) {
+                String[] bands = riskBand.split(",");
+                sql.append(" AND UPPER(risk_band) IN (");
+                for (int i = 0; i < bands.length; i++) {
+                    if (i > 0) sql.append(", ");
+                    sql.append("?");
+                    params.add(bands[i].trim().toUpperCase());
+                }
+                sql.append(")");
+            } else {
+                sql.append(" AND UPPER(risk_band) = ?");
+                params.add(riskBand.trim().toUpperCase());
+            }
         }
         if (trajectory != null && !trajectory.trim().isEmpty() && !"ALL".equalsIgnoreCase(trajectory)) {
             sql.append(" AND UPPER(risk_trajectory) = ?");

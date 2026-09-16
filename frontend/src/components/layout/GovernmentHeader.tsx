@@ -15,11 +15,13 @@ export const GovernmentHeader: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between gap-4">
           
-          {/* Left: Emblem of India & Ministry Identity (Clickable -> Home) */}
-          <Link 
-            to="/" 
+          {/* Left: Emblem of India & Ministry Identity (External Link -> Official MoSPI) */}
+          <a 
+            href="https://mospi.gov.in/" 
+            target="_blank" 
+            rel="noopener noreferrer"
             className="flex items-center gap-3 sm:gap-4 group cursor-pointer hover:opacity-90 transition-opacity"
-            title="Return to National Infrastructure Overview"
+            title="Official Portal — Ministry of Statistics and Programme Implementation (External Link)"
           >
             <img 
               src="/emblem.png" 
@@ -43,30 +45,32 @@ export const GovernmentHeader: React.FC = () => {
                 Infrastructure & Project Monitoring Division (IPMD)
               </p>
             </div>
-          </Link>
+          </a>
 
-          {/* Right: PAIMANA & Institutional Identifiers (Clickable -> Home) */}
+          {/* Right: Partner & PAIMANA Branding */}
           <div className="flex items-center gap-3 sm:gap-4">
-            <Link 
-              to="/" 
+            <a 
+              href="https://dic.gov.in/" 
+              target="_blank" 
+              rel="noopener noreferrer"
               className="hidden md:flex items-center gap-2 pr-3 border-r border-[#DDD9D0] hover:opacity-90 transition-opacity cursor-pointer"
-              title="Data for Development - National Infrastructure Monitoring"
+              title="Digital India Corporation — Ministry of Electronics & Information Technology (External Link)"
             >
               <img 
                 src="/data-for-dev.png" 
-                alt="Data for Development" 
+                alt="Digital India Corporation — Data for Development" 
                 className="h-8 w-auto object-contain"
               />
-            </Link>
+            </a>
 
             <Link 
               to="/" 
               className="flex items-center gap-2.5 group cursor-pointer hover:opacity-90 transition-opacity"
-              title="PAIMANA Intelligence - Decision Support System"
+              title="PAIMANA Intelligence — Return to National Dashboard"
             >
               <img 
                 src="/logo-paimana.png" 
-                alt="PAIMANA" 
+                alt="PAIMANA Intelligence" 
                 className="h-6 sm:h-7 w-auto object-contain"
               />
               <div className="hidden lg:flex flex-col text-left">

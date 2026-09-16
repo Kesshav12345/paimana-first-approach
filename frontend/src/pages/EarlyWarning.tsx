@@ -6,7 +6,9 @@ import {
   ExternalLink,
   ChevronRight,
   SlidersHorizontal,
-  Workflow
+  Workflow,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 import { api } from '../services/api';
 import type { 
@@ -124,9 +126,10 @@ export const EarlyWarning: React.FC = () => {
 
   // Action / Transition Modal State
   const [modalProject, setModalProject] = useState<Intervention | null>(null);
-  const [newStatus, setNewStatus] = useState('');
-  const [newNotes, setNewNotes] = useState('');
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [newStatus, setNewStatus] = useState<string>('');
+  const [newNotes, setNewNotes] = useState<string>('');
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
+  const [actionToast, setActionToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Load canonical filter metadata on mount
   useEffect(() => {
@@ -326,9 +329,18 @@ export const EarlyWarning: React.FC = () => {
     try {
       await api.updateInterventionStatus(modalProject.projectId, newStatus, newNotes);
       setModalProject(null);
+      setActionToast({ 
+        message: `Intervention status for ${modalProject.projectName} updated to ${newStatus.replace(/_/g, ' ')}.`, 
+        type: 'success' 
+      });
+      setTimeout(() => setActionToast(null), 5000);
       await fetchInterventions(appliedIntFilters);
     } catch (e: any) {
-      alert(e.message || 'Failed to update intervention status');
+      setActionToast({ 
+        message: e.message || 'Failed to update intervention status in canonical database', 
+        type: 'error' 
+      });
+      setTimeout(() => setActionToast(null), 6000);
     } finally {
       setIsUpdatingStatus(false);
     }
@@ -388,6 +400,31 @@ export const EarlyWarning: React.FC = () => {
             Signal detection, risk driver investigation, executive triage, and verified operational intervention
           </p>
         </div>
+
+        {/* Dynamic Action Notification Banner */}
+        {actionToast && (
+          <div className={`p-3 rounded-lg border text-xs flex items-center justify-between gap-3 shadow-xs ${
+            actionToast.type === 'success' 
+              ? 'bg-[#E8F0EC] border-[#BED6CB] text-[#173F35]' 
+              : 'bg-[#F5E7E4] border-[#E8C6C1] text-[#B74436]'
+          }`}>
+            <div className="flex items-center gap-2">
+              {actionToast.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-[#267A69] flex-shrink-0" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 text-[#B74436] flex-shrink-0" />
+              )}
+              <span className="font-semibold">{actionToast.message}</span>
+            </div>
+            <button 
+              type="button" 
+              onClick={() => setActionToast(null)}
+              className="text-[#66736D] hover:text-[#173F35] font-bold text-xs"
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         {/* Dual Tab Switcher with Dynamic Counts */}
         <div className="flex bg-[#FAF8F5] border border-[#DDD9D0] p-1 rounded-lg text-xs self-start sm:self-auto">
