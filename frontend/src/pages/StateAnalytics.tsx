@@ -264,6 +264,9 @@ export const StateAnalytics: React.FC = () => {
     };
   }, [states]);
 
+  const megaStatesCount = useMemo(() => states.filter(s => (s.totalRevisedCostCr ?? s.totalInvestmentCr) >= 100000).length, [states]);
+  const specializedStatesCount = useMemo(() => states.filter(s => (s.totalRevisedCostCr ?? s.totalInvestmentCr) < 100000).length, [states]);
+
   // Chart dataset with Cohort Filtering & Normalized Risk Percentages
   const chartData = useMemo(() => {
     let cohortStates = states;
@@ -535,45 +538,45 @@ export const StateAnalytics: React.FC = () => {
           )}
 
           {/* Graphical Pictorial Comparison Tabs */}
-          <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-2xs overflow-hidden">
-            <div className="p-4 border-b border-[#DDD9D0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF8F5]/50">
+          <div className="bg-white rounded-xl border-2 border-[#B8D9F2] shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-[#B8D9F2] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F0F6FB]">
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-emerald-600" />
-                <span className="text-xs font-bold uppercase tracking-wider text-[#26312D]">
+                <BarChart3 className="w-4 h-4 text-[#0A365C]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0A365C]">
                   Regional Comparative Visual Analytics
                 </span>
               </div>
 
               {/* Chart Tabs */}
-              <div className="flex bg-slate-200/70 p-0.5 rounded-lg text-xs self-start sm:self-auto">
+              <div className="flex bg-[#E1EFF9] p-0.5 rounded-lg text-xs self-start sm:self-auto border border-[#B8D9F2]">
                 <button
                   onClick={() => setActiveChartTab('CAPITAL')}
-                  className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'CAPITAL' ? 'bg-white text-emerald-700 shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
+                  className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                    activeChartTab === 'CAPITAL' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
                   }`}
                 >
-                  Capital & Delivery
+                  Capital &amp; Delivery
                 </button>
                 <button
                   onClick={() => setActiveChartTab('COST_DELAY')}
-                  className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'COST_DELAY' ? 'bg-white text-emerald-700 shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
+                  className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                    activeChartTab === 'COST_DELAY' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
                   }`}
                 >
                   Cost vs Schedule Delay
                 </button>
                 <button
                   onClick={() => setActiveChartTab('RISK')}
-                  className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'RISK' ? 'bg-white text-emerald-700 shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
+                  className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                    activeChartTab === 'RISK' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
                   }`}
                 >
-                  Risk Concentration & Alerts
+                  Risk Concentration &amp; Alerts
                 </button>
                 <button
                   onClick={() => setActiveChartTab('PROGRESS')}
-                  className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'PROGRESS' ? 'bg-white text-emerald-700 shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
+                  className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                    activeChartTab === 'PROGRESS' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
                   }`}
                 >
                   Execution Progress
@@ -582,9 +585,9 @@ export const StateAnalytics: React.FC = () => {
             </div>
 
             {/* Sub-controls: Cohort Selection & View Mode */}
-            <div className="px-4 sm:px-6 py-2.5 bg-[#FAF8F5] border-b border-[#EAE6DF] flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="text-[#66736D] text-[11px] font-medium flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#267A69]" />
+            <div className="px-4 sm:px-6 py-2.5 bg-[#F4F9FD] border-b border-[#D8EBF8] flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="text-[#4B647D] text-[11px] font-medium flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#1BA0E2]" />
                 {activeChartTab === 'CAPITAL' && 'Regional fiscal outlay: Original Sanction vs Revised Outlay vs Certified Cumulative Spend.'}
                 {activeChartTab === 'COST_DELAY' && 'Dual-axis comparison: Weighted Cost Escalation (% left) vs Average Schedule Delay (Months right).'}
                 {activeChartTab === 'RISK' && (riskViewMode === 'COUNT' ? 'Volume distribution: Absolute project count in each risk category.' : 'Normalized risk exposure: Percentage share of regional portfolio in each risk band.')}
@@ -592,44 +595,44 @@ export const StateAnalytics: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Cohort Selector */}
-                <div className="flex items-center gap-1 bg-white border border-[#DDD9D0] p-0.5 rounded-lg text-[11px]">
-                  <span className="px-2 py-0.5 text-[#8C9893] font-semibold uppercase text-[9px] tracking-wider">Cohort:</span>
+                {/* Cohort Selector with Live Counts */}
+                <div className="flex items-center gap-1 bg-white border border-[#B8D9F2] p-0.5 rounded-lg text-[11px]">
+                  <span className="px-2 py-0.5 text-[#7E97B0] font-semibold uppercase text-[9px] tracking-wider">Cohort:</span>
                   <button
                     onClick={() => setChartCohort('ALL')}
-                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'ALL' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'ALL' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                   >
                     All ({states.length})
                   </button>
                   <button
                     onClick={() => setChartCohort('MEGA')}
-                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'MEGA' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'MEGA' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                     title="States & Multi-State with Outlay ≥ ₹1,00,000 Cr"
                   >
-                    Major (≥₹1L Cr)
+                    Major (≥₹1L Cr) ({megaStatesCount})
                   </button>
                   <button
                     onClick={() => setChartCohort('SPECIALIZED')}
-                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'SPECIALIZED' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'SPECIALIZED' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                     title="States and Union Territories with Outlay < ₹1,00,000 Cr (Scaled to make smaller jurisdictions distinguishable)"
                   >
-                    Regional & UTs (&lt;₹1L Cr)
+                    Regional &amp; UTs (&lt;₹1L Cr) ({specializedStatesCount})
                   </button>
                 </div>
 
                 {/* Risk Mode Toggle */}
                 {activeChartTab === 'RISK' && (
-                  <div className="flex items-center gap-1 bg-white border border-[#DDD9D0] p-0.5 rounded-lg text-[11px]">
-                    <span className="px-2 py-0.5 text-[#8C9893] font-semibold uppercase text-[9px] tracking-wider">Metric:</span>
+                  <div className="flex items-center gap-1 bg-white border border-[#B8D9F2] p-0.5 rounded-lg text-[11px]">
+                    <span className="px-2 py-0.5 text-[#7E97B0] font-semibold uppercase text-[9px] tracking-wider">Metric:</span>
                     <button
                       onClick={() => setRiskViewMode('COUNT')}
-                      className={`px-2 py-0.5 rounded-md font-medium transition ${riskViewMode === 'COUNT' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                      className={`px-2 py-0.5 rounded-md font-semibold transition ${riskViewMode === 'COUNT' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                     >
                       Project Count (#)
                     </button>
                     <button
                       onClick={() => setRiskViewMode('PERCENT')}
-                      className={`px-2 py-0.5 rounded-md font-medium transition ${riskViewMode === 'PERCENT' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                      className={`px-2 py-0.5 rounded-md font-semibold transition ${riskViewMode === 'PERCENT' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                       title="100% Stacked Bar: Risk share percentage"
                     >
                       Risk Share (%)
@@ -641,36 +644,46 @@ export const StateAnalytics: React.FC = () => {
 
             <div className="p-4 sm:p-6 h-[420px]">
               {loading ? (
-                <div className="h-full flex items-center justify-center text-xs text-[#8C9893]">
+                <div className="h-full flex items-center justify-center text-xs text-[#7E97B0]">
                   Recomputing visual comparison across regional states...
                 </div>
-              ) : states.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-xs text-[#8C9893]">
-                  No states match the selected criteria.
+              ) : chartData.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-xs text-[#4B647D] p-6 text-center">
+                  <BarChart3 className="w-8 h-8 text-[#90C3E8] mb-2" />
+                  <p className="font-semibold text-[#0A365C]">
+                    No states found in the {chartCohort === 'MEGA' ? 'Major (≥₹1L Cr)' : chartCohort === 'SPECIALIZED' ? 'Regional & UTs (<₹1L Cr)' : ''} cohort.
+                  </p>
+                  <p className="text-[11px] text-[#7E97B0] mt-1">Adjust your filters or switch back to the complete portfolio.</p>
+                  <button 
+                    onClick={() => setChartCohort('ALL')} 
+                    className="mt-3 px-3.5 py-1.5 bg-[#1BA0E2] text-white rounded-md text-xs font-semibold hover:bg-[#148AC4] transition-colors shadow-xs"
+                  >
+                    View All States ({states.length})
+                  </button>
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   {activeChartTab === 'CAPITAL' ? (
                     <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => v >= 1000 ? `₹${(v/1000).toFixed(0)}k Cr` : `₹${v} Cr`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => v >= 1000 ? `₹${(v/1000).toFixed(0)}k Cr` : `₹${v} Cr`} />
                       <Tooltip 
                         formatter={(val: any, name: any) => [`₹${Number(val).toLocaleString()} Cr`, name]}
                         labelFormatter={(label) => `State / Territory: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="originalCost" name="Original Sanction" fill="#DDD9D0" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#173F35" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
-                      <Bar dataKey="expenditure" name="Cumulative Spend" fill="#267A69" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="originalCost" name="Original Sanction" fill="#90C3E8" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#0A365C" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
+                      <Bar dataKey="expenditure" name="Cumulative Spend" fill="#1BA0E2" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   ) : activeChartTab === 'COST_DELAY' ? (
                     <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
-                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}%`} />
-                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v} Mo`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
+                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}%`} />
+                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v} Mo`} />
                       <Tooltip 
                         formatter={(val: any, name: any, item: any) => [
                           item?.dataKey === 'costEscalationPct' 
@@ -679,18 +692,18 @@ export const StateAnalytics: React.FC = () => {
                           name
                         ]}
                         labelFormatter={(label) => `State / Territory: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation" fill="#C89432" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
-                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Schedule Delay" stroke="#B74436" strokeWidth={3} dot={{ r: 4, fill: '#B74436' }} />
+                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation" fill="#D97706" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
+                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Schedule Delay" stroke="#C53030" strokeWidth={3} dot={{ r: 4, fill: '#C53030' }} />
                     </ComposedChart>
                   ) : activeChartTab === 'RISK' ? (
                     <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
                       <YAxis 
-                        tick={{ fontSize: 11, fill: '#66736D' }} 
+                        tick={{ fontSize: 11, fill: '#4B647D' }} 
                         domain={riskViewMode === 'PERCENT' ? [0, 100] : ['auto', 'auto']}
                         tickFormatter={riskViewMode === 'PERCENT' ? (v) => `${v}%` : undefined}
                       />
@@ -704,14 +717,14 @@ export const StateAnalytics: React.FC = () => {
                           return [`${val} projects`, name];
                         }}
                         labelFormatter={(label) => `State / Territory: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
                       <Bar 
                         dataKey={riskViewMode === 'PERCENT' ? 'criticalRiskPct' : 'criticalRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'Critical Risk (%)' : 'Critical Risk'} 
                         stackId="a" 
-                        fill="#B74436" 
+                        fill="#C53030" 
                         onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} 
                         className="cursor-pointer" 
                       />
@@ -719,29 +732,29 @@ export const StateAnalytics: React.FC = () => {
                         dataKey={riskViewMode === 'PERCENT' ? 'highRiskPct' : 'highRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'High Risk (%)' : 'High Risk'} 
                         stackId="a" 
-                        fill="#C89432" 
+                        fill="#D97706" 
                       />
                       <Bar 
                         dataKey={riskViewMode === 'PERCENT' ? 'moderateLowRiskPct' : 'moderateLowRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'Moderate / Low Risk (%)' : 'Moderate / Low Risk'} 
                         stackId="a" 
-                        fill="#8C9893" 
+                        fill="#7E97B0" 
                         radius={[4, 4, 0, 0]} 
                       />
                     </BarChart>
                   ) : (
                     <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
                       <Tooltip 
                         formatter={(val: any, name: any) => [`${val}%`, name]}
                         labelFormatter={(label) => `State / Territory: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="physicalProgressPct" name="Average Physical Progress" fill="#267A69" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
-                      <Line type="monotone" dataKey="expenditurePct" name="Cumulative Expenditure / Revised Outlay" stroke="#173F35" strokeWidth={3} dot={{ r: 4, fill: '#173F35' }} />
+                      <Bar dataKey="physicalProgressPct" name="Average Physical Progress" fill="#1BA0E2" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
+                      <Line type="monotone" dataKey="expenditurePct" name="Cumulative Expenditure / Revised Outlay" stroke="#0A365C" strokeWidth={3} dot={{ r: 4, fill: '#0A365C' }} />
                     </ComposedChart>
                   )}
                 </ResponsiveContainer>

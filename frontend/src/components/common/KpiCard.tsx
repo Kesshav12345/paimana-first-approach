@@ -16,17 +16,17 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   subtitle,
   trend,
   trendDirection,
-  colorClass = 'text-[#173F35]',
+  colorClass = 'text-[#0A365C]',
   icon
 }) => {
   return (
-    <div className="bg-white border border-[#DDD9D0] rounded-xl p-4 sm:p-5 shadow-xs hover:border-[#C4BFB6] transition-all flex flex-col justify-between">
+    <div className="bg-white border-2 border-[#B8D9F2] rounded-xl p-4 sm:p-5 shadow-xs hover:border-[#1BA0E2] transition-all flex flex-col justify-between">
       <div>
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#66736D]">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#4A6572]">
             {title}
           </span>
-          {icon && <span className="text-[#8C9893]">{icon}</span>}
+          {icon && <span className="text-[#1BA0E2]">{icon}</span>}
         </div>
         <div className={`mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums ${colorClass}`}>
           {value}
@@ -34,15 +34,15 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       </div>
 
       {(subtitle || trend) && (
-        <div className="mt-3 pt-2.5 border-t border-[#EAE6DF] flex items-center justify-between text-xs text-[#66736D]">
+        <div className="mt-3 pt-2.5 border-t border-[#B8D9F2]/60 flex items-center justify-between text-xs text-[#4A6572]">
           <span className="truncate pr-1">{subtitle}</span>
           {trend && (
             <span className={`font-semibold flex-shrink-0 tabular-nums ${
               trendDirection === 'up' 
-                ? 'text-[#B74436]' 
+                ? 'text-[#C53030]' 
                 : trendDirection === 'down' 
-                ? 'text-[#267A69]' 
-                : 'text-[#66736D]'
+                ? 'text-[#1BA0E2]' 
+                : 'text-[#4A6572]'
             }`}>
               {trend}
             </span>

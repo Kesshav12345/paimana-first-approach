@@ -12,7 +12,6 @@ interface Slide {
   id: number;
   image: string;
   objectPosition: string;
-  sectorTag: string;
   caption: string;
 }
 
@@ -21,28 +20,24 @@ const SLIDES: Slide[] = [
     id: 1,
     image: '/banner4-BesNf3Ns.png',
     objectPosition: 'center 45%',
-    sectorTag: 'National Expressways & Urban Transit',
     caption: 'Grade-separated transit corridors, multi-level expressways, and high-speed road networks.'
   },
   {
     id: 2,
     image: '/banner2-AZrNp54C.png',
     objectPosition: 'center 40%',
-    sectorTag: 'Strategic Aerospace & Maritime Logistics',
     caption: 'Deep-water logistics terminals, container handling berths, and coastal multi-modal hubs.'
   },
   {
     id: 3,
     image: '/banner3-BkFJVKqW.png',
     objectPosition: 'center 45%',
-    sectorTag: 'Civil Aviation & National Air Corridors',
     caption: 'Modern passenger terminals, integrated air cargo complexes, and runway expansion corridors.'
   },
   {
     id: 4,
     image: '/banner1-1razA4xw.jpeg',
     objectPosition: 'center 65%',
-    sectorTag: 'Thermal & Clean Energy Grid',
     caption: 'Supercritical power generation units, high-voltage transmission, and clean energy parks.'
   }
 ];
@@ -76,16 +71,14 @@ export const HeroCarousel: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [nextSlide, prevSlide]);
 
-  const activeSlide = SLIDES[current];
-
   return (
     <div 
-      className="relative w-full overflow-hidden bg-[#173F35] text-white border-b border-[#DDD9D0]"
+      className="relative w-full overflow-hidden bg-[#0A365C] text-white border-b-2 border-[#B8D9F2]"
       aria-roledescription="carousel"
       aria-label="National Infrastructure Highlights"
     >
       {/* Full-bleed Cinematic Viewport */}
-      <div className="relative w-full h-[470px] sm:h-[510px] lg:h-[550px]">
+      <div className="relative w-full h-[480px] sm:h-[520px] lg:h-[560px]">
         {SLIDES.map((slide, index) => {
           const isActive = index === current;
           return (
@@ -99,16 +92,16 @@ export const HeroCarousel: React.FC = () => {
               {/* Natural Infrastructure Photography with subtle zoom/pan */}
               <img
                 src={slide.image}
-                alt={slide.sectorTag}
+                alt="Government Infrastructure"
                 className={`w-full h-full object-cover transition-transform duration-[6000ms] ease-out ${
                   isActive ? 'scale-105 translate-x-1' : 'scale-100 translate-x-0'
                 }`}
                 style={{ objectPosition: slide.objectPosition }}
                 loading={index === 0 ? 'eager' : 'lazy'}
               />
-              {/* Editorial neutral vignette: high legibility without artificial color wash */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent pointer-events-none" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+              {/* Institutional Government Blue Vignette */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#072540]/90 via-[#0A365C]/55 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#072540]/70 via-transparent to-[#072540]/30 pointer-events-none" />
             </div>
           );
         })}
@@ -119,64 +112,59 @@ export const HeroCarousel: React.FC = () => {
           {/* Top Row: Eyebrow Tag & Sector Badge */}
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded bg-[#173F35]/90 border border-white/20 text-white font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-xs">
+              <span className="px-3 py-1 rounded bg-[#0A365C]/90 border border-[#1BA0E2]/50 text-white font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-xs">
                 PAIMANA ATLAS
               </span>
-              <span className="hidden sm:inline-block px-2.5 py-1 rounded bg-black/50 text-[#C5D4CD] border border-white/20 text-[11px] font-medium backdrop-blur-xs">
+              <span className="hidden sm:inline-block px-2.5 py-1 rounded bg-[#072540]/70 text-[#B8D9F2] border border-[#1BA0E2]/30 text-[11px] font-medium backdrop-blur-xs">
                 Central Sector Monitoring (₹150 Cr+)
               </span>
             </div>
 
             {/* Slide Counter (01 / 04) */}
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-white/20 text-xs font-mono font-bold text-[#E8F0EC] backdrop-blur-xs">
-              <span className="text-[#F5EEDB]">0{current + 1}</span>
-              <span className="text-[#8C9893]">/</span>
-              <span className="text-[#8C9893]">0{SLIDES.length}</span>
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#072540]/70 border border-[#1BA0E2]/30 text-xs font-mono font-bold text-[#F0F6FB] backdrop-blur-xs">
+              <span className="text-[#1BA0E2]">0{current + 1}</span>
+              <span className="text-[#7E97B0]">/</span>
+              <span className="text-[#7E97B0]">0{SLIDES.length}</span>
             </div>
           </div>
 
-          {/* Center Text Block: Editorial, Authoritative & Increased Font Size */}
+          {/* Center Text Block: Clean, Authoritative, Open Sans */}
           <div className="max-w-3xl space-y-4 my-auto">
-            <div className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#F5EEDB] font-bold tracking-wide drop-shadow-sm">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#C89432]" />
-              <span>{activeSlide.sectorTag}</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15] drop-shadow-md">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.18] drop-shadow-md">
               Infrastructure Intelligence for Evidence-Based Governance
             </h1>
 
-            <p className="text-sm sm:text-base text-[#F6F3EC] leading-relaxed drop-shadow-sm max-w-2xl font-normal">
+            <p className="text-base sm:text-lg text-[#F0F6FB] leading-relaxed drop-shadow-sm max-w-2xl font-normal">
               Monitor progress, detect emerging risk, understand underlying drivers and prioritize intervention across India&apos;s major infrastructure portfolio.
             </p>
 
-            {/* Action Buttons: Institutional Forest & Translucent */}
+            {/* Action Buttons: Exact Blue #1BA0E2 & Translucent Navy */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => navigate('/projects')}
-                className="px-4 py-2.5 rounded-lg bg-[#267A69] hover:bg-[#173F35] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm border border-[#3CA38F]/40 transition-colors cursor-pointer"
+                className="px-5 py-3 rounded-lg bg-[#1BA0E2] hover:bg-[#148AC4] text-white text-sm font-bold flex items-center gap-2 shadow-sm border border-[#90C3E8]/40 transition-colors cursor-pointer"
               >
-                <FolderKanban className="w-4 h-4 text-[#F5EEDB]" />
+                <FolderKanban className="w-4 h-4 text-white" />
                 <span>Explore Infrastructure Portfolio</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
 
               <button
                 type="button"
                 onClick={() => navigate('/early-warning')}
-                className="px-4 py-2.5 rounded-lg bg-black/40 hover:bg-black/60 text-white border border-white/30 text-xs sm:text-sm font-semibold flex items-center gap-2 backdrop-blur-xs transition-colors cursor-pointer"
+                className="px-5 py-3 rounded-lg bg-[#072540]/70 hover:bg-[#072540]/90 text-white border border-[#B8D9F2]/40 text-sm font-bold flex items-center gap-2 backdrop-blur-xs transition-colors cursor-pointer"
               >
-                <ShieldAlert className="w-4 h-4 text-[#C89432]" />
+                <ShieldAlert className="w-4 h-4 text-[#F59E0B]" />
                 <span>Explore Early Warning</span>
               </button>
             </div>
           </div>
 
-          {/* Bottom Bar: Indicators & Controls (Caption removed as requested) */}
-          <div className="flex items-center justify-between pt-4 border-t border-white/20 text-xs text-[#E8F0EC]">
-            <div className="text-[11px] text-[#C5D4CD] font-medium tracking-wide">
-              {activeSlide.sectorTag}
+          {/* Bottom Bar: Indicators & Controls */}
+          <div className="flex items-center justify-between pt-4 border-t border-white/20 text-xs text-[#E1EFF9]">
+            <div className="text-[11px] text-[#B8D9F2] font-semibold tracking-wide uppercase">
+              Ministry of Statistics and Programme Implementation (MoSPI)
             </div>
 
             <div className="flex items-center gap-3">
@@ -191,7 +179,7 @@ export const HeroCarousel: React.FC = () => {
                     aria-label={`Go to slide ${idx + 1}`}
                     onClick={() => setCurrent(idx)}
                     className={`h-2 rounded-full transition-all cursor-pointer ${
-                      idx === current ? 'w-6 bg-[#C89432]' : 'w-2 bg-white/40 hover:bg-white/70'
+                      idx === current ? 'w-7 bg-[#1BA0E2]' : 'w-2 bg-white/40 hover:bg-white/70'
                     }`}
                   />
                 ))}
@@ -203,7 +191,7 @@ export const HeroCarousel: React.FC = () => {
                   type="button"
                   onClick={prevSlide}
                   aria-label="Previous slide"
-                  className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 text-[#E8F0EC] border border-white/20 transition cursor-pointer"
+                  className="p-1.5 rounded-full bg-[#072540]/60 hover:bg-[#0A365C] text-[#F0F6FB] border border-[#B8D9F2]/30 transition cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -211,7 +199,7 @@ export const HeroCarousel: React.FC = () => {
                   type="button"
                   onClick={nextSlide}
                   aria-label="Next slide"
-                  className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 text-[#E8F0EC] border border-white/20 transition cursor-pointer"
+                  className="p-1.5 rounded-full bg-[#072540]/60 hover:bg-[#0A365C] text-[#F0F6FB] border border-[#B8D9F2]/30 transition cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

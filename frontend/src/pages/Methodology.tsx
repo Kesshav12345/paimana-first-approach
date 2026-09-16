@@ -138,43 +138,45 @@ export const Methodology: React.FC = () => {
 
       case 'sec-2':
         return (
-          <section id="sec-2" className="bg-white p-6 sm:p-8 rounded-2xl border border-[#DDD9D0]/90 shadow-sm space-y-5">
-            <div className="flex items-center gap-3 text-indigo-600">
-              <Layers className="w-6 h-6" />
-              <h2 className="text-xl font-bold text-[#173F35]">2. System Architecture & Boundaries</h2>
+          <section id="sec-2" className="bg-white p-6 sm:p-8 rounded-2xl border-2 border-[#B8D9F2] shadow-xs space-y-5">
+            <div className="flex items-center gap-3 text-[#0A365C]">
+              <Layers className="w-6 h-6 text-[#1BA0E2]" />
+              <h2 className="text-xl font-bold text-[#0A365C]">2. System Architecture &amp; Boundaries</h2>
             </div>
-            <p className="text-[#26312D] text-sm leading-relaxed">
+            <p className="text-[#0F2942] text-sm leading-relaxed">
               The platform implements a clean multi-tier architecture with strict separation of concerns, ensuring high 
               concurrency, point-in-time analytical safety, and zero data corruption:
             </p>
 
-            <div className="bg-slate-900 text-slate-200 p-6 rounded-xl border border-slate-800 space-y-4 text-xs font-mono">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-slate-800/80 rounded-lg border border-slate-700">
-                <div className="flex items-center gap-2 text-blue-400 font-bold">
-                  <Workflow className="w-4 h-4" />
-                  <span>React 18 + TypeScript Client</span>
+            <div className="bg-[#F0F6FB] text-[#0F2942] p-6 rounded-xl border-2 border-[#B8D9F2] shadow-xs space-y-4 text-xs font-mono">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 bg-white rounded-lg border-2 border-[#B8D9F2] shadow-xs">
+                <div className="flex items-center gap-2 text-[#0A365C] font-bold">
+                  <Workflow className="w-4 h-4 text-[#1BA0E2]" />
+                  <span>React 18 + TypeScript Client Portal</span>
                 </div>
-                <span className="text-[#8C9893] text-[11px]">15-Area Project Intelligence, Operator Console, Analytics</span>
+                <span className="text-[#4B647D] text-[11px] font-medium">15-Area Project Intelligence, Operator Console, Analytics</span>
               </div>
 
-              <div className="flex justify-center text-[#66736D]">↓ REST / JSON Contracts (Strict DTOs)</div>
+              <div className="flex justify-center text-[#1BA0E2] font-bold text-xs">
+                ↓ REST / JSON Official Contracts (Strict DTOs)
+              </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 bg-slate-800/80 rounded-lg border border-slate-700">
-                <div className="flex items-center gap-2 text-emerald-400 font-bold">
-                  <Server className="w-4 h-4" />
-                  <span>Spring Boot 3 API Gateway & Orchestrator</span>
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 bg-white rounded-lg border-2 border-[#B8D9F2] shadow-xs">
+                <div className="flex items-center gap-2 text-[#0A365C] font-bold">
+                  <Server className="w-4 h-4 text-[#1BA0E2]" />
+                  <span>Spring Boot 3 API Gateway &amp; Orchestrator</span>
                 </div>
-                <span className="text-[#8C9893] text-[11px]">Lifecycle Security, Job State, Transactional Boundaries</span>
+                <span className="text-[#4B647D] text-[11px] font-medium">Lifecycle Security, RBAC Gates, Transactional Boundaries</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                  <span className="text-purple-400 font-bold block mb-1">Canonical SQLite / Postgres</span>
-                  <span className="text-[#8C9893] text-[11px]">Idempotent facts, cost revisions, quarantine, research snapshots</span>
+                <div className="p-3.5 bg-white rounded-lg border-2 border-[#B8D9F2] shadow-xs">
+                  <span className="text-[#0A365C] font-bold block mb-1">Canonical SQLite / Postgres</span>
+                  <span className="text-[#4B647D] text-[11px]">Idempotent facts, cost revisions, quarantine, research snapshots</span>
                 </div>
-                <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                  <span className="text-amber-400 font-bold block mb-1">Python FastAPI ML & Research Engine</span>
-                  <span className="text-[#8C9893] text-[11px]">CatBoost MLOps, TreeSHAP, SearchProvider, ClaimExtractor</span>
+                <div className="p-3.5 bg-white rounded-lg border-2 border-[#B8D9F2] shadow-xs">
+                  <span className="text-[#1BA0E2] font-bold block mb-1">Python FastAPI ML &amp; Research Engine</span>
+                  <span className="text-[#4B647D] text-[11px]">CatBoost MLOps, TreeSHAP, SearchProvider, ClaimExtractor</span>
                 </div>
               </div>
             </div>
@@ -670,7 +672,7 @@ export const Methodology: React.FC = () => {
   return (
     <div id="methodology-content-root" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* Header Banner - Institutional Warm Editorial Theme with authentic engineering context */}
-      <div className="bg-[#FAF8F5] border border-[#DDD9D0] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden border-l-4 border-l-[#173F35]">
+      <div className="bg-white border-2 border-[#B8D9F2] rounded-xl p-6 sm:p-8 shadow-xs relative overflow-hidden border-l-4 border-l-[#0A365C]">
         {/* Subtle authentic infrastructure contextual backdrop */}
         <div 
           className="absolute right-0 top-0 bottom-0 w-1/2 opacity-15 pointer-events-none bg-cover bg-right hidden md:block"
@@ -682,14 +684,14 @@ export const Methodology: React.FC = () => {
         />
 
         <div className="relative z-10 max-w-4xl space-y-2.5">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB] text-xs font-bold uppercase tracking-wider">
-            <BookOpen className="w-3.5 h-3.5 text-[#267A69]" />
-            <span>Decision Support Methodology & Engineering Specification</span>
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#E1EFF9] text-[#0A365C] border border-[#B8D9F2] text-xs font-bold uppercase tracking-wider">
+            <BookOpen className="w-3.5 h-3.5 text-[#1BA0E2]" />
+            <span>Decision Support Methodology &amp; Engineering Specification</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#173F35]">
-            Systems Architecture & Analytical Methodology
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0A365C]">
+            Systems Architecture &amp; Analytical Methodology
           </h1>
-          <p className="text-xs sm:text-sm text-[#52605B] leading-relaxed max-w-3xl">
+          <p className="text-sm text-[#4B647D] leading-relaxed max-w-3xl">
             PAIMANA Intelligence fuses official infrastructure monitoring records, historical project trajectories, 
             deterministic analytics, predictive CatBoost ML models, and multi-tier external intelligence to surface 
             early-warning signals and explain why they matter for governance and timely intervention.
@@ -697,40 +699,40 @@ export const Methodology: React.FC = () => {
         </div>
 
         {/* Dynamic Telemetry Strip */}
-        <div className="relative z-10 mt-6 pt-5 border-t border-[#E5E0D8] grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#267A69]">
-            <span className="text-[11px] text-[#66736D] block font-medium">Methodology Version</span>
-            <span className="text-sm font-bold text-[#173F35]">
+        <div className="relative z-10 mt-6 pt-5 border-t border-[#B8D9F2] grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="bg-[#F4F9FD] rounded-lg p-3 border-2 border-[#B8D9F2] shadow-2xs hover:border-[#1BA0E2] transition-colors border-t-2 border-t-[#1BA0E2]">
+            <span className="text-[11px] text-[#4B647D] block font-medium">Methodology Version</span>
+            <span className="text-sm font-bold text-[#0A365C]">
               {loadingTelemetry ? '...' : telemetry?.active_methodology_version || 'v2.4.0'}
             </span>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#173F35]">
-            <span className="text-[11px] text-[#66736D] block font-medium">Production ML</span>
-            <span className="text-sm font-bold text-[#173F35]">
+          <div className="bg-[#F4F9FD] rounded-lg p-3 border-2 border-[#B8D9F2] shadow-2xs hover:border-[#1BA0E2] transition-colors border-t-2 border-t-[#0A365C]">
+            <span className="text-[11px] text-[#4B647D] block font-medium">Production ML</span>
+            <span className="text-sm font-bold text-[#0A365C]">
               {loadingTelemetry ? '...' : telemetry?.production_model_version || 'CatBoost v2026.07'}
             </span>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#C85A32]">
-            <span className="text-[11px] text-[#66736D] block font-medium">Reporting Cycle</span>
-            <span className="text-sm font-bold text-[#C85A32]">
+          <div className="bg-[#F4F9FD] rounded-lg p-3 border-2 border-[#B8D9F2] shadow-2xs hover:border-[#1BA0E2] transition-colors border-t-2 border-t-[#D97706]">
+            <span className="text-[11px] text-[#4B647D] block font-medium">Reporting Cycle</span>
+            <span className="text-sm font-bold text-[#D97706]">
               {loadingTelemetry ? '...' : telemetry?.latest_dataset_period || 'Jul 2026'}
             </span>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#173F35]">
-            <span className="text-[11px] text-[#66736D] block font-medium">Monitored Projects</span>
-            <span className="text-sm font-bold text-[#173F35]">
+          <div className="bg-[#F4F9FD] rounded-lg p-3 border-2 border-[#B8D9F2] shadow-2xs hover:border-[#1BA0E2] transition-colors border-t-2 border-t-[#0A365C]">
+            <span className="text-[11px] text-[#4B647D] block font-medium">Monitored Projects</span>
+            <span className="text-sm font-bold text-[#0A365C]">
               {loadingTelemetry ? '...' : (telemetry?.total_monitored_projects?.toLocaleString() || '1,892')}
             </span>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#267A69]">
-            <span className="text-[11px] text-[#66736D] block font-medium">Evidence Claims</span>
-            <span className="text-sm font-bold text-[#267A69]">
+          <div className="bg-[#F4F9FD] rounded-lg p-3 border-2 border-[#B8D9F2] shadow-2xs hover:border-[#1BA0E2] transition-colors border-t-2 border-t-[#1BA0E2]">
+            <span className="text-[11px] text-[#4B647D] block font-medium">Evidence Claims</span>
+            <span className="text-sm font-bold text-[#1BA0E2]">
               {loadingTelemetry ? '...' : (telemetry?.total_evidence_claims?.toLocaleString() || '4,280')}
             </span>
           </div>
-          <div className="bg-white rounded-lg p-3 border border-[#DDD9D0] shadow-2xs hover:border-[#BED6CB] transition-colors border-t-2 border-t-[#52605B]">
-            <span className="text-[11px] text-[#66736D] block font-medium">Search Provider</span>
-            <span className="text-sm font-bold text-[#26312D] truncate block" title={telemetry?.search_provider}>
+          <div className="bg-[#F4F9FD] rounded-lg p-3 border-2 border-[#B8D9F2] shadow-2xs hover:border-[#1BA0E2] transition-colors border-t-2 border-t-[#4B647D]">
+            <span className="text-[11px] text-[#4B647D] block font-medium">Search Provider</span>
+            <span className="text-sm font-bold text-[#0F2942] truncate block" title={telemetry?.search_provider}>
               {loadingTelemetry ? '...' : formatSearchProvider(telemetry?.search_provider)}
             </span>
           </div>
@@ -740,25 +742,25 @@ export const Methodology: React.FC = () => {
       {/* Main Grid: Sidebar + Content */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         {/* Navigation Sidebar */}
-        <aside className="bg-white p-5 rounded-2xl border border-[#DDD9D0]/90 shadow-sm space-y-3 lg:sticky lg:top-20">
+        <aside className="bg-white p-5 rounded-2xl border-2 border-[#B8D9F2] shadow-xs space-y-3 lg:sticky lg:top-20">
           <div className="flex items-center justify-between px-1">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-[#8C9893]">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-[#0A365C]">
               Methodology Chapters
             </div>
             {/* View Mode Toggle Button */}
             <button
               onClick={() => setViewMode(viewMode === 'focused' ? 'all' : 'focused')}
-              className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#66736D] hover:text-[#267A69] bg-[#FAF8F5] hover:bg-[#E8F0EC] px-2 py-0.5 rounded border border-[#DDD9D0] transition-colors"
+              className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#0A365C] hover:text-white bg-[#E1EFF9] hover:bg-[#1BA0E2] px-2.5 py-1 rounded-md border border-[#B8D9F2] transition-colors cursor-pointer"
               title={viewMode === 'focused' ? 'Switch to Continuous Full Document' : 'Switch to Solitary Focused Card View'}
             >
               {viewMode === 'focused' ? (
                 <>
-                  <Eye className="w-3 h-3 text-[#267A69]" />
+                  <Eye className="w-3 h-3 text-[#1BA0E2]" />
                   <span>Focused</span>
                 </>
               ) : (
                 <>
-                  <FileText className="w-3 h-3 text-[#66736D]" />
+                  <FileText className="w-3 h-3 text-[#4B647D]" />
                   <span>All Docs</span>
                 </>
               )}
@@ -772,14 +774,14 @@ export const Methodology: React.FC = () => {
                 <button
                   key={s.id}
                   onClick={() => selectSection(s.id)}
-                  className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs transition-all flex items-center justify-between ${
+                  className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs transition-all flex items-center justify-between cursor-pointer ${
                     isActive
-                      ? 'border-2 border-blue-500 bg-[#E8F0EC]/40 text-[#267A69] font-bold shadow-sm'
-                      : 'text-[#66736D] hover:text-[#173F35] hover:bg-[#FAF8F5] border border-transparent font-medium'
+                      ? 'border-2 border-[#1BA0E2] bg-[#E1EFF9] text-[#0A365C] font-bold shadow-xs'
+                      : 'text-[#4B647D] hover:text-[#0A365C] hover:bg-[#F4F9FD] border border-transparent font-medium'
                   }`}
                 >
                   <span>{s.label}</span>
-                  <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive ? 'text-[#267A69] translate-x-0.5' : 'text-[#8C9893]'}`} />
+                  <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive ? 'text-[#1BA0E2] translate-x-0.5' : 'text-[#7E97B0]'}`} />
                 </button>
               );
             })}

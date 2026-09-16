@@ -264,25 +264,42 @@ export const MinistryAnalytics: React.FC = () => {
     };
   }, [ministries]);
 
-  // Chart dataset
+  const majorMinistriesCount = useMemo(() => ministries.filter(m => m.totalRevisedCostCr >= 50000).length, [ministries]);
+  const targetedMinistriesCount = useMemo(() => ministries.filter(m => m.totalRevisedCostCr < 50000).length, [ministries]);
+
+  // Chart dataset with Cohort Filtering & Normalized Risk Percentages
   const chartData = useMemo(() => {
-    return ministries.map(m => ({
-      name: m.ministryName,
-      shortName: m.ministryName.length > 18 ? m.ministryName.substring(0, 16) + '...' : m.ministryName,
-      projects: m.projectCount,
-      originalCost: Math.round(m.totalOriginalCostCr),
-      revisedCost: Math.round(m.totalRevisedCostCr),
-      expenditure: Math.round(m.totalCumulativeExpenditureCr),
-      costEscalationPct: Number(m.weightedCostEscalationPct.toFixed(1)),
-      expenditurePct: Number(m.weightedExpenditurePct.toFixed(1)),
-      physicalProgressPct: Number(m.avgPhysicalProgressPct.toFixed(1)),
-      scheduleDelayMonths: Number((m.avgScheduleDelayMonths || 0).toFixed(1)),
-      criticalRiskCount: m.criticalRiskCount,
-      highRiskCount: m.highRiskCount,
-      moderateLowRiskCount: Math.max(0, m.projectCount - (m.highRiskCount + m.criticalRiskCount)),
-      warningCount: m.activeWarningCount,
-    }));
-  }, [ministries]);
+    let cohortMinistries = ministries;
+    if (chartCohort === 'MEGA') {
+      cohortMinistries = ministries.filter(m => m.totalRevisedCostCr >= 50000);
+    } else if (chartCohort === 'SPECIALIZED') {
+      cohortMinistries = ministries.filter(m => m.totalRevisedCostCr < 50000);
+    }
+
+    return cohortMinistries.map(m => {
+      const totalPrjs = Math.max(1, m.projectCount);
+      const modLow = Math.max(0, m.projectCount - (m.highRiskCount + m.criticalRiskCount));
+      return {
+        name: m.ministryName,
+        shortName: m.ministryName.length > 18 ? m.ministryName.substring(0, 16) + '...' : m.ministryName,
+        projects: m.projectCount,
+        originalCost: Math.round(m.totalOriginalCostCr),
+        revisedCost: Math.round(m.totalRevisedCostCr),
+        expenditure: Math.round(m.totalCumulativeExpenditureCr),
+        costEscalationPct: Number(m.weightedCostEscalationPct.toFixed(1)),
+        expenditurePct: Number(m.weightedExpenditurePct.toFixed(1)),
+        physicalProgressPct: Number(m.avgPhysicalProgressPct.toFixed(1)),
+        scheduleDelayMonths: Number((m.avgScheduleDelayMonths || 0).toFixed(1)),
+        criticalRiskCount: m.criticalRiskCount,
+        highRiskCount: m.highRiskCount,
+        moderateLowRiskCount: modLow,
+        criticalRiskPct: Number(((m.criticalRiskCount / totalPrjs) * 100).toFixed(1)),
+        highRiskPct: Number(((m.highRiskCount / totalPrjs) * 100).toFixed(1)),
+        moderateLowRiskPct: Number(((modLow / totalPrjs) * 100).toFixed(1)),
+        warningCount: m.activeWarningCount,
+      };
+    });
+  }, [ministries, chartCohort]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -518,45 +535,45 @@ export const MinistryAnalytics: React.FC = () => {
           )}
 
           {/* Graphical Pictorial Comparison Tabs */}
-          <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-2xs overflow-hidden">
-            <div className="p-4 border-b border-[#DDD9D0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF8F5]/50">
+          <div className="bg-white rounded-xl border-2 border-[#B8D9F2] shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-[#B8D9F2] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F0F6FB]">
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-indigo-600" />
-                <span className="text-xs font-bold uppercase tracking-wider text-[#26312D]">
+                <BarChart3 className="w-4 h-4 text-[#0A365C]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#0A365C]">
                   Visual Comparative Analytics
                 </span>
               </div>
 
               {/* Chart Tabs */}
-              <div className="flex bg-slate-200/70 p-0.5 rounded-lg text-xs self-start sm:self-auto">
+              <div className="flex bg-[#E1EFF9] p-0.5 rounded-lg text-xs self-start sm:self-auto border border-[#B8D9F2]">
                 <button
                   onClick={() => setActiveChartTab('CAPITAL')}
-                  className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'CAPITAL' ? 'bg-white text-indigo-700 shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
+                  className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                    activeChartTab === 'CAPITAL' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
                   }`}
                 >
-                  Capital & Delivery
+                  Capital &amp; Delivery
                 </button>
                 <button
                   onClick={() => setActiveChartTab('COST_DELAY')}
-                  className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'COST_DELAY' ? 'bg-white text-indigo-700 shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
+                  className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                    activeChartTab === 'COST_DELAY' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
                   }`}
                 >
                   Cost vs Schedule Delay
                 </button>
                 <button
                   onClick={() => setActiveChartTab('RISK')}
-                  className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'RISK' ? 'bg-white text-indigo-700 shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
+                  className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                    activeChartTab === 'RISK' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
                   }`}
                 >
-                  Risk Concentration & Alerts
+                  Risk Concentration &amp; Alerts
                 </button>
                 <button
                   onClick={() => setActiveChartTab('PROGRESS')}
-                  className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'PROGRESS' ? 'bg-white text-indigo-700 shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
+                  className={`px-3 py-1.5 rounded-md font-semibold transition ${
+                    activeChartTab === 'PROGRESS' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
                   }`}
                 >
                   Execution Progress
@@ -565,9 +582,9 @@ export const MinistryAnalytics: React.FC = () => {
             </div>
 
             {/* Sub-controls: Cohort Selection & View Mode */}
-            <div className="px-4 sm:px-6 py-2.5 bg-[#FAF8F5] border-b border-[#EAE6DF] flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="text-[#66736D] text-[11px] font-medium flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#267A69]" />
+            <div className="px-4 sm:px-6 py-2.5 bg-[#F4F9FD] border-b border-[#D8EBF8] flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="text-[#4B647D] text-[11px] font-medium flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#1BA0E2]" />
                 {activeChartTab === 'CAPITAL' && 'Fiscal allocation comparison: Original Sanction vs Revised Outlay vs Certified Spend.'}
                 {activeChartTab === 'COST_DELAY' && 'Dual-axis comparison: Weighted Cost Escalation (% left) vs Average Schedule Delay (Months right).'}
                 {activeChartTab === 'RISK' && (riskViewMode === 'COUNT' ? 'Volume distribution: Absolute project count in each risk category.' : 'Normalized risk exposure: Percentage share of ministry portfolio in each risk band.')}
@@ -575,44 +592,44 @@ export const MinistryAnalytics: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Cohort Selector */}
-                <div className="flex items-center gap-1 bg-white border border-[#DDD9D0] p-0.5 rounded-lg text-[11px]">
-                  <span className="px-2 py-0.5 text-[#8C9893] font-semibold uppercase text-[9px] tracking-wider">Cohort:</span>
+                {/* Cohort Selector with Live Counts */}
+                <div className="flex items-center gap-1 bg-white border border-[#B8D9F2] p-0.5 rounded-lg text-[11px]">
+                  <span className="px-2 py-0.5 text-[#7E97B0] font-semibold uppercase text-[9px] tracking-wider">Cohort:</span>
                   <button
                     onClick={() => setChartCohort('ALL')}
-                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'ALL' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'ALL' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                   >
                     All ({ministries.length})
                   </button>
                   <button
                     onClick={() => setChartCohort('MEGA')}
-                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'MEGA' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'MEGA' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                     title="Ministries with Revised Outlay ≥ ₹50,000 Cr"
                   >
-                    Major (≥₹50k Cr)
+                    Major (≥₹50k Cr) ({majorMinistriesCount})
                   </button>
                   <button
                     onClick={() => setChartCohort('SPECIALIZED')}
-                    className={`px-2 py-0.5 rounded-md font-medium transition ${chartCohort === 'SPECIALIZED' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'SPECIALIZED' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                     title="Ministries with Revised Outlay < ₹50,000 Cr (Zoom into specialized & social sectors)"
                   >
-                    Targeted (&lt;₹50k Cr)
+                    Targeted (&lt;₹50k Cr) ({targetedMinistriesCount})
                   </button>
                 </div>
 
                 {/* Risk Mode Toggle */}
                 {activeChartTab === 'RISK' && (
-                  <div className="flex items-center gap-1 bg-white border border-[#DDD9D0] p-0.5 rounded-lg text-[11px]">
-                    <span className="px-2 py-0.5 text-[#8C9893] font-semibold uppercase text-[9px] tracking-wider">Metric:</span>
+                  <div className="flex items-center gap-1 bg-white border border-[#B8D9F2] p-0.5 rounded-lg text-[11px]">
+                    <span className="px-2 py-0.5 text-[#7E97B0] font-semibold uppercase text-[9px] tracking-wider">Metric:</span>
                     <button
                       onClick={() => setRiskViewMode('COUNT')}
-                      className={`px-2 py-0.5 rounded-md font-medium transition ${riskViewMode === 'COUNT' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                      className={`px-2 py-0.5 rounded-md font-semibold transition ${riskViewMode === 'COUNT' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                     >
                       Project Count (#)
                     </button>
                     <button
                       onClick={() => setRiskViewMode('PERCENT')}
-                      className={`px-2 py-0.5 rounded-md font-medium transition ${riskViewMode === 'PERCENT' ? 'bg-[#173F35] text-white shadow-2xs' : 'text-[#66736D] hover:text-[#173F35]'}`}
+                      className={`px-2 py-0.5 rounded-md font-semibold transition ${riskViewMode === 'PERCENT' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
                       title="100% Stacked Bar: Risk share percentage"
                     >
                       Risk Share (%)
@@ -624,36 +641,46 @@ export const MinistryAnalytics: React.FC = () => {
 
             <div className="p-4 sm:p-6 h-[420px]">
               {loading ? (
-                <div className="h-full flex items-center justify-center text-xs text-[#8C9893]">
+                <div className="h-full flex items-center justify-center text-xs text-[#7E97B0]">
                   Recomputing visual comparison across ministries...
                 </div>
-              ) : ministries.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-xs text-[#8C9893]">
-                  No ministries match the selected criteria.
+              ) : chartData.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-xs text-[#4B647D] p-6 text-center">
+                  <BarChart3 className="w-8 h-8 text-[#90C3E8] mb-2" />
+                  <p className="font-semibold text-[#0A365C]">
+                    No ministries found in the {chartCohort === 'MEGA' ? 'Major (≥₹50k Cr)' : chartCohort === 'SPECIALIZED' ? 'Targeted (<₹50k Cr)' : ''} cohort.
+                  </p>
+                  <p className="text-[11px] text-[#7E97B0] mt-1">Adjust your filters or switch back to the complete portfolio.</p>
+                  <button 
+                    onClick={() => setChartCohort('ALL')} 
+                    className="mt-3 px-3.5 py-1.5 bg-[#1BA0E2] text-white rounded-md text-xs font-semibold hover:bg-[#148AC4] transition-colors shadow-xs"
+                  >
+                    View All Ministries ({ministries.length})
+                  </button>
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   {activeChartTab === 'CAPITAL' ? (
                     <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => v >= 1000 ? `₹${(v/1000).toFixed(0)}k Cr` : `₹${v} Cr`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => v >= 1000 ? `₹${(v/1000).toFixed(0)}k Cr` : `₹${v} Cr`} />
                       <Tooltip 
                         formatter={(val: any, name: any) => [`₹${Number(val).toLocaleString()} Cr`, name]}
                         labelFormatter={(label) => `Ministry: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="originalCost" name="Original Sanction" fill="#DDD9D0" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#173F35" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectMinistry(d.name); }} className="cursor-pointer" />
-                      <Bar dataKey="expenditure" name="Cumulative Expenditure" fill="#267A69" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="originalCost" name="Original Sanction" fill="#90C3E8" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#0A365C" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectMinistry(d.name); }} className="cursor-pointer" />
+                      <Bar dataKey="expenditure" name="Cumulative Expenditure" fill="#1BA0E2" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   ) : activeChartTab === 'COST_DELAY' ? (
                     <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
-                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}%`} />
-                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v} Mo`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
+                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}%`} />
+                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v} Mo`} />
                       <Tooltip 
                         formatter={(val: any, name: any, item: any) => [
                           item?.dataKey === 'costEscalationPct' 
@@ -662,18 +689,18 @@ export const MinistryAnalytics: React.FC = () => {
                           name
                         ]}
                         labelFormatter={(label) => `Ministry: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation" fill="#C89432" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectMinistry(d.name); }} className="cursor-pointer" />
-                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Schedule Delay" stroke="#B74436" strokeWidth={3} dot={{ r: 4, fill: '#B74436' }} />
+                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation" fill="#D97706" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectMinistry(d.name); }} className="cursor-pointer" />
+                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Schedule Delay" stroke="#C53030" strokeWidth={3} dot={{ r: 4, fill: '#C53030' }} />
                     </ComposedChart>
                   ) : activeChartTab === 'RISK' ? (
                     <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
                       <YAxis 
-                        tick={{ fontSize: 11, fill: '#66736D' }} 
+                        tick={{ fontSize: 11, fill: '#4B647D' }} 
                         domain={riskViewMode === 'PERCENT' ? [0, 100] : ['auto', 'auto']}
                         tickFormatter={riskViewMode === 'PERCENT' ? (v) => `${v}%` : undefined}
                       />
@@ -687,14 +714,14 @@ export const MinistryAnalytics: React.FC = () => {
                           return [`${val} projects`, name];
                         }}
                         labelFormatter={(label) => `Ministry: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
                       <Bar 
                         dataKey={riskViewMode === 'PERCENT' ? 'criticalRiskPct' : 'criticalRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'Critical Risk (%)' : 'Critical Risk'} 
                         stackId="a" 
-                        fill="#B74436" 
+                        fill="#C53030" 
                         onClick={(d: any) => { if (d?.name) handleSelectMinistry(d.name); }} 
                         className="cursor-pointer" 
                       />
@@ -702,29 +729,29 @@ export const MinistryAnalytics: React.FC = () => {
                         dataKey={riskViewMode === 'PERCENT' ? 'highRiskPct' : 'highRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'High Risk (%)' : 'High Risk'} 
                         stackId="a" 
-                        fill="#C89432" 
+                        fill="#D97706" 
                       />
                       <Bar 
                         dataKey={riskViewMode === 'PERCENT' ? 'moderateLowRiskPct' : 'moderateLowRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'Moderate / Low Risk (%)' : 'Moderate / Low Risk'} 
                         stackId="a" 
-                        fill="#8C9893" 
+                        fill="#7E97B0" 
                         radius={[4, 4, 0, 0]} 
                       />
                     </BarChart>
                   ) : (
                     <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#EAE6DF" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66736D' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#66736D' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
                       <Tooltip 
                         formatter={(val: any, name: any) => [`${val}%`, name]}
                         labelFormatter={(label) => `Ministry: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DDD9D0', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="physicalProgressPct" name="Average Certified Physical Progress" fill="#267A69" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectMinistry(d.name); }} className="cursor-pointer" />
-                      <Line type="monotone" dataKey="expenditurePct" name="Cumulative Expenditure / Revised Outlay" stroke="#173F35" strokeWidth={3} dot={{ r: 4, fill: '#173F35' }} />
+                      <Bar dataKey="physicalProgressPct" name="Average Certified Physical Progress" fill="#1BA0E2" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectMinistry(d.name); }} className="cursor-pointer" />
+                      <Line type="monotone" dataKey="expenditurePct" name="Cumulative Expenditure / Revised Outlay" stroke="#0A365C" strokeWidth={3} dot={{ r: 4, fill: '#0A365C' }} />
                     </ComposedChart>
                   )}
                 </ResponsiveContainer>
@@ -733,19 +760,19 @@ export const MinistryAnalytics: React.FC = () => {
           </div>
 
           {/* Numerical Ministry Comparison Table */}
-          <div className="bg-white border border-[#DDD9D0] rounded-xl overflow-hidden shadow-2xs">
-            <div className="p-4 border-b border-[#DDD9D0] bg-[#FAF8F5]/70 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#26312D]">
+          <div className="bg-white border-2 border-[#B8D9F2] rounded-xl overflow-hidden shadow-xs">
+            <div className="p-4 border-b border-[#B8D9F2] bg-[#F0F6FB] flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#0A365C]">
                 Detailed Ministry Portfolio Comparison ({ministries.length})
               </span>
-              <span className="text-xs text-[#66736D]">
+              <span className="text-xs text-[#4B647D]">
                 Ordered by {appliedFilters.sortBy === 'cost' ? 'Revised Outlay' : appliedFilters.sortBy}
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#26312D]">
-                <thead className="bg-[#FAF8F5]/70 border-b border-[#DDD9D0] uppercase text-[11px] font-semibold text-[#66736D]">
+              <table className="w-full text-left text-xs text-[#0F2942]">
+                <thead className="bg-[#E1EFF9] border-b-2 border-[#B8D9F2] uppercase text-[11px] font-bold text-[#0A365C]">
                   <tr>
                     <th className="px-4 py-3">Ministry Name</th>
                     <th className="px-4 py-3 text-right">Projects</th>
@@ -763,18 +790,18 @@ export const MinistryAnalytics: React.FC = () => {
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={11} className="text-center py-12 text-[#8C9893]">
+                      <td colSpan={11} className="text-center py-12 text-[#7E97B0]">
                         Querying ministry portfolio cohort...
                       </td>
                     </tr>
                   ) : ministries.length === 0 ? (
                     <tr>
                       <td colSpan={11} className="text-center py-12 space-y-2">
-                        <p className="text-sm font-medium text-[#66736D]">No ministries contain projects matching the selected scope.</p>
-                        <p className="text-xs text-[#8C9893]">Broaden your filters or reset to national comparison.</p>
+                        <p className="text-sm font-medium text-[#4B647D]">No ministries contain projects matching the selected scope.</p>
+                        <p className="text-xs text-[#7E97B0]">Broaden your filters or reset to national comparison.</p>
                         <button
                           onClick={handleReset}
-                          className="mt-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-semibold"
+                          className="mt-2 px-3 py-1.5 bg-[#0A365C] hover:bg-[#1BA0E2] text-white rounded text-xs font-semibold"
                         >
                           Reset Filters
                         </button>
@@ -782,27 +809,27 @@ export const MinistryAnalytics: React.FC = () => {
                     </tr>
                   ) : (
                     ministries.map((m) => (
-                      <tr key={m.ministryName} className="hover:bg-indigo-50/40 transition">
-                        <td className="px-4 py-3 font-semibold text-[#173F35] max-w-sm truncate" title={m.ministryName}>
+                      <tr key={m.ministryName} className="hover:bg-[#F4F9FD] transition">
+                        <td className="px-4 py-3 font-semibold text-[#0A365C] max-w-sm truncate" title={m.ministryName}>
                           {m.ministryName}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono text-[#26312D]">{m.projectCount.toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right font-mono text-[#66736D]">₹{Math.round(m.totalOriginalCostCr).toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right font-mono font-semibold text-[#173F35]">₹{Math.round(m.totalRevisedCostCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono text-[#0F2942]">{m.projectCount.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono text-[#4B647D]">₹{Math.round(m.totalOriginalCostCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-[#0A365C]">₹{Math.round(m.totalRevisedCostCr).toLocaleString()}</td>
                         <td className="px-4 py-3 text-right font-mono">
-                          <span className={m.weightedCostEscalationPct > 15 ? 'text-amber-600 font-semibold' : 'text-[#66736D]'}>
+                          <span className={m.weightedCostEscalationPct > 15 ? 'text-amber-600 font-semibold' : 'text-[#4B647D]'}>
                             +{m.weightedCostEscalationPct.toFixed(1)}%
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right font-mono text-[#267A69] font-medium">₹{Math.round(m.totalCumulativeExpenditureCr).toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right font-mono font-medium text-[#26312D]">{m.avgPhysicalProgressPct.toFixed(1)}%</td>
+                        <td className="px-4 py-3 text-right font-mono text-[#1BA0E2] font-semibold">₹{Math.round(m.totalCumulativeExpenditureCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono font-medium text-[#0F2942]">{m.avgPhysicalProgressPct.toFixed(1)}%</td>
                         <td className="px-4 py-3 text-right font-mono">
-                          <span className={m.avgScheduleDelayMonths > 12 ? 'text-orange-600 font-semibold' : 'text-[#66736D]'}>
+                          <span className={m.avgScheduleDelayMonths > 12 ? 'text-orange-600 font-semibold' : 'text-[#4B647D]'}>
                             {(m.avgScheduleDelayMonths || 0).toFixed(1)} Mo
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className={m.highRiskCount + m.criticalRiskCount > 0 ? 'text-rose-600 font-bold' : 'text-[#8C9893]'}>
+                          <span className={m.highRiskCount + m.criticalRiskCount > 0 ? 'text-rose-600 font-bold' : 'text-[#7E97B0]'}>
                             {m.highRiskCount + m.criticalRiskCount}
                           </span>
                         </td>
@@ -810,7 +837,7 @@ export const MinistryAnalytics: React.FC = () => {
                         <td className="px-4 py-3 text-center">
                           <button
                             onClick={() => handleSelectMinistry(m.ministryName)}
-                            className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] font-semibold transition flex items-center gap-1 mx-auto shadow-2xs"
+                            className="px-3 py-1 bg-[#0A365C] hover:bg-[#1BA0E2] text-white rounded text-[11px] font-semibold transition flex items-center gap-1 mx-auto shadow-2xs cursor-pointer"
                           >
                             Explore <ChevronRight className="w-3 h-3" />
                           </button>

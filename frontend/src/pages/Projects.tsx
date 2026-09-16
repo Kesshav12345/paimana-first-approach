@@ -253,37 +253,37 @@ export const Projects: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[#DDD9D0] pb-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b-2 border-[#B8D9F2] pb-4">
         <div>
-          <div className="flex items-center gap-2 text-[#267A69] font-semibold text-xs uppercase tracking-wider mb-1">
-            <FolderKanban className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-[#1BA0E2] font-bold text-xs uppercase tracking-wider mb-1">
+            <FolderKanban className="w-4 h-4 text-[#1BA0E2]" />
             <span>Infrastructure Projects Registry</span>
           </div>
-          <h1 className="text-2xl font-extrabold text-[#173F35] tracking-tight">
+          <h1 className="text-2xl font-extrabold text-[#0A365C] tracking-tight">
             Projects Portfolio & Intelligence
           </h1>
-          <p className="text-xs text-[#66736D] mt-1 max-w-3xl leading-relaxed">
+          <p className="text-xs text-[#4A6572] mt-1 max-w-3xl leading-relaxed font-medium">
             Multi-attribute query and drill-down engine across all monitored central sector infrastructure projects. 
             Configure jurisdictional, financial, risk, and early warning criteria below to inspect matching cohorts.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 rounded-lg bg-[#E8F0EC] border border-[#BED6CB] text-[#173F35] text-xs font-semibold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#173F35] animate-pulse" />
+          <div className="px-3.5 py-1.5 rounded-lg bg-[#E1EFF9] border border-[#B8D9F2] text-[#0A365C] text-xs font-bold flex items-center gap-2 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-[#1BA0E2] animate-pulse" />
             <span>{homeSummary?.totalProjects ? `${homeSummary.totalProjects.toLocaleString()} Projects Monitored` : 'Central Portfolio Monitored'}</span>
           </div>
         </div>
       </div>
 
       {/* Quick Filter Presets */}
-      <div className="bg-white rounded-xl border border-[#DDD9D0] p-4 shadow-sm space-y-3">
+      <div className="bg-white rounded-xl border-2 border-[#B8D9F2] p-4 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-[#26312D] uppercase tracking-wider flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-[#267A69]" />
+          <span className="text-xs font-bold text-[#0A365C] uppercase tracking-wider flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-[#1BA0E2]" />
             Quick Query Presets
           </span>
-          <span className="text-[11px] text-[#8C9893]">Click any preset to instantly apply filter</span>
+          <span className="text-[11px] text-[#4A6572] font-medium">Click any preset to instantly apply filter</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -692,83 +692,83 @@ export const Projects: React.FC = () => {
       {/* Results or Initial Guidance Section */}
       {!hasApplied ? (
         /* INITIAL STATE: Clean guidance panel, no mass table dump */
-        <div className="bg-white rounded-xl border border-dashed border-[#DDD9D0] p-8 text-center space-y-6">
+        <div className="bg-white rounded-xl border-2 border-dashed border-[#B8D9F2] p-8 text-center space-y-6">
           <div className="max-w-md mx-auto space-y-3">
-            <div className="w-12 h-12 rounded-full bg-[#E8F0EC] text-[#267A69] flex items-center justify-center mx-auto border border-[#BED6CB]">
+            <div className="w-12 h-12 rounded-full bg-[#E1EFF9] text-[#1BA0E2] flex items-center justify-center mx-auto border border-[#B8D9F2]">
               <Filter className="w-6 h-6" />
             </div>
-            <h2 className="text-base font-bold text-[#26312D]">
+            <h2 className="text-base font-extrabold text-[#0A365C]">
               Filter System Ready
             </h2>
-            <p className="text-xs text-[#66736D] leading-relaxed">
+            <p className="text-xs text-[#4A6572] leading-relaxed font-medium">
               To inspect projects, select your criteria from the filters above and click{' '}
-              <strong className="text-[#267A69]">"Apply Filters & Query Projects"</strong>, or choose one of the{' '}
-              <strong className="text-[#26312D]">Quick Query Presets</strong> above.
+              <strong className="text-[#1BA0E2]">"Apply Filters & Query Projects"</strong>, or choose one of the{' '}
+              <strong className="text-[#0A365C]">Quick Query Presets</strong> above.
             </p>
           </div>
 
           {/* Statistical Overview Badges */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-2">
-            <div className="p-3 rounded-lg bg-[#FAF8F5] border border-[#DDD9D0]">
-              <span className="block text-lg font-bold text-[#173F35] tabular-nums">{homeSummary?.totalProjects?.toLocaleString() || '—'}</span>
-              <span className="text-[11px] text-[#66736D]">Total Projects</span>
+            <div className="p-3 rounded-lg bg-[#F0F6FB] border border-[#B8D9F2]">
+              <span className="block text-lg font-bold text-[#0A365C] tabular-nums">{homeSummary?.totalProjects?.toLocaleString() || '—'}</span>
+              <span className="text-[11px] text-[#4A6572] font-medium">Total Projects</span>
             </div>
-            <div className="p-3 rounded-lg bg-[#FAF8F5] border border-[#DDD9D0]">
-              <span className="block text-lg font-bold text-[#173F35] tabular-nums">{meta?.sectors?.length || 12}</span>
-              <span className="text-[11px] text-[#66736D]">Sectors</span>
+            <div className="p-3 rounded-lg bg-[#F0F6FB] border border-[#B8D9F2]">
+              <span className="block text-lg font-bold text-[#0A365C] tabular-nums">{meta?.sectors?.length || 12}</span>
+              <span className="text-[11px] text-[#4A6572] font-medium">Sectors</span>
             </div>
-            <div className="p-3 rounded-lg bg-[#FAF8F5] border border-[#DDD9D0]">
-              <span className="block text-lg font-bold text-[#173F35] tabular-nums">{meta?.ministries?.length || 16}</span>
-              <span className="text-[11px] text-[#66736D]">Ministries</span>
+            <div className="p-3 rounded-lg bg-[#F0F6FB] border border-[#B8D9F2]">
+              <span className="block text-lg font-bold text-[#0A365C] tabular-nums">{meta?.ministries?.length || 16}</span>
+              <span className="text-[11px] text-[#4A6572] font-medium">Ministries</span>
             </div>
-            <div className="p-3 rounded-lg bg-[#F5E7E4] border border-[#E5B8B2]">
-              <span className="block text-lg font-bold text-[#B74436] tabular-nums">{homeSummary?.projectsRequiringAttentionCount?.toLocaleString() || '—'}</span>
-              <span className="text-[11px] text-[#B74436] font-medium">Critical / High Risk</span>
+            <div className="p-3 rounded-lg bg-red-50 border border-red-200">
+              <span className="block text-lg font-bold text-[#C53030] tabular-nums">{homeSummary?.projectsRequiringAttentionCount?.toLocaleString() || '—'}</span>
+              <span className="text-[11px] text-[#C53030] font-bold">Critical / High Risk</span>
             </div>
           </div>
         </div>
       ) : loadingResults ? (
         /* LOADING STATE */
-        <div className="bg-white rounded-xl border border-[#DDD9D0] p-12 text-center">
-          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-xs font-semibold text-[#26312D]">Querying canonical database...</p>
-          <p className="text-[11px] text-[#8C9893] mt-1">Evaluating multi-dimensional filters across the central infrastructure portfolio</p>
+        <div className="bg-white rounded-xl border-2 border-[#B8D9F2] p-12 text-center">
+          <div className="w-8 h-8 border-2 border-[#1BA0E2] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-xs font-bold text-[#0A365C]">Querying canonical database...</p>
+          <p className="text-[11px] text-[#4A6572] mt-1 font-medium">Evaluating multi-dimensional filters across the central infrastructure portfolio</p>
         </div>
       ) : results.length === 0 ? (
         /* EMPTY STATE */
-        <div className="bg-white rounded-xl border border-[#DDD9D0] p-12 text-center">
+        <div className="bg-white rounded-xl border-2 border-[#B8D9F2] p-12 text-center">
           <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-          <h2 className="text-base font-bold text-[#26312D]">No Projects Matched Selected Criteria</h2>
-          <p className="text-xs text-[#66736D] mt-1 max-w-md mx-auto">
+          <h2 className="text-base font-bold text-[#0A365C]">No Projects Matched Selected Criteria</h2>
+          <p className="text-xs text-[#4A6572] mt-1 max-w-md mx-auto font-medium">
             No projects in the canonical repository satisfied all your active filter conditions. 
             Try clearing some filters or selecting "All" on specific criteria.
           </p>
           <button
             onClick={resetFilters}
-            className="mt-4 px-4 py-2 bg-[#173F35] hover:bg-[#267A69] text-white rounded-lg text-xs font-semibold shadow transition"
+            className="mt-4 px-4 py-2 bg-[#1BA0E2] hover:bg-[#0A365C] text-white rounded-lg text-xs font-bold shadow-xs transition cursor-pointer"
           >
             Clear Filters & Reset
           </button>
         </div>
       ) : (
         /* RESULTS TABLE */
-        <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border-2 border-[#B8D9F2] shadow-xs overflow-hidden">
           
-          <div className="px-5 py-3.5 bg-[#FAF8F5] border-b border-[#DDD9D0] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="px-5 py-3.5 bg-[#F0F6FB] border-b-2 border-[#B8D9F2] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#26312D]">Matching Projects</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-[#173F35]">
+              <span className="text-xs font-bold text-[#0A365C]">Matching Projects</span>
+              <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-[#E1EFF9] text-[#0A365C] border border-[#B8D9F2]">
                 {total.toLocaleString()} Records
               </span>
             </div>
-            <div className="text-xs text-[#66736D]">
-              Click <span className="font-semibold text-[#267A69]">"Explore"</span> on any project row to view all 15 analytical dimensions
+            <div className="text-xs text-[#4A6572] font-medium">
+              Click <span className="font-bold text-[#1BA0E2]">"Explore"</span> on any project row to view all 15 analytical dimensions
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#F6F3EC]/75 text-slate-600 uppercase text-[10px] tracking-wider font-bold border-b border-[#DDD9D0]">
+            <table className="w-full text-left text-xs atlas-table">
+              <thead className="bg-[#E1EFF9] text-[#0A365C] uppercase text-[10px] tracking-wider font-bold border-b border-[#B8D9F2]">
                 <tr>
                   <th className="px-4 py-3">Project & Identity</th>
                   <th className="px-4 py-3">Sector / Ministry</th>
@@ -785,13 +785,13 @@ export const Projects: React.FC = () => {
                 {results.map(p => (
                   <tr 
                     key={p.projectId} 
-                    className="hover:bg-[#FAF8F5]/80 transition-colors group cursor-pointer"
+                    className="hover:bg-[#F0F6FB] transition-colors group cursor-pointer"
                     onClick={() => navigate(`/projects/${p.projectId}`)}
                   >
                     {/* 1. Project ID & Name */}
                     <td className="px-4 py-3 max-w-xs">
                       <div className="flex items-center gap-1.5 mb-1">
-                        <span className="font-mono text-[11px] font-semibold text-[#267A69] bg-[#E8F0EC] px-1.5 py-0.5 rounded border border-[#BED6CB]">
+                        <span className="font-mono text-[11px] font-bold text-[#0A365C] bg-[#E1EFF9] px-1.5 py-0.5 rounded border border-[#B8D9F2]">
                           {p.projectId}
                         </span>
                         {p.multiState && (
@@ -800,34 +800,34 @@ export const Projects: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <div className="font-bold text-[#173F35] group-hover:text-[#267A69] transition truncate" title={p.projectName}>
+                      <div className="font-bold text-[#0A365C] group-hover:text-[#1BA0E2] transition truncate" title={p.projectName}>
                         {p.projectName}
                       </div>
                     </td>
 
                     {/* 2. Sector & Ministry */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-semibold text-[#26312D]">{p.sectorName}</div>
-                      <div className="text-[11px] text-[#66736D] truncate max-w-[180px]" title={p.ministryName}>
+                      <div className="font-bold text-[#0A365C]">{p.sectorName}</div>
+                      <div className="text-[11px] text-[#4A6572] font-medium truncate max-w-[180px]" title={p.ministryName}>
                         {p.ministryName}
                       </div>
                     </td>
 
                     {/* 3. State */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-1 text-[#26312D] font-medium">
-                        <MapPin className="w-3.5 h-3.5 text-[#8C9893] shrink-0" />
+                      <div className="flex items-center gap-1 text-[#0A365C] font-semibold">
+                        <MapPin className="w-3.5 h-3.5 text-[#1BA0E2] shrink-0" />
                         <span>{p.stateName || 'Multi-State'}</span>
                       </div>
                     </td>
 
                     {/* 4. Cost Exposure */}
                     <td className="px-4 py-3 text-right whitespace-nowrap">
-                      <div className="font-mono font-bold text-[#173F35]">
+                      <div className="font-mono font-bold text-[#0A365C]">
                         ₹{(p.latestRevisedCostCr || p.originalCostCr).toLocaleString()} Cr
                       </div>
                       <div className="text-[11px] flex items-center justify-end gap-1 mt-0.5">
-                        <span className="text-[#8C9893]">Orig: ₹{p.originalCostCr?.toLocaleString()} Cr</span>
+                        <span className="text-[#4A6572] font-medium">Orig: ₹{p.originalCostCr?.toLocaleString()} Cr</span>
                         {p.costEscalationPct > 0 ? (
                           <span className="text-[#B74436] font-semibold font-mono">
                             (+{p.costEscalationPct}%)

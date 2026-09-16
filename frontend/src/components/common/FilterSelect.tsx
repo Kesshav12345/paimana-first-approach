@@ -65,10 +65,10 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
           value={value || 'ALL'}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-full bg-white border border-[#DDD9D0] rounded-lg px-2.5 py-1.5 text-xs text-[#26312D] font-medium shadow-2xs hover:border-[#173F35] focus:outline-none focus:ring-1 focus:ring-[#267A69] focus:border-[#267A69] disabled:bg-[#FAF8F5] disabled:text-[#8C9893] disabled:cursor-not-allowed transition-all truncate cursor-pointer"
+          className="w-full bg-white border border-[#B8D9F2] rounded-lg px-2.5 py-1.5 text-xs text-[#0A365C] font-semibold shadow-2xs hover:border-[#1BA0E2] focus:outline-none focus:ring-2 focus:ring-[#1BA0E2]/30 focus:border-[#1BA0E2] disabled:bg-[#F0F6FB] disabled:text-[#4A6572]/50 disabled:cursor-not-allowed transition-all truncate cursor-pointer"
         >
           {allOption !== false && !hasAll && (
-            <option value="ALL" className="text-[#26312D] font-semibold">
+            <option value="ALL" className="text-[#0A365C] font-bold">
               {allLabel}
             </option>
           )}
@@ -79,7 +79,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
             const optCount = isObj && opt.count !== undefined ? ` (${opt.count.toLocaleString()})` : '';
 
             return (
-              <option key={optVal} value={optVal} className="text-[#26312D]">
+              <option key={optVal} value={optVal} className="text-[#0A365C]">
                 {optLabel}
                 {optCount}
               </option>
