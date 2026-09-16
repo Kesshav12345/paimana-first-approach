@@ -668,7 +668,7 @@ export const EarlyWarning: React.FC = () => {
                             <p className="text-xs text-[#66736D]">Try broadening your search or resetting restrictive filters.</p>
                             <button
                               onClick={handleResetAlertFilters}
-                              className="mt-2 px-3 py-1.5 bg-blue-600 hover:bg-[#E8F0EC]0 text-white rounded text-xs font-semibold"
+                              className="mt-2 px-3 py-1.5 bg-[#173F35] hover:bg-[#267A69] text-white rounded text-xs font-semibold"
                             >
                               Reset Warning Filters
                             </button>

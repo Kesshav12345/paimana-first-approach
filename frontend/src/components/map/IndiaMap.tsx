@@ -302,8 +302,14 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                   <div className="text-xl font-extrabold text-[#B74436] tabular-nums mt-0.5">
                     {(activeTelemetry.critical_risk_count || 0) + (activeTelemetry.high_risk_count || 0)}
                   </div>
-                  <div className="text-[10px] text-[#66736D]">
-                    {activeTelemetry.critical_risk_count || 0} Critical | {activeTelemetry.high_risk_count || 0} High
+                  <div className="text-[10px] text-[#66736D] flex items-center gap-1 mt-0.5">
+                    <span className={`font-bold ${activeTelemetry.critical_risk_count > 0 ? 'text-[#B74436]' : 'text-[#66736D]'}`}>
+                      {activeTelemetry.critical_risk_count || 0} Critical
+                    </span>
+                    <span>|</span>
+                    <span className={`font-medium ${activeTelemetry.high_risk_count > 0 ? 'text-[#C89432]' : 'text-[#66736D]'}`}>
+                      {activeTelemetry.high_risk_count || 0} High
+                    </span>
                   </div>
                 </div>
 
@@ -368,9 +374,15 @@ export const IndiaMap: React.FC<IndiaMapProps> = ({
                     </div>
 
                     {(st.critical_risk_count > 0 || st.high_risk_count > 0) && (
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F5EEDB] text-[#C89432] border border-[#DFCBB0]">
-                        {st.critical_risk_count + st.high_risk_count} flagged
-                      </span>
+                      st.critical_risk_count > 0 ? (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F5E7E4] text-[#B74436] border border-[#E8C6C1] whitespace-nowrap">
+                          {st.critical_risk_count} crit · {st.high_risk_count} high
+                        </span>
+                      ) : (
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#F5EEDB] text-[#C89432] border border-[#DFCBB0] whitespace-nowrap">
+                          {st.high_risk_count} high
+                        </span>
+                      )
                     )}
                   </div>
                 </div>

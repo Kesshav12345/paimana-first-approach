@@ -148,7 +148,7 @@ export const ProjectIntelligence: React.FC = () => {
             <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 font-mono text-[10px]" title="Point-in-time CatBoost Supervised ML Model">
               [CATBOOST FORECAST: {detail.modelVersion || 'v2026.07'}]
             </span>
-            <span className="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-mono text-[10px]" title="External Multi-Tier Internet Research & Causal Claims">
+            <span className="px-2 py-0.5 rounded bg-amber-950 text-[#C89432] border border-amber-800 font-mono text-[10px]" title="External Multi-Tier Internet Research & Causal Claims">
               [EXTERNAL EVIDENCE: {detail.researchSummary ? `${detail.researchSummary.sourceCount} Sources` : 'Gov Direct / PIB'}]
             </span>
           </div>
@@ -166,8 +166,8 @@ export const ProjectIntelligence: React.FC = () => {
             <div className="flex flex-wrap items-center gap-2">
               <span className={`px-2.5 py-1 rounded text-[11px] font-bold tracking-wide flex items-center gap-1.5 ${
                 detail.researchSummary.status === 'COMPLETED' 
-                  ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-700/60' 
-                  : 'bg-amber-950/80 text-amber-300 border border-amber-700/60'
+                  ? 'bg-emerald-950/80 text-[#173F35] border border-emerald-700/60' 
+                  : 'bg-amber-950/80 text-[#C89432] border border-amber-700/60'
               }`}>
                 <Globe className="w-3.5 h-3.5" />
                 DEEP-DIVE EVIDENCE: {detail.researchSummary.status} ({Math.round(detail.researchSummary.completenessScore)}% COMPLETE)
@@ -179,13 +179,13 @@ export const ProjectIntelligence: React.FC = () => {
                 Verified Sources: <strong className="text-[#26312D] font-semibold">{detail.researchSummary.sourceCount}</strong>
               </span>
               <span className="text-[11px] text-[#66736D] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#DDD9D0]">
-                Causal Factors: <strong className="text-amber-300 font-semibold">{detail.researchSummary.causalFactorCount}</strong>
+                Causal Factors: <strong className="text-[#C89432] font-semibold">{detail.researchSummary.causalFactorCount}</strong>
               </span>
             </div>
 
             <button
               onClick={() => setActiveModalComponent('evidence_dossier')}
-              className="px-3 py-1.5 bg-[#173F35] hover:bg-[#267A69] text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-blue-950/50 transition-all cursor-pointer"
+              className="px-3 py-1.5 bg-[#173F35] hover:bg-[#267A69] text-white rounded text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
             >
               <BookOpen className="w-3.5 h-3.5" />
               <span>Evidence Dossier & Non-CUF Provenance</span>
@@ -217,89 +217,157 @@ export const ProjectIntelligence: React.FC = () => {
         const hasPrev = !!prevRecord;
         const costDelta = hasPrev && currRecord ? parseNum(currRecord.revised_cost_cr) - parseNum(prevRecord.revised_cost_cr) : 0;
         const progressDelta = hasPrev && currRecord ? +(parseNum(currRecord.physical_progress_pct) - parseNum(prevRecord.physical_progress_pct)).toFixed(2) : 0;
+        const spendDelta = hasPrev && currRecord ? +(parseNum(currRecord.cumulative_expenditure_cr) - parseNum(prevRecord.cumulative_expenditure_cr)).toFixed(2) : 0;
         const slippageDelta = hasPrev && currRecord ? parseNum(currRecord.schedule_slippage_months) - parseNum(prevRecord.schedule_slippage_months) : 0;
         const riskDelta = hasPrev && currRecord ? +(parseNum(currRecord.overall_risk_score) - parseNum(prevRecord.overall_risk_score)).toFixed(1) : 0;
 
         return (
-          <div className="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-[#DDD9D0] rounded-lg p-4 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+          <div className="bg-white border border-[#DDD9D0] rounded-xl p-4 sm:p-5 shadow-xs relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#173F35] via-[#267A69] to-[#C89432]" />
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3.5 pt-0.5">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-900/80 text-indigo-300 border border-indigo-700/60 uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded text-[10px] font-extrabold bg-[#173F35] text-white uppercase tracking-wider">
                   DELTA TRACKING
                 </span>
-                <h3 className="text-xs font-bold text-[#173F35] uppercase tracking-wider">
-                  {hasPrev ? `What Changed Since Previous Report (${prevRecord.reporting_month})?` : `Baseline Intelligence (${currRecord?.reporting_month || detail.latestReportingMonth})`}
+                <h3 className="text-xs sm:text-sm font-bold text-[#173F35] uppercase tracking-wide">
+                  {hasPrev ? `What Changed Since Previous Report (${prevRecord.reporting_month})?` : `Baseline Intelligence Benchmark (${currRecord?.reporting_month || detail.latestReportingMonth})`}
                 </h3>
               </div>
-              <span className="text-[11px] text-[#66736D]">
-                Latest Cycle: <strong className="text-[#26312D]">{detail.latestReportingMonth}</strong>
-                {hasPrev ? (
-                  <> vs <strong className="text-[#66736D]">{prevRecord.reporting_month}</strong></>
-                ) : (
-                  <span className="ml-1 text-[#267A69] font-medium">(First Ingestion Baseline)</span>
-                )}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded bg-[#FAF8F5] border border-[#DDD9D0] text-[#66736D] text-[11px] font-medium">
+                  Latest Cycle: <strong className="text-[#173F35] font-bold">{detail.latestReportingMonth}</strong>
+                  {hasPrev ? (
+                    <> vs <strong className="text-[#26312D] font-bold">{prevRecord.reporting_month}</strong></>
+                  ) : (
+                    <span className="ml-1 text-[#267A69] font-medium">(First Ingestion Baseline)</span>
+                  )}
+                </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="bg-[#FAF8F5]/70 p-2.5 rounded border border-[#DDD9D0]">
-                <span className="text-[#66736D] text-[11px] block">Revised Cost Shift</span>
-                <div className={`text-sm font-bold mt-0.5 ${costDelta > 0 ? 'text-rose-400' : costDelta < 0 ? 'text-emerald-400' : 'text-[#26312D]'}`}>
-                  {hasPrev 
-                    ? (costDelta > 0 ? `+₹${costDelta.toLocaleString()} Cr` : costDelta < 0 ? `-₹${Math.abs(costDelta).toLocaleString()} Cr` : '₹0 Cr (No Revision)')
-                    : `₹${parseNum(detail.latestRevisedCostCr).toLocaleString()} Cr`}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
+              {/* 1. Revised Cost Shift */}
+              <div className="bg-[#FAF8F5] p-3 rounded-lg border border-[#DDD9D0] flex flex-col justify-between">
+                <div>
+                  <span className="text-[#66736D] text-[10px] font-bold uppercase tracking-wider block">Revised Cost Shift</span>
+                  <div className={`text-base font-extrabold mt-1 tabular-nums ${
+                    costDelta > 0 ? 'text-[#B74436]' : costDelta < 0 ? 'text-[#267A69]' : 'text-[#26312D]'
+                  }`}>
+                    {hasPrev 
+                      ? (costDelta > 0 ? `+₹${costDelta.toLocaleString()} Cr` : costDelta < 0 ? `-₹${Math.abs(costDelta).toLocaleString()} Cr` : '₹0 Cr (No Revision)')
+                      : `₹${parseNum(detail.latestRevisedCostCr).toLocaleString()} Cr`}
+                  </div>
                 </div>
-                <span className="text-[10px] text-[#66736D]">{hasPrev ? 'Official Sanction Delta' : 'Current Approved Baseline'}</span>
+                <span className="text-[10px] text-[#66736D] mt-1.5 pt-1.5 border-t border-[#EAE6DF]">
+                  {hasPrev ? (costDelta !== 0 ? 'Sanction Revision' : 'Sanction Ceiling Maintained') : 'Current Approved Baseline'}
+                </span>
               </div>
 
-              <div className="bg-[#FAF8F5]/70 p-2.5 rounded border border-[#DDD9D0]">
-                <span className="text-[#66736D] text-[11px] block">Progress Velocity (1M)</span>
-                <div className={`text-sm font-bold mt-0.5 ${progressDelta > 0 ? 'text-emerald-400' : progressDelta === 0 ? 'text-amber-400' : 'text-rose-400'}`}>
-                  {hasPrev
-                    ? (progressDelta > 0 ? `+${progressDelta}%` : progressDelta === 0 ? '0.0% (Stagnant)' : `${progressDelta}%`)
-                    : `${detail.physicalProgressPct}% (Cumulative)`}
+              {/* 2. Progress Velocity */}
+              <div className="bg-[#FAF8F5] p-3 rounded-lg border border-[#DDD9D0] flex flex-col justify-between">
+                <div>
+                  <span className="text-[#66736D] text-[10px] font-bold uppercase tracking-wider block">Progress Velocity (1M)</span>
+                  <div className={`text-base font-extrabold mt-1 tabular-nums ${
+                    progressDelta > 0 ? 'text-[#267A69]' : progressDelta === 0 ? 'text-[#C89432]' : 'text-[#B74436]'
+                  }`}>
+                    {hasPrev
+                      ? (progressDelta > 0 ? `+${progressDelta}%` : progressDelta === 0 ? '0.0% (Stagnant)' : `${progressDelta}%`)
+                      : `${detail.physicalProgressPct}%`}
+                  </div>
                 </div>
-                <span className="text-[10px] text-[#66736D]">{hasPrev ? 'Monthly Physical Advance' : 'Total Certified Physical'}</span>
+                <span className="text-[10px] text-[#66736D] mt-1.5 pt-1.5 border-t border-[#EAE6DF]">
+                  {hasPrev ? 'Monthly Physical Advance' : 'Total Certified Physical'}
+                </span>
               </div>
 
-              <div className="bg-[#FAF8F5]/70 p-2.5 rounded border border-[#DDD9D0]">
-                <span className="text-[#66736D] text-[11px] block">Schedule Drift Delta</span>
-                <div className={`text-sm font-bold mt-0.5 ${slippageDelta > 0 ? 'text-rose-400' : slippageDelta < 0 ? 'text-emerald-400' : 'text-[#26312D]'}`}>
-                  {hasPrev
-                    ? (slippageDelta > 0 ? `+${slippageDelta} Months` : slippageDelta < 0 ? `${slippageDelta} Months` : '0 Months (Stable DOC)')
-                    : `${detail.scheduleSlippageMonths} Months`}
+              {/* 3. Monthly Disbursement Burn */}
+              <div className="bg-[#FAF8F5] p-3 rounded-lg border border-[#DDD9D0] flex flex-col justify-between">
+                <div>
+                  <span className="text-[#66736D] text-[10px] font-bold uppercase tracking-wider block">Expenditure Outflow</span>
+                  <div className="text-base font-extrabold mt-1 tabular-nums text-[#173F35]">
+                    {hasPrev
+                      ? (spendDelta > 0 ? `+₹${spendDelta.toLocaleString()} Cr` : spendDelta < 0 ? `-₹${Math.abs(spendDelta).toLocaleString()} Cr` : '₹0 Cr')
+                      : `₹${parseNum(detail.cumulativeExpenditureCr).toLocaleString()} Cr`}
+                  </div>
                 </div>
-                <span className="text-[10px] text-[#66736D]">{hasPrev ? 'Anticipated Target Shift' : 'Total Cumulative Delay'}</span>
+                <div className="text-[10px] mt-1.5 pt-1.5 border-t border-[#EAE6DF]">
+                  {hasPrev && progressDelta === 0 && spendDelta > 0 ? (
+                    <span className="text-[#B74436] font-bold flex items-center gap-1">
+                      <span>⚠️ Spend w/o Progress</span>
+                    </span>
+                  ) : hasPrev ? (
+                    <span className="text-[#66736D]">Monthly Incurred Spend</span>
+                  ) : (
+                    <span className="text-[#66736D]">Cumulative Expenditure</span>
+                  )}
+                </div>
               </div>
 
-              <div className="bg-[#FAF8F5]/70 p-2.5 rounded border border-[#DDD9D0]">
-                <span className="text-[#66736D] text-[11px] block">Risk Score Delta</span>
-                <div className={`text-sm font-bold mt-0.5 ${riskDelta > 0 ? 'text-rose-400' : riskDelta < 0 ? 'text-emerald-400' : 'text-[#26312D]'}`}>
-                  {hasPrev
-                    ? (riskDelta > 0 ? `+${riskDelta} pts (${detail.riskBand})` : riskDelta < 0 ? `${riskDelta} pts (Improving)` : '0.0 pts (Unchanged)')
-                    : `${detail.overallRiskScore.toFixed(1)} pts (${detail.riskBand})`}
+              {/* 4. Schedule Drift Delta */}
+              <div className="bg-[#FAF8F5] p-3 rounded-lg border border-[#DDD9D0] flex flex-col justify-between">
+                <div>
+                  <span className="text-[#66736D] text-[10px] font-bold uppercase tracking-wider block">Schedule Drift Delta</span>
+                  <div className={`text-base font-extrabold mt-1 tabular-nums ${
+                    slippageDelta > 0 ? 'text-[#B74436]' : slippageDelta < 0 ? 'text-[#267A69]' : 'text-[#26312D]'
+                  }`}>
+                    {hasPrev
+                      ? (slippageDelta > 0 ? `+${slippageDelta} Mo (Delayed)` : slippageDelta < 0 ? `${slippageDelta} Mo (Recovered)` : '0 Mo (Stable DOC)')
+                      : `${detail.scheduleSlippageMonths} Months`}
+                  </div>
                 </div>
-                <span className="text-[10px] text-[#66736D]">Trajectory: {detail.riskTrajectory}</span>
+                <span className="text-[10px] text-[#66736D] mt-1.5 pt-1.5 border-t border-[#EAE6DF]">
+                  {hasPrev ? 'Anticipated Target Shift' : 'Total Cumulative Delay'}
+                </span>
+              </div>
+
+              {/* 5. Risk Score Delta */}
+              <div className="bg-[#FAF8F5] p-3 rounded-lg border border-[#DDD9D0] flex flex-col justify-between">
+                <div>
+                  <span className="text-[#66736D] text-[10px] font-bold uppercase tracking-wider block">Risk Score Delta</span>
+                  <div className={`text-base font-extrabold mt-1 tabular-nums ${
+                    riskDelta > 0 ? 'text-[#B74436]' : riskDelta < 0 ? 'text-[#267A69]' : 'text-[#26312D]'
+                  }`}>
+                    {hasPrev
+                      ? (riskDelta > 0 ? `+${riskDelta} pts` : riskDelta < 0 ? `${riskDelta} pts` : '0.0 pts (Unchanged)')
+                      : `${detail.overallRiskScore.toFixed(1)} pts`}
+                  </div>
+                </div>
+                <span className="text-[10px] text-[#66736D] mt-1.5 pt-1.5 border-t border-[#EAE6DF] truncate">
+                  Band: {detail.riskBand} ({detail.riskTrajectory})
+                </span>
               </div>
             </div>
 
             {/* Contextual Intelligence Insight if Factors exist */}
-            {detail.causalFactors && detail.causalFactors.length > 0 && (
-              <div className="mt-2.5 pt-2.5 border-t border-[#DDD9D0] flex items-center justify-between text-[11px] text-[#26312D]">
-                <div className="flex items-center gap-1.5 truncate">
-                  <span className="text-amber-400 font-semibold">Active External Factor:</span>
-                  <span className="text-[#26312D] truncate">{detail.causalFactors[0].factorTitle}</span>
-                  <span className="text-[#66736D]">({detail.causalFactors[0].status})</span>
+            <div className="mt-3 pt-3 border-t border-[#EAE6DF] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              {detail.causalFactors && detail.causalFactors.length > 0 ? (
+                <div className="flex items-center gap-2 truncate min-w-0">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#F5EEDB] text-[#C89432] border border-[#DFCBB0] uppercase shrink-0">
+                    Active Bottleneck Factor
+                  </span>
+                  <span className="font-semibold text-[#26312D] truncate">
+                    {detail.causalFactors[0].factorTitle}
+                  </span>
+                  <span className="text-[10px] text-[#66736D] bg-[#FAF8F5] px-1.5 py-0.5 rounded border border-[#DDD9D0] shrink-0">
+                    ({detail.causalFactors[0].status})
+                  </span>
                 </div>
-                <button
-                  onClick={() => setActiveModalComponent('evidence_dossier')}
-                  className="text-[#267A69] hover:text-blue-300 font-medium shrink-0 ml-2 text-[10px] flex items-center gap-1"
-                >
-                  <span>View Evidence</span>
-                  <ExternalLink className="w-2.5 h-2.5" />
-                </button>
-              </div>
-            )}
+              ) : (
+                <div className="flex items-center gap-1.5 text-xs text-[#66736D]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#267A69]" />
+                  <span>No critical physical impediment or land bottleneck flagged for current reporting cycle.</span>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => setActiveModalComponent('evidence_dossier')}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#173F35] hover:text-[#267A69] transition-colors shrink-0 cursor-pointer self-end sm:self-auto"
+              >
+                <span>Inspect Evidence Dossier</span>
+                <ExternalLink className="w-3.5 h-3.5 text-[#267A69]" />
+              </button>
+            </div>
           </div>
         );
       })()}
@@ -316,13 +384,13 @@ export const ProjectIntelligence: React.FC = () => {
             </h2>
             <div className="flex items-center gap-2">
               {detail.costRevisions && detail.costRevisions.length > 0 && (
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800/80">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB]">
                   {detail.costRevisions.length} Revisions Logged
                 </span>
               )}
               <button
                 onClick={() => setActiveModalComponent('telemetry_accounting')}
-                className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+                className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
                 title="Inspect Telemetry Ledger & Revision Audit Trail"
               >
                 <span>Inspect</span>
@@ -336,7 +404,7 @@ export const ProjectIntelligence: React.FC = () => {
               <span className="text-[11px] text-[#66736D]">Physical Progress</span>
               <div className="text-lg font-bold text-[#173F35] mt-1">{detail.physicalProgressPct}%</div>
               <div className="w-full bg-[#FAF8F5] h-1.5 rounded-full mt-2 overflow-hidden">
-                <div className="bg-[#E8F0EC]0 h-full rounded-full" style={{ width: `${detail.physicalProgressPct}%` }} />
+                <div className="bg-[#267A69] h-full rounded-full" style={{ width: `${detail.physicalProgressPct}%` }} />
               </div>
             </div>
 
@@ -420,7 +488,7 @@ export const ProjectIntelligence: React.FC = () => {
               </h2>
               <button
                 onClick={() => setActiveModalComponent('health_summary')}
-                className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+                className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
                 title="Inspect Health Evaluation Methodology"
               >
                 <span>Inspect</span>
@@ -506,12 +574,12 @@ export const ProjectIntelligence: React.FC = () => {
               4. Predictive Cost Forecast (CatBoost)
             </h2>
             <div className="flex items-center gap-2">
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-950 text-[#267A69] border border-blue-800">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB]">
                 Supervised ML
               </span>
               <button
                 onClick={() => setActiveModalComponent('cost_forecast')}
-                className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+                className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
                 title="Inspect Cost Forecast Algorithm & Inputs"
               >
                 <span>Inspect</span>
@@ -554,12 +622,12 @@ export const ProjectIntelligence: React.FC = () => {
               5. Predictive Schedule Forecast (CatBoost)
             </h2>
             <div className="flex items-center gap-2">
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-950 text-[#267A69] border border-blue-800">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB]">
                 Supervised ML
               </span>
               <button
                 onClick={() => setActiveModalComponent('schedule_forecast')}
-                className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+                className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
                 title="Inspect Schedule Forecast Algorithm & Inputs"
               >
                 <span>Inspect</span>
@@ -612,7 +680,7 @@ export const ProjectIntelligence: React.FC = () => {
             </h2>
             <button
               onClick={() => setActiveModalComponent('risk_decomposition')}
-              className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+              className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
               title="Inspect Exact Risk Score Formula"
             >
               <span>Inspect</span>
@@ -656,7 +724,7 @@ export const ProjectIntelligence: React.FC = () => {
                 <span className="font-mono">{detail.progressRiskScore.toFixed(0)}</span>
               </div>
               <div className="w-full bg-[#FAF8F5] h-1.5 rounded-full overflow-hidden">
-                <div className="bg-[#E8F0EC]0 h-full rounded-full" style={{ width: `${detail.progressRiskScore}%` }} />
+                <div className="bg-[#267A69] h-full rounded-full" style={{ width: `${detail.progressRiskScore}%` }} />
               </div>
             </div>
           </div>
@@ -673,7 +741,7 @@ export const ProjectIntelligence: React.FC = () => {
             </div>
             <button
               onClick={() => setActiveModalComponent('trajectory')}
-              className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+              className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
               title="Inspect Trajectory Methodology"
             >
               <span>Inspect</span>
@@ -717,7 +785,7 @@ export const ProjectIntelligence: React.FC = () => {
             </h2>
             <button
               onClick={() => setActiveModalComponent('active_warnings')}
-              className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+              className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
               title="Inspect Warning Heuristics & Severity Rules"
             >
               <span>Inspect</span>
@@ -763,7 +831,7 @@ export const ProjectIntelligence: React.FC = () => {
             </h2>
             <button
               onClick={() => setActiveModalComponent('why_flagged')}
-              className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+              className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
               title="Inspect Detailed Flagging Reasoning"
             >
               <span>Inspect</span>
@@ -802,7 +870,7 @@ export const ProjectIntelligence: React.FC = () => {
             </h2>
             <button
               onClick={() => setActiveModalComponent('shap_drivers')}
-              className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+              className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
               title="Inspect SHAP Additive Feature Contributions"
             >
               <span>Inspect</span>
@@ -846,7 +914,7 @@ export const ProjectIntelligence: React.FC = () => {
             </h2>
             <button
               onClick={() => setActiveModalComponent('peer_benchmark')}
-              className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+              className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
               title="Inspect Peer Cohort Methodology"
             >
               <span>Inspect</span>
@@ -886,7 +954,7 @@ export const ProjectIntelligence: React.FC = () => {
             </h2>
             <button
               onClick={() => setActiveModalComponent('attention_priorities')}
-              className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+              className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
               title="Inspect Priority Assessment Criteria"
             >
               <span>Inspect</span>
@@ -913,7 +981,7 @@ export const ProjectIntelligence: React.FC = () => {
             </h2>
             <button
               onClick={() => setActiveModalComponent('recommended_interventions')}
-              className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+              className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
               title="Inspect Data-Driven Recommendation Logic"
             >
               <span>Inspect</span>
@@ -956,7 +1024,7 @@ export const ProjectIntelligence: React.FC = () => {
               </h2>
               <button
                 onClick={() => setActiveModalComponent('intervention_governance')}
-                className="text-[10px] text-[#267A69] hover:text-blue-300 flex items-center gap-1 bg-blue-950/60 hover:bg-blue-900/80 px-2 py-0.5 rounded border border-blue-800/60 transition-colors"
+                className="text-[11px] font-semibold text-[#173F35] hover:text-[#267A69] flex items-center gap-1 bg-white hover:bg-[#FAF8F5] px-2.5 py-1 rounded border border-[#DDD9D0] hover:border-[#173F35] transition-colors shadow-2xs cursor-pointer"
                 title="Inspect Intervention Governance Lifecycle"
               >
                 <span>Inspect Governance</span>
@@ -1005,7 +1073,7 @@ export const ProjectIntelligence: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 px-4 py-2.5 bg-emerald-950/80 border border-emerald-800 text-emerald-300 rounded text-xs font-semibold flex items-center gap-2">
+                <div className="flex-shrink-0 px-4 py-2.5 bg-emerald-950/80 border border-emerald-800 text-[#173F35] rounded text-xs font-semibold flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   <span>Asset Operational</span>
                 </div>
@@ -1035,7 +1103,7 @@ export const ProjectIntelligence: React.FC = () => {
 
                 <button
                   onClick={() => navigate('/early-warning')}
-                  className="flex-shrink-0 px-4 py-2.5 bg-blue-600 hover:bg-[#E8F0EC]0 text-[#173F35] rounded text-xs font-semibold flex items-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
+                  className="flex-shrink-0 px-4 py-2.5 bg-blue-600 hover:bg-[#267A69] text-[#173F35] rounded text-xs font-semibold flex items-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
                 >
                   <span>Schedule in Early Warning</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -1117,7 +1185,7 @@ const EvaluationModal: React.FC<EvaluationModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-white/60 backdrop-blur-sm animate-fadeIn"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-xs animate-fadeIn"
       onClick={onClose}
     >
       <div 
@@ -1130,7 +1198,7 @@ const EvaluationModal: React.FC<EvaluationModalProps> = ({
             {componentKey === 'evidence_dossier' ? (
               <>
                 <Globe className="w-4 h-4 text-emerald-400" />
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#173F35]">
                   Project Evidence Dossier & Non-CUF Provenance
                 </span>
               </>
@@ -1377,9 +1445,9 @@ function renderEvaluationDetails(
           <div className="bg-[#FAF8F5] p-4 rounded-lg border border-[#DDD9D0] space-y-2">
             <span className="text-xs font-bold text-[#267A69] uppercase tracking-wider">Evaluation Methodology</span>
             <p className="text-xs leading-relaxed text-[#26312D]">
-              Implementation Health is evaluated independently of trajectory to reflect absolute distress severity: <strong className="text-rose-400">CRITICAL DISTRESS</strong> (Risk &ge; 70.0 or budget exhausted with physical milestones incomplete), <strong className="text-amber-400">HIGH RISK / VULNERABLE</strong> (50.0–69.9), <strong className="text-yellow-400">MODERATE / WATCHLIST</strong> (25.0–49.9), or <strong className="text-emerald-400">HEALTHY / ON TRACK</strong> (&lt; 25.0). Completed projects are tagged <strong className="text-emerald-300">COMPLETED & COMMISSIONED</strong>.
+              Implementation Health is evaluated independently of trajectory to reflect absolute distress severity: <strong className="text-rose-400">CRITICAL DISTRESS</strong> (Risk &ge; 70.0 or budget exhausted with physical milestones incomplete), <strong className="text-amber-400">HIGH RISK / VULNERABLE</strong> (50.0–69.9), <strong className="text-yellow-400">MODERATE / WATCHLIST</strong> (25.0–49.9), or <strong className="text-emerald-400">HEALTHY / ON TRACK</strong> (&lt; 25.0). Completed projects are tagged <strong className="text-[#173F35]">COMPLETED & COMMISSIONED</strong>.
             </p>
-            <p className="text-xs leading-relaxed text-[#66736D] pt-1 border-t border-slate-900">
+            <p className="text-xs leading-relaxed text-[#66736D] pt-1 border-t border-[#DDD9D0]">
               <strong className="text-[#26312D]">Risk Trajectory</strong> monitors momentum: projects stalled at high risk without progress are classified as <strong className="text-rose-300">Chronic Stagnation</strong>, preventing severe distress projects from erroneously appearing benign or "Stable".
             </p>
           </div>
@@ -1413,7 +1481,7 @@ function renderEvaluationDetails(
                 </div>
               ))}
               {detail.positiveSignals.map((s, i) => (
-                <div key={i} className="p-2.5 rounded bg-emerald-950/20 border border-emerald-900/50 text-emerald-300 flex items-start gap-2">
+                <div key={i} className="p-2.5 rounded bg-emerald-950/20 border border-emerald-900/50 text-[#173F35] flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-400 mt-0.5" />
                   <span><strong>Mitigating Factor:</strong> {s}</span>
                 </div>
@@ -1438,7 +1506,7 @@ function renderEvaluationDetails(
 
           <div className="bg-[#FAF8F5] p-4 rounded-lg border border-[#DDD9D0] space-y-2">
             <span className="text-xs font-bold text-[#267A69] uppercase tracking-wider">Algorithmic Formulation</span>
-            <pre className="text-[11px] font-mono bg-white p-2.5 rounded text-amber-300 overflow-x-auto">
+            <pre className="text-[11px] font-mono bg-white p-2.5 rounded text-[#C89432] overflow-x-auto">
               Predicted Final Cost = RevisedCost + f_CatBoost(ExpenditureVelocity, TimeElapsedRatio, SectorEscalationRate, ApprovedCostTier)
             </pre>
             <p className="text-xs leading-relaxed text-[#26312D]">
@@ -1497,7 +1565,7 @@ function renderEvaluationDetails(
 
           <div className="bg-[#FAF8F5] p-4 rounded-lg border border-[#DDD9D0] space-y-2">
             <span className="text-xs font-bold text-[#267A69] uppercase tracking-wider">Algorithmic Formulation</span>
-            <pre className="text-[11px] font-mono bg-white p-2.5 rounded text-amber-300 overflow-x-auto">
+            <pre className="text-[11px] font-mono bg-white p-2.5 rounded text-[#C89432] overflow-x-auto">
               Predicted Delay Months = g_CatBoost(TimeElapsedMonths, RemainingProgressPct, ExecutionVelocity3M, StateClearanceIndex)
             </pre>
             <p className="text-xs leading-relaxed text-[#26312D]">
@@ -1860,7 +1928,7 @@ function renderEvaluationDetails(
                 )}
 
                 {rec.expected_impact && (
-                  <div className="p-2.5 rounded bg-emerald-950/30 border border-emerald-900/50 text-[11px] text-emerald-300">
+                  <div className="p-2.5 rounded bg-emerald-950/30 border border-emerald-900/50 text-[11px] text-[#173F35]">
                     <strong>Expected Governance Impact:</strong> {rec.expected_impact}
                   </div>
                 )}
@@ -1875,7 +1943,7 @@ function renderEvaluationDetails(
           <div className="pt-2">
             <button
               onClick={onNavigateEarlyWarning}
-              className="w-full py-2.5 bg-blue-600 hover:bg-[#E8F0EC]0 text-[#173F35] rounded text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
+              className="w-full py-2.5 bg-blue-600 hover:bg-[#267A69] text-[#173F35] rounded text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
             >
               <span>Review & Schedule in Early Warning Dashboard</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -1942,7 +2010,7 @@ function renderEvaluationDetails(
 
           <button
             onClick={onNavigateEarlyWarning}
-            className="w-full py-2.5 bg-blue-600 hover:bg-[#E8F0EC]0 text-[#173F35] rounded text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
+            className="w-full py-2.5 bg-blue-600 hover:bg-[#267A69] text-[#173F35] rounded text-xs font-semibold flex items-center justify-center gap-2 transition-colors shadow-lg shadow-blue-900/30"
           >
             <span>Open Early Warning Dashboard to Manage Interventions</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -1987,7 +2055,7 @@ function renderEvaluationDetails(
                       <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${
                         detail.researchSummary.status === 'COMPLETED' 
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                          : 'bg-amber-950 text-amber-300 border border-amber-800'
+                          : 'bg-amber-950 text-[#C89432] border border-amber-800'
                       }`}>
                         {detail.researchSummary.status}
                       </span>
@@ -2026,7 +2094,7 @@ function renderEvaluationDetails(
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                   <div className="bg-white/60 p-2.5 rounded border border-[#DDD9D0] flex items-center justify-between">
                     <span className="text-[#66736D]">Data Confidence (Primary Telemetry):</span>
-                    <span className="font-bold text-[#267A69] bg-blue-950/60 px-2 py-0.5 rounded border border-blue-900/60">
+                    <span className="font-bold text-[#267A69] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#DDD9D0]">
                       {detail.researchSummary.dataConfidence}
                     </span>
                   </div>
@@ -2063,7 +2131,7 @@ function renderEvaluationDetails(
                   <div className="p-3.5 bg-[#FAF8F5] rounded-lg border border-[#DDD9D0] space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-[#26312D]">Forecast Alignment Status:</span>
-                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-800">
+                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#E8F0EC] text-[#173F35] border border-[#BED6CB]">
                         {detail.evidenceOutlook.forecastConcern.replace(/_/g, ' ')}
                       </span>
                     </div>
@@ -2074,7 +2142,7 @@ function renderEvaluationDetails(
                     {detail.evidenceOutlook.unresolvedRisks && detail.evidenceOutlook.unresolvedRisks.length > 0 && (
                       <div className="mt-2 pt-2 border-t border-[#DDD9D0]">
                         <span className="text-[11px] font-bold text-rose-400 block mb-1">Active Critical Path Bottlenecks:</span>
-                        <ul className="list-disc list-inside space-y-1 text-xs text-rose-300/90">
+                        <ul className="list-disc list-inside space-y-1 text-xs text-[#B74436]">
                           {detail.evidenceOutlook.unresolvedRisks.map((risk, rIdx) => (
                             <li key={rIdx} className="leading-relaxed">{risk}</li>
                           ))}
@@ -2098,7 +2166,7 @@ function renderEvaluationDetails(
                       <div key={fIdx} className="p-3.5 bg-[#FAF8F5] rounded-lg border border-[#DDD9D0] text-xs space-y-2">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FAF8F5] text-amber-300 uppercase tracking-wider">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FAF8F5] text-[#C89432] uppercase tracking-wider">
                               {factor.category}
                             </span>
                             <span className="font-bold text-[#173F35] text-xs">{factor.factorTitle}</span>
@@ -2132,7 +2200,7 @@ function renderEvaluationDetails(
                             </div>
                           )}
                           {factor.unresolvedDetail && (
-                            <div className="sm:col-span-2 text-amber-300/90">
+                            <div className="sm:col-span-2 text-[#C89432]">
                               <strong>Unresolved Condition:</strong> {factor.unresolvedDetail}
                             </div>
                           )}
@@ -2170,7 +2238,7 @@ function renderEvaluationDetails(
 
                         {claim.quantitativeSignal && (
                           <div className="text-[11px] text-[#66736D]">
-                            <strong>Corroborates Quantitative Telemetry:</strong> <span className="text-amber-300">{claim.quantitativeSignal}</span>
+                            <strong>Corroborates Quantitative Telemetry:</strong> <span className="text-[#C89432]">{claim.quantitativeSignal}</span>
                           </div>
                         )}
 

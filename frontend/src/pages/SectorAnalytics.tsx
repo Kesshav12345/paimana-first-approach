@@ -667,7 +667,7 @@ export const SectorAnalytics: React.FC = () => {
                         <p className="text-xs text-[#8C9893]">Broaden your filters or reset to national comparison.</p>
                         <button
                           onClick={handleReset}
-                          className="mt-2 px-3 py-1.5 bg-[#173F35] hover:bg-[#E8F0EC]0 text-white rounded text-xs font-semibold"
+                          className="mt-2 px-3 py-1.5 bg-[#173F35] hover:bg-[#267A69] text-white rounded text-xs font-semibold"
                         >
                           Reset Filters
                         </button>
@@ -703,7 +703,7 @@ export const SectorAnalytics: React.FC = () => {
                         <td className="px-4 py-3 text-center">
                           <button
                             onClick={() => handleSelectSector(s.sectorName)}
-                            className="px-3 py-1 bg-[#173F35] hover:bg-[#E8F0EC]0 text-white rounded text-[11px] font-semibold transition flex items-center gap-1 mx-auto shadow-2xs"
+                            className="px-3 py-1 bg-[#173F35] hover:bg-[#267A69] text-white rounded text-[11px] font-semibold transition flex items-center gap-1 mx-auto shadow-2xs"
                           >
                             Explore <ChevronRight className="w-3 h-3" />
                           </button>

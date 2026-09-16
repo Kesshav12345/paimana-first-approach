@@ -852,8 +852,8 @@ export const Projects: React.FC = () => {
                       <div className="w-20 ml-auto bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden">
                         <div 
                           className={`h-1.5 rounded-full ${
-                            p.physicalProgressPct >= 75 ? 'bg-emerald-500' :
-                            p.physicalProgressPct >= 40 ? 'bg-[#E8F0EC]0' : 'bg-[#F5EEDB]0'
+                            p.physicalProgressPct >= 75 ? 'bg-[#267A69]' :
+                            p.physicalProgressPct >= 40 ? 'bg-[#519E8F]' : 'bg-[#C89432]'
                           }`}
                           style={{ width: `${Math.min(100, Math.max(0, p.physicalProgressPct))}%` }}
                         />
