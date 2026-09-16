@@ -15,7 +15,7 @@ import { Methodology } from './pages/Methodology';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-[#F5F7FA] text-[#172B4D] antialiased selection:bg-[#1877C9] selection:text-white">
+      <div className="min-h-screen flex flex-col bg-[#F6F3EC] text-[#26312D] antialiased selection:bg-[#267A69] selection:text-white">
         {/* National Government Masthead */}
         <GovernmentHeader />
         
@@ -38,11 +38,11 @@ function App() {
             {/* 404 Fallback */}
             <Route path="*" element={
               <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-8">
-                <h1 className="text-4xl font-extrabold text-[#0B2945]">404</h1>
-                <p className="text-slate-600 mt-2 text-sm">The requested dashboard or project view was not found.</p>
+                <h1 className="text-4xl font-extrabold text-[#173F35]">404</h1>
+                <p className="text-[#66736D] mt-2 text-sm">The requested dashboard or project view was not found.</p>
                 <a
                   href="/"
-                  className="mt-4 px-4 py-2 bg-[#1877C9] text-white rounded-lg text-xs font-semibold hover:bg-[#123B63] transition-colors shadow-xs"
+                  className="mt-4 px-4 py-2 bg-[#173F35] text-white rounded-lg text-xs font-semibold hover:bg-[#267A69] transition-colors shadow-xs"
                 >
                   Return to National Overview
                 </a>

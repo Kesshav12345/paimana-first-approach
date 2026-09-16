@@ -7,18 +7,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        gov: {
-          navy: "#123B63",
-          deep: "#0B2945",
-          blue: "#1877C9",
-          saffron: "#F59E0B",
-          green: "#16804B",
-          critical: "#C62828",
+        atlas: {
+          canvas: "#F6F3EC",
           surface: "#FFFFFF",
-          bg: "#F5F7FA",
-          text: "#172B4D",
-          muted: "#64748B",
-          border: "#D9E1EA",
+          surfaceSubtle: "#FAF8F5",
+          forestDeep: "#173F35",
+          forest: "#267A69",
+          forestLight: "#E8F0EC",
+          charcoal: "#26312D",
+          secondary: "#66736D",
+          muted: "#8C9893",
+          ochre: "#C89432",
+          ochreSoft: "#F5EEDB",
+          terracotta: "#B74436",
+          terracottaSoft: "#F5E7E4",
+          border: "#DDD9D0",
+          borderSubtle: "#EAE6DF",
         }
       },
       fontFamily: {

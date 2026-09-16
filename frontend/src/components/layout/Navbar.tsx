@@ -43,8 +43,8 @@ export const Navbar: React.FC = () => {
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold tracking-wide transition-all ${
       isActive
-        ? 'bg-[#1877C9] text-white shadow-xs'
-        : 'text-slate-200 hover:text-white hover:bg-[#123B63]'
+        ? 'bg-[#267A69] text-white shadow-xs'
+        : 'text-[#E8F0EC] hover:text-white hover:bg-[#1E5246]'
     }`;
 
   const isExploreActive = ['/projects', '/sectors', '/ministries', '/states'].some(p => 
@@ -52,7 +52,7 @@ export const Navbar: React.FC = () => {
   );
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#0B2945] border-b border-[#123B63] shadow-sm">
+    <nav className="sticky top-0 z-50 bg-[#173F35] border-b border-[#1F4E42] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-13">
           
@@ -67,7 +67,7 @@ export const Navbar: React.FC = () => {
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-1">
               
-              {/* Explore Dropdown */}
+              {/* Explore Portfolio Dropdown */}
               <div className="relative">
                 <button
                   type="button"
@@ -75,11 +75,11 @@ export const Navbar: React.FC = () => {
                   onMouseEnter={() => setExploreOpen(true)}
                   className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold tracking-wide transition-all ${
                     isExploreActive
-                      ? 'bg-[#123B63] text-white ring-1 ring-[#1877C9]'
-                      : 'text-slate-200 hover:text-white hover:bg-[#123B63]'
+                      ? 'bg-[#1E5246] text-white ring-1 ring-[#267A69]'
+                      : 'text-[#E8F0EC] hover:text-white hover:bg-[#1E5246]'
                   }`}
                 >
-                  <FolderKanban className="w-3.5 h-3.5 text-blue-300" />
+                  <FolderKanban className="w-3.5 h-3.5 text-[#C89432]" />
                   <span>Explore Portfolio</span>
                   <ChevronDown className={`w-3 h-3 transition-transform ${exploreOpen ? 'rotate-180' : ''}`} />
                 </button>
@@ -87,65 +87,65 @@ export const Navbar: React.FC = () => {
                 {exploreOpen && (
                   <div 
                     onMouseLeave={() => setExploreOpen(false)}
-                    className="absolute left-0 mt-1 w-52 bg-[#0B2945] border border-[#123B63] rounded-lg shadow-xl py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                    className="absolute left-0 mt-1 w-56 bg-[#173F35] border border-[#1F4E42] rounded-lg shadow-xl py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
                   >
                     <NavLink
                       to="/projects"
                       className={({ isActive }) =>
-                        `flex items-center gap-2 px-3 py-2 text-xs font-medium ${
-                          isActive ? 'bg-[#1877C9] text-white' : 'text-slate-200 hover:bg-[#123B63] hover:text-white'
+                        `flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium ${
+                          isActive ? 'bg-[#267A69] text-white' : 'text-[#E8F0EC] hover:bg-[#1E5246] hover:text-white'
                         }`
                       }
                     >
-                      <FolderKanban className="w-3.5 h-3.5 text-blue-400" />
+                      <FolderKanban className="w-3.5 h-3.5 text-[#C89432]" />
                       <div>
-                        <div className="font-semibold">All Projects</div>
-                        <div className="text-[10px] text-slate-300">Multi-attribute query engine</div>
+                        <div className="font-semibold">Central Projects</div>
+                        <div className="text-[10px] text-[#A3B8B0]">Multi-attribute query engine</div>
                       </div>
                     </NavLink>
 
                     <NavLink
                       to="/sectors"
                       className={({ isActive }) =>
-                        `flex items-center gap-2 px-3 py-2 text-xs font-medium ${
-                          isActive ? 'bg-[#1877C9] text-white' : 'text-slate-200 hover:bg-[#123B63] hover:text-white'
+                        `flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium ${
+                          isActive ? 'bg-[#267A69] text-white' : 'text-[#E8F0EC] hover:bg-[#1E5246] hover:text-white'
                         }`
                       }
                     >
-                      <Layers className="w-3.5 h-3.5 text-cyan-400" />
+                      <Layers className="w-3.5 h-3.5 text-[#6BB8A6]" />
                       <div>
-                        <div className="font-semibold">Sectors</div>
-                        <div className="text-[10px] text-slate-300">12 Infrastructure sectors</div>
+                        <div className="font-semibold">Sector Intelligence</div>
+                        <div className="text-[10px] text-[#A3B8B0]">12 Infrastructure sectors</div>
                       </div>
                     </NavLink>
 
                     <NavLink
                       to="/ministries"
                       className={({ isActive }) =>
-                        `flex items-center gap-2 px-3 py-2 text-xs font-medium ${
-                          isActive ? 'bg-[#1877C9] text-white' : 'text-slate-200 hover:bg-[#123B63] hover:text-white'
+                        `flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium ${
+                          isActive ? 'bg-[#267A69] text-white' : 'text-[#E8F0EC] hover:bg-[#1E5246] hover:text-white'
                         }`
                       }
                     >
-                      <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                      <Building2 className="w-3.5 h-3.5 text-[#E5B8B2]" />
                       <div>
                         <div className="font-semibold">Ministries & Agencies</div>
-                        <div className="text-[10px] text-slate-300">Line ministries & PSUs</div>
+                        <div className="text-[10px] text-[#A3B8B0]">Implementing line ministries</div>
                       </div>
                     </NavLink>
 
                     <NavLink
                       to="/states"
                       className={({ isActive }) =>
-                        `flex items-center gap-2 px-3 py-2 text-xs font-medium ${
-                          isActive ? 'bg-[#1877C9] text-white' : 'text-slate-200 hover:bg-[#123B63] hover:text-white'
+                        `flex items-center gap-2.5 px-3.5 py-2 text-xs font-medium ${
+                          isActive ? 'bg-[#267A69] text-white' : 'text-[#E8F0EC] hover:bg-[#1E5246] hover:text-white'
                         }`
                       }
                     >
-                      <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                      <MapPin className="w-3.5 h-3.5 text-[#DFCBB0]" />
                       <div>
                         <div className="font-semibold">States & UTs</div>
-                        <div className="text-[10px] text-slate-300">Geographic investments</div>
+                        <div className="text-[10px] text-[#A3B8B0]">Geographic density & clusters</div>
                       </div>
                     </NavLink>
                   </div>
@@ -154,19 +154,19 @@ export const Navbar: React.FC = () => {
 
               {/* Intelligence Section */}
               <NavLink to="/early-warning" className={navLinkClass}>
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                <AlertTriangle className="w-3.5 h-3.5 text-[#C89432]" />
                 <span>Early Warning Center</span>
               </NavLink>
 
               {/* Operations */}
               <NavLink to="/operations" className={navLinkClass}>
-                <Database className="w-3.5 h-3.5 text-emerald-400" />
+                <Database className="w-3.5 h-3.5 text-[#6BB8A6]" />
                 <span>Operations</span>
               </NavLink>
 
               {/* Technical Methodology */}
               <NavLink to="/methodology" className={navLinkClass}>
-                <BookOpen className="w-3.5 h-3.5 text-sky-300" />
+                <BookOpen className="w-3.5 h-3.5 text-[#DFCBB0]" />
                 <span>Methodology</span>
               </NavLink>
 
@@ -175,22 +175,23 @@ export const Navbar: React.FC = () => {
 
           {/* Right: Dynamic Reporting Cycle & System Health */}
           <div className="hidden lg:flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs text-slate-300 bg-[#123B63]/70 px-3 py-1.5 rounded-full border border-slate-700/60">
-              <Activity className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-[11px]">Reporting Cycle:</span>
-              <strong className="text-white font-semibold">{reportingCycle}</strong>
+            <div className="flex items-center gap-2 text-xs text-[#E8F0EC] bg-[#1E5246] px-3 py-1.5 rounded-full border border-[#276657]">
+              <Activity className="w-3.5 h-3.5 text-[#C89432]" />
+              <span className="text-[11px] text-[#A3B8B0]">Reporting Cycle:</span>
+              <strong className="text-white font-semibold tabular-nums">{reportingCycle}</strong>
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span className="font-medium">System Online</span>
+            <div className="flex items-center gap-1.5 text-[11px] text-[#86EFAC]">
+              <span className="w-2 h-2 rounded-full bg-[#86EFAC]" />
+              <span className="font-medium">System Active</span>
             </div>
           </div>
 
           {/* Mobile Menu Toggle Button */}
           <div className="flex md:hidden items-center">
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-md text-slate-300 hover:text-white hover:bg-[#123B63]"
+              className="p-1.5 rounded-md text-[#E8F0EC] hover:text-white hover:bg-[#1E5246]"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -202,46 +203,46 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0B2945] border-t border-[#123B63] px-4 pt-2 pb-4 space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1">
-            Navigation
+        <div className="md:hidden bg-[#173F35] border-t border-[#1F4E42] px-4 pt-2 pb-4 space-y-1 animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="text-[10px] font-bold text-[#A3B8B0] uppercase tracking-wider px-3 py-1">
+            National Portals
           </div>
           <NavLink to="/" end className={navLinkClass}>
             <BarChart3 className="w-4 h-4" />
             <span>Overview</span>
           </NavLink>
           <NavLink to="/projects" className={navLinkClass}>
-            <FolderKanban className="w-4 h-4 text-blue-400" />
-            <span>All Projects</span>
+            <FolderKanban className="w-4 h-4 text-[#C89432]" />
+            <span>Central Projects Registry</span>
           </NavLink>
           <NavLink to="/sectors" className={navLinkClass}>
-            <Layers className="w-4 h-4 text-cyan-400" />
-            <span>Sector Analytics</span>
+            <Layers className="w-4 h-4 text-[#6BB8A6]" />
+            <span>Sector Intelligence</span>
           </NavLink>
           <NavLink to="/ministries" className={navLinkClass}>
-            <Building2 className="w-4 h-4 text-indigo-400" />
+            <Building2 className="w-4 h-4 text-[#E5B8B2]" />
             <span>Ministry Analytics</span>
           </NavLink>
           <NavLink to="/states" className={navLinkClass}>
-            <MapPin className="w-4 h-4 text-emerald-400" />
+            <MapPin className="w-4 h-4 text-[#DFCBB0]" />
             <span>State Analytics</span>
           </NavLink>
           <NavLink to="/early-warning" className={navLinkClass}>
-            <AlertTriangle className="w-4 h-4 text-amber-400" />
-            <span>Early Warning Center</span>
+            <AlertTriangle className="w-4 h-4 text-[#C89432]" />
+            <span>Early Warning & Intervention</span>
           </NavLink>
           <NavLink to="/operations" className={navLinkClass}>
-            <Database className="w-4 h-4 text-emerald-400" />
-            <span>Operations</span>
+            <Database className="w-4 h-4 text-[#6BB8A6]" />
+            <span>Operations & MLOps</span>
           </NavLink>
           <NavLink to="/methodology" className={navLinkClass}>
-            <BookOpen className="w-4 h-4 text-sky-300" />
+            <BookOpen className="w-4 h-4 text-[#DFCBB0]" />
             <span>Technical Methodology</span>
           </NavLink>
 
-          <div className="pt-3 border-t border-[#123B63] mt-2 text-xs text-slate-300 flex items-center justify-between px-3">
-            <span>Reporting Cycle:</span>
-            <span className="font-semibold text-white">{reportingCycle}</span>
+          <div className="pt-3 border-t border-[#1F4E42] mt-2 text-xs text-[#E8F0EC] flex items-center justify-between px-3">
+            <span className="text-[#A3B8B0]">Cycle:</span>
+            <span className="font-semibold text-white tabular-nums">{reportingCycle}</span>
           </div>
         </div>
       )}

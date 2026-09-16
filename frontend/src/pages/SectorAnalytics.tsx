@@ -287,13 +287,13 @@ export const SectorAnalytics: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DDD9D0] pb-4">
         <div>
-          <div className="flex items-center gap-2 text-blue-600 font-semibold text-xs uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 text-[#267A69] font-semibold text-xs uppercase tracking-wider mb-1">
             {selectedSector ? (
               <button
                 onClick={() => { setSelectedSector(null); setSelectedState(null); syncUrl(appliedFilters, null, null); }}
-                className="flex items-center gap-1 hover:underline text-slate-500 hover:text-blue-600"
+                className="flex items-center gap-1 hover:underline text-[#66736D] hover:text-[#267A69]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to Sector Overview
               </button>
@@ -304,10 +304,10 @@ export const SectorAnalytics: React.FC = () => {
               </>
             )}
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-extrabold text-[#173F35] tracking-tight">
             {selectedSector ? `${selectedSector} Detailed Analytics` : 'Infrastructure Sector Comparison & Analytics'}
           </h1>
-          <p className="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
+          <p className="text-xs text-[#66736D] mt-1 max-w-3xl leading-relaxed">
             {selectedSector
               ? `State-wise performance breakdown, capital burn, and project execution drill-down for ${selectedSector}.`
               : 'Comparative pictorial and tabular intelligence across central infrastructure sectors. Filter by state, ministry, and risk criteria to evaluate capital allocation and delivery.'}
@@ -315,8 +315,8 @@ export const SectorAnalytics: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+          <div className="px-3 py-1.5 rounded-lg bg-[#E8F0EC] border border-[#BED6CB] text-[#173F35] text-xs font-semibold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#173F35] animate-pulse" />
             <span>{sectors.length} Sectors Active</span>
           </div>
         </div>
@@ -445,53 +445,53 @@ export const SectorAnalytics: React.FC = () => {
 
           {/* Filtered KPI Summary Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-slate-500">Filtered Projects</p>
-              <p className="text-lg font-bold text-slate-900 mt-0.5">{kpi.totalProjects.toLocaleString()}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">{kpi.sectorsCount} Sectors Active</p>
+            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66736D]">Filtered Projects</p>
+              <p className="text-lg font-bold text-[#173F35] mt-0.5">{kpi.totalProjects.toLocaleString()}</p>
+              <p className="text-[10px] text-[#8C9893] mt-0.5">{kpi.sectorsCount} Sectors Active</p>
             </div>
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-slate-500">Revised Outlay</p>
-              <p className="text-lg font-bold text-slate-900 mt-0.5">₹{Math.round(kpi.totalRevisedCost).toLocaleString()}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Cr Capital Exposure</p>
+            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66736D]">Revised Outlay</p>
+              <p className="text-lg font-bold text-[#173F35] mt-0.5">₹{Math.round(kpi.totalRevisedCost).toLocaleString()}</p>
+              <p className="text-[10px] text-[#8C9893] mt-0.5">Cr Capital Exposure</p>
             </div>
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-slate-500">Expenditure</p>
-              <p className="text-lg font-bold text-blue-600 mt-0.5">₹{Math.round(kpi.totalSpend).toLocaleString()}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Cr Cumulative Burn</p>
+            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66736D]">Expenditure</p>
+              <p className="text-lg font-bold text-[#267A69] mt-0.5">₹{Math.round(kpi.totalSpend).toLocaleString()}</p>
+              <p className="text-[10px] text-[#8C9893] mt-0.5">Cr Cumulative Burn</p>
             </div>
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-slate-500">Weighted Escalation</p>
-              <p className={`text-lg font-bold mt-0.5 ${kpi.portfolioCostEscalation > 15 ? 'text-amber-600' : 'text-slate-900'}`}>
+            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66736D]">Weighted Escalation</p>
+              <p className={`text-lg font-bold mt-0.5 ${kpi.portfolioCostEscalation > 15 ? 'text-amber-600' : 'text-[#173F35]'}`}>
                 +{kpi.portfolioCostEscalation.toFixed(1)}%
               </p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Cost Growth vs Sanction</p>
+              <p className="text-[10px] text-[#8C9893] mt-0.5">Cost Growth vs Sanction</p>
             </div>
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-slate-500">Average Delay</p>
-              <p className={`text-lg font-bold mt-0.5 ${kpi.avgDelay > 12 ? 'text-orange-600' : 'text-slate-900'}`}>
+            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66736D]">Average Delay</p>
+              <p className={`text-lg font-bold mt-0.5 ${kpi.avgDelay > 12 ? 'text-orange-600' : 'text-[#173F35]'}`}>
                 {kpi.avgDelay.toFixed(1)} Mo
               </p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Weighted Slippage</p>
+              <p className="text-[10px] text-[#8C9893] mt-0.5">Weighted Slippage</p>
             </div>
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-slate-500">High / Critical Risk</p>
+            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66736D]">High / Critical Risk</p>
               <p className="text-lg font-bold text-rose-600 mt-0.5">{kpi.totalHighCritical.toLocaleString()}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Flagged Projects</p>
+              <p className="text-[10px] text-[#8C9893] mt-0.5">Flagged Projects</p>
             </div>
-            <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-slate-500">Active Warnings</p>
+            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66736D]">Active Warnings</p>
               <p className="text-lg font-bold text-amber-500 mt-0.5">{kpi.totalWarnings.toLocaleString()}</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Rule Anomaly Signals</p>
+              <p className="text-[10px] text-[#8C9893] mt-0.5">Rule Anomaly Signals</p>
             </div>
           </div>
 
           {/* Context statement */}
-          <div className="flex items-center justify-between text-xs text-slate-500 px-1">
+          <div className="flex items-center justify-between text-xs text-[#66736D] px-1">
             <span>
-              Comparing <strong className="text-slate-800">{sectors.length} sectors</strong> across <strong className="text-slate-800">{kpi.totalProjects.toLocaleString()} projects</strong> matching applied analytical scope.
+              Comparing <strong className="text-[#26312D]">{sectors.length} sectors</strong> across <strong className="text-[#26312D]">{kpi.totalProjects.toLocaleString()} projects</strong> matching applied analytical scope.
             </span>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-[#8C9893]">
               Click any sector row or bar to inspect state breakdown & project cohort
             </span>
           </div>
@@ -507,11 +507,11 @@ export const SectorAnalytics: React.FC = () => {
           )}
 
           {/* Graphical Pictorial Comparison Tabs */}
-          <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
-            <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+          <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-2xs overflow-hidden">
+            <div className="p-4 border-b border-[#DDD9D0] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FAF8F5]/50">
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                <BarChart3 className="w-4 h-4 text-[#267A69]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#26312D]">
                   Sector Comparative Visual Analytics
                 </span>
               </div>
@@ -521,7 +521,7 @@ export const SectorAnalytics: React.FC = () => {
                 <button
                   onClick={() => setActiveChartTab('CAPITAL')}
                   className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'CAPITAL' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    activeChartTab === 'CAPITAL' ? 'bg-white text-[#173F35] shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
                   }`}
                 >
                   Capital & Delivery
@@ -529,7 +529,7 @@ export const SectorAnalytics: React.FC = () => {
                 <button
                   onClick={() => setActiveChartTab('COST_DELAY')}
                   className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'COST_DELAY' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    activeChartTab === 'COST_DELAY' ? 'bg-white text-[#173F35] shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
                   }`}
                 >
                   Cost vs Schedule Delay
@@ -537,7 +537,7 @@ export const SectorAnalytics: React.FC = () => {
                 <button
                   onClick={() => setActiveChartTab('RISK')}
                   className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'RISK' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    activeChartTab === 'RISK' ? 'bg-white text-[#173F35] shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
                   }`}
                 >
                   Risk Concentration & Alerts
@@ -545,7 +545,7 @@ export const SectorAnalytics: React.FC = () => {
                 <button
                   onClick={() => setActiveChartTab('PROGRESS')}
                   className={`px-3 py-1.5 rounded-md font-medium transition ${
-                    activeChartTab === 'PROGRESS' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    activeChartTab === 'PROGRESS' ? 'bg-white text-[#173F35] shadow-xs' : 'text-[#66736D] hover:text-[#173F35]'
                   }`}
                 >
                   Execution Progress
@@ -555,11 +555,11 @@ export const SectorAnalytics: React.FC = () => {
 
             <div className="p-4 sm:p-6 h-[380px]">
               {loading ? (
-                <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                <div className="h-full flex items-center justify-center text-xs text-[#8C9893]">
                   Recomputing visual comparison across sectors...
                 </div>
               ) : sectors.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-xs text-slate-400">
+                <div className="h-full flex items-center justify-center text-xs text-[#8C9893]">
                   No sectors match the selected criteria.
                 </div>
               ) : (
@@ -626,19 +626,19 @@ export const SectorAnalytics: React.FC = () => {
           </div>
 
           {/* Numerical Sector Comparison Table */}
-          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-            <div className="p-4 border-b border-slate-200 bg-slate-50/70 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+          <div className="bg-white border border-[#DDD9D0] rounded-xl overflow-hidden shadow-2xs">
+            <div className="p-4 border-b border-[#DDD9D0] bg-[#FAF8F5]/70 flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#26312D]">
                 Detailed Sector Portfolio Comparison ({sectors.length})
               </span>
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-[#66736D]">
                 Ordered by {appliedFilters.sortBy === 'cost' ? 'Revised Outlay' : appliedFilters.sortBy}
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-700">
-                <thead className="bg-slate-100/70 border-b border-slate-200 uppercase text-[11px] font-semibold text-slate-500">
+              <table className="w-full text-left text-xs text-[#26312D]">
+                <thead className="bg-[#FAF8F5]/70 border-b border-[#DDD9D0] uppercase text-[11px] font-semibold text-[#66736D]">
                   <tr>
                     <th className="px-4 py-3">Sector Name</th>
                     <th className="px-4 py-3 text-right">Projects</th>
@@ -656,18 +656,18 @@ export const SectorAnalytics: React.FC = () => {
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={11} className="text-center py-12 text-slate-400">
+                      <td colSpan={11} className="text-center py-12 text-[#8C9893]">
                         Querying sector portfolio cohort...
                       </td>
                     </tr>
                   ) : sectors.length === 0 ? (
                     <tr>
                       <td colSpan={11} className="text-center py-12 space-y-2">
-                        <p className="text-sm font-medium text-slate-600">No sectors contain projects matching the selected scope.</p>
-                        <p className="text-xs text-slate-400">Broaden your filters or reset to national comparison.</p>
+                        <p className="text-sm font-medium text-[#66736D]">No sectors contain projects matching the selected scope.</p>
+                        <p className="text-xs text-[#8C9893]">Broaden your filters or reset to national comparison.</p>
                         <button
                           onClick={handleReset}
-                          className="mt-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold"
+                          className="mt-2 px-3 py-1.5 bg-[#173F35] hover:bg-[#E8F0EC]0 text-white rounded text-xs font-semibold"
                         >
                           Reset Filters
                         </button>
@@ -675,27 +675,27 @@ export const SectorAnalytics: React.FC = () => {
                     </tr>
                   ) : (
                     sectors.map((s) => (
-                      <tr key={s.sectorName} className="hover:bg-blue-50/40 transition">
-                        <td className="px-4 py-3 font-semibold text-slate-900 max-w-sm truncate" title={s.sectorName}>
+                      <tr key={s.sectorName} className="hover:bg-[#E8F0EC]/40 transition">
+                        <td className="px-4 py-3 font-semibold text-[#173F35] max-w-sm truncate" title={s.sectorName}>
                           {s.sectorName}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-700">{s.projectCount.toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right font-mono text-slate-500">₹{Math.round(s.totalOriginalCostCr).toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right font-mono font-semibold text-slate-900">₹{Math.round(s.totalRevisedCostCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono text-[#26312D]">{s.projectCount.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono text-[#66736D]">₹{Math.round(s.totalOriginalCostCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-[#173F35]">₹{Math.round(s.totalRevisedCostCr).toLocaleString()}</td>
                         <td className="px-4 py-3 text-right font-mono">
-                          <span className={s.weightedCostEscalationPct > 15 ? 'text-amber-600 font-semibold' : 'text-slate-600'}>
+                          <span className={s.weightedCostEscalationPct > 15 ? 'text-amber-600 font-semibold' : 'text-[#66736D]'}>
                             +{s.weightedCostEscalationPct.toFixed(1)}%
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-right font-mono text-blue-600 font-medium">₹{Math.round(s.totalCumulativeExpenditureCr).toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right font-mono font-medium text-slate-700">{s.avgPhysicalProgressPct.toFixed(1)}%</td>
+                        <td className="px-4 py-3 text-right font-mono text-[#267A69] font-medium">₹{Math.round(s.totalCumulativeExpenditureCr).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono font-medium text-[#26312D]">{s.avgPhysicalProgressPct.toFixed(1)}%</td>
                         <td className="px-4 py-3 text-right font-mono">
-                          <span className={s.avgScheduleDelayMonths > 12 ? 'text-orange-600 font-semibold' : 'text-slate-600'}>
+                          <span className={s.avgScheduleDelayMonths > 12 ? 'text-orange-600 font-semibold' : 'text-[#66736D]'}>
                             {(s.avgScheduleDelayMonths || 0).toFixed(1)} Mo
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className={s.highRiskCount + s.criticalRiskCount > 0 ? 'text-rose-600 font-bold' : 'text-slate-400'}>
+                          <span className={s.highRiskCount + s.criticalRiskCount > 0 ? 'text-rose-600 font-bold' : 'text-[#8C9893]'}>
                             {s.highRiskCount + s.criticalRiskCount}
                           </span>
                         </td>
@@ -703,7 +703,7 @@ export const SectorAnalytics: React.FC = () => {
                         <td className="px-4 py-3 text-center">
                           <button
                             onClick={() => handleSelectSector(s.sectorName)}
-                            className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-[11px] font-semibold transition flex items-center gap-1 mx-auto shadow-2xs"
+                            className="px-3 py-1 bg-[#173F35] hover:bg-[#E8F0EC]0 text-white rounded text-[11px] font-semibold transition flex items-center gap-1 mx-auto shadow-2xs"
                           >
                             Explore <ChevronRight className="w-3 h-3" />
                           </button>
@@ -726,20 +726,20 @@ export const SectorAnalytics: React.FC = () => {
         <div className="space-y-6">
           
           {/* Top Drill-Down Selectors Panel */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 shadow-2xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div className="bg-white rounded-xl border border-[#DDD9D0] p-4 sm:p-5 shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EAE6DF] pb-3">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#267A69]">
                   Detailed Sector Drill-Down
                 </span>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-[#66736D] mt-0.5">
                   Scope inherited from overview: {activeChips.length > 0 ? activeChips.map(c => `${c.label}: ${c.value}`).join(' · ') : 'National Aggregate (All criteria)'}
                 </p>
               </div>
 
               <button
                 onClick={() => { setSelectedSector(null); setSelectedState(null); syncUrl(appliedFilters, null, null); }}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition flex items-center gap-1.5 self-start sm:self-auto"
+                className="px-3 py-1.5 rounded-lg border border-[#DDD9D0] hover:bg-[#FAF8F5] text-xs font-semibold text-[#26312D] transition flex items-center gap-1.5 self-start sm:self-auto"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to Overview
               </button>
@@ -749,13 +749,13 @@ export const SectorAnalytics: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Sector Selector */}
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                <label className="block text-[11px] font-semibold text-[#26312D] mb-1">
                   Selected Sector
                 </label>
                 <select
                   value={selectedSector}
                   onChange={(e) => handleSelectSector(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                  className="w-full bg-white border border-[#DDD9D0] rounded-lg px-3 py-2 text-xs text-[#26312D] font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
                 >
                   {(meta?.sectors && meta.sectors.length > 0 
                     ? meta.sectors 
@@ -773,13 +773,13 @@ export const SectorAnalytics: React.FC = () => {
 
               {/* State / Territory Selector */}
               <div>
-                <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                <label className="block text-[11px] font-semibold text-[#26312D] mb-1">
                   State / Territory
                 </label>
                 <select
                   value={selectedState || 'ALL'}
                   onChange={(e) => handleSelectState(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-800 font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                  className="w-full bg-white border border-[#DDD9D0] rounded-lg px-3 py-2 text-xs text-[#26312D] font-medium focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
                 >
                   <option value="ALL">All States & UTs ({sectorStates.reduce((acc, s) => acc + s.project_count, 0)})</option>
                   {sectorStates.map(st => (
@@ -792,9 +792,9 @@ export const SectorAnalytics: React.FC = () => {
 
               {/* Scoped Entity Summary Pill */}
               <div className="flex flex-col justify-end">
-                <div className="p-2 rounded-lg bg-blue-50/70 border border-blue-100 text-xs text-blue-900 flex items-center justify-between">
+                <div className="p-2 rounded-lg bg-[#E8F0EC]/70 border border-[#BED6CB] text-xs text-blue-900 flex items-center justify-between">
                   <span className="font-semibold">Matching Sector Projects:</span>
-                  <span className="font-mono font-bold text-sm text-blue-700">
+                  <span className="font-mono font-bold text-sm text-[#173F35]">
                     {selectedState 
                       ? sectorStates.find(s => s.state_name === selectedState)?.project_count || projects.length
                       : sectorStates.reduce((acc, s) => acc + s.project_count, 0) || projects.length}
@@ -805,24 +805,24 @@ export const SectorAnalytics: React.FC = () => {
           </div>
 
           {/* Project Cohort Table inheriting overview filters */}
-          <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-            <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="bg-white border border-[#DDD9D0] rounded-xl overflow-hidden shadow-2xs">
+            <div className="p-4 bg-[#FAF8F5] border-b border-[#DDD9D0] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#26312D]">
                   Project Cohort: {selectedSector} {selectedState ? `→ ${selectedState}` : '(All States)'}
                 </span>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-[11px] text-[#66736D] mt-0.5">
                   Displaying projects satisfying inherited overview filters
                 </p>
               </div>
-              <span className="text-xs text-slate-500 font-mono">
+              <span className="text-xs text-[#66736D] font-mono">
                 {projects.length} displayed on page {page}
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-700">
-                <thead className="bg-slate-100/70 border-b border-slate-200 uppercase text-[11px] font-semibold text-slate-500">
+              <table className="w-full text-left text-xs text-[#26312D]">
+                <thead className="bg-[#FAF8F5]/70 border-b border-[#DDD9D0] uppercase text-[11px] font-semibold text-[#66736D]">
                   <tr>
                     <th className="px-4 py-2.5">Project ID</th>
                     <th className="px-4 py-2.5">Project Name</th>
@@ -838,31 +838,31 @@ export const SectorAnalytics: React.FC = () => {
                 <tbody className="divide-y divide-slate-100">
                   {loadingDrilldown ? (
                     <tr>
-                      <td colSpan={9} className="text-center py-12 text-slate-400">
+                      <td colSpan={9} className="text-center py-12 text-[#8C9893]">
                         Loading sector project cohort...
                       </td>
                     </tr>
                   ) : projects.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="text-center py-12 text-slate-400">
+                      <td colSpan={9} className="text-center py-12 text-[#8C9893]">
                         No projects found under this sector/state matching the applied filters.
                       </td>
                     </tr>
                   ) : (
                     projects.map((p) => (
-                      <tr key={p.projectId} className="hover:bg-slate-50/80 transition">
-                        <td className="px-4 py-2.5 font-mono text-slate-500">{p.projectId}</td>
-                        <td className="px-4 py-2.5 font-medium text-slate-900 max-w-xs truncate" title={p.projectName}>
+                      <tr key={p.projectId} className="hover:bg-[#FAF8F5]/80 transition">
+                        <td className="px-4 py-2.5 font-mono text-[#66736D]">{p.projectId}</td>
+                        <td className="px-4 py-2.5 font-medium text-[#173F35] max-w-xs truncate" title={p.projectName}>
                           {p.projectName}
                         </td>
-                        <td className="px-4 py-2.5 text-slate-600 truncate max-w-[150px]">{p.agencyName}</td>
-                        <td className="px-4 py-2.5 text-slate-600">{p.stateName}</td>
-                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-slate-900">
+                        <td className="px-4 py-2.5 text-[#66736D] truncate max-w-[150px]">{p.agencyName}</td>
+                        <td className="px-4 py-2.5 text-[#66736D]">{p.stateName}</td>
+                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-[#173F35]">
                           ₹{p.latestRevisedCostCr.toLocaleString()} Cr
                         </td>
-                        <td className="px-4 py-2.5 text-right font-mono text-slate-700">{p.physicalProgressPct}%</td>
+                        <td className="px-4 py-2.5 text-right font-mono text-[#26312D]">{p.physicalProgressPct}%</td>
                         <td className="px-4 py-2.5 text-right font-mono">
-                          <span className={p.scheduleSlippageMonths > 0 ? 'text-amber-600 font-semibold' : 'text-slate-500'}>
+                          <span className={p.scheduleSlippageMonths > 0 ? 'text-amber-600 font-semibold' : 'text-[#66736D]'}>
                             {p.scheduleSlippageMonths}
                           </span>
                         </td>
@@ -872,7 +872,7 @@ export const SectorAnalytics: React.FC = () => {
                         <td className="px-4 py-2.5 text-center">
                           <button
                             onClick={() => navigate(`/projects/${p.projectId}`)}
-                            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded text-xs font-semibold border border-blue-200 transition inline-flex items-center gap-1"
+                            className="px-2.5 py-1 bg-[#E8F0EC] hover:bg-blue-100 text-[#173F35] rounded text-xs font-semibold border border-[#BED6CB] transition inline-flex items-center gap-1"
                           >
                             Details <ExternalLink className="w-3 h-3" />
                           </button>

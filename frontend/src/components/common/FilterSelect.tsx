@@ -43,7 +43,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
     if (l.includes('risk')) return 'All Risk Bands';
     if (l.includes('cost') || l.includes('escalation')) return 'All Budget Profiles';
     if (l.includes('delay') || l.includes('schedule') || l.includes('slippage')) return 'All Schedule Profiles';
-    if (l.includes('warn') || l.includes('alert')) return 'All Alert Levels';
+    if (l.includes('warn') || l.includes('alert') || l.includes('signal')) return 'All Signal Levels';
     if (l.includes('corridor') || l.includes('footprint')) return 'All Geographies';
     return `All (${label})`;
   })();
@@ -54,9 +54,9 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
     <div className={`space-y-1 ${className}`} title={tooltip}>
       <label
         htmlFor={selectId}
-        className="block text-[11px] font-semibold text-slate-700 tracking-wide flex items-center gap-1"
+        className="block text-[11px] font-semibold text-[#26312D] tracking-wide flex items-center gap-1"
       >
-        {icon && <span className="text-slate-400 shrink-0">{icon}</span>}
+        {icon && <span className="text-[#8C9893] shrink-0">{icon}</span>}
         <span>{label}</span>
       </label>
       <div className="relative">
@@ -65,10 +65,10 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
           value={value || 'ALL'}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 font-medium shadow-sm hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed transition-all truncate"
+          className="w-full bg-white border border-[#DDD9D0] rounded-lg px-2.5 py-1.5 text-xs text-[#26312D] font-medium shadow-2xs hover:border-[#173F35] focus:outline-none focus:ring-1 focus:ring-[#267A69] focus:border-[#267A69] disabled:bg-[#FAF8F5] disabled:text-[#8C9893] disabled:cursor-not-allowed transition-all truncate cursor-pointer"
         >
           {allOption !== false && !hasAll && (
-            <option value="ALL" className="text-slate-800 font-semibold">
+            <option value="ALL" className="text-[#26312D] font-semibold">
               {allLabel}
             </option>
           )}
@@ -79,7 +79,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
             const optCount = isObj && opt.count !== undefined ? ` (${opt.count.toLocaleString()})` : '';
 
             return (
-              <option key={optVal} value={optVal} className="text-slate-800">
+              <option key={optVal} value={optVal} className="text-[#26312D]">
                 {optLabel}
                 {optCount}
               </option>

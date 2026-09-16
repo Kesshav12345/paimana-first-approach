@@ -24,6 +24,7 @@ export const Projects: React.FC = () => {
 
   // Filter metadata loaded from backend
   const [meta, setMeta] = useState<FilterMetadata | null>(null);
+  const [homeSummary, setHomeSummary] = useState<any>(null);
   const [loadingMeta, setLoadingMeta] = useState(true);
 
   // Filter form state (initialized from URL search params if present)
@@ -50,12 +51,13 @@ export const Projects: React.FC = () => {
 
   // Load filter metadata
   useEffect(() => {
-    api.getProjectFilters()
-      .then(data => {
-        setMeta(data);
+    Promise.all([api.getProjectFilters(), api.getHomeSummary().catch(() => null)])
+      .then(([filtersData, hData]) => {
+        if (hData) setHomeSummary(hData);
+        setMeta(filtersData);
         setLoadingMeta(false);
       })
-      .catch(err => {
+      .catch((err: unknown) => {
         console.error('Failed to load filter metadata:', err);
         setLoadingMeta(false);
       });
@@ -251,37 +253,37 @@ export const Projects: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[#DDD9D0] pb-4">
         <div>
-          <div className="flex items-center gap-2 text-blue-600 font-semibold text-xs uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 text-[#267A69] font-semibold text-xs uppercase tracking-wider mb-1">
             <FolderKanban className="w-4 h-4" />
             <span>Infrastructure Projects Registry</span>
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-extrabold text-[#173F35] tracking-tight">
             Projects Portfolio & Intelligence
           </h1>
-          <p className="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
-            Multi-attribute query and drill-down engine across all 3,977 central infrastructure projects. 
+          <p className="text-xs text-[#66736D] mt-1 max-w-3xl leading-relaxed">
+            Multi-attribute query and drill-down engine across all monitored central sector infrastructure projects. 
             Configure jurisdictional, financial, risk, and early warning criteria below to inspect matching cohorts.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-            <span>3,977 Projects Monitored</span>
+          <div className="px-3 py-1.5 rounded-lg bg-[#E8F0EC] border border-[#BED6CB] text-[#173F35] text-xs font-semibold flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#173F35] animate-pulse" />
+            <span>{homeSummary?.totalProjects ? `${homeSummary.totalProjects.toLocaleString()} Projects Monitored` : 'Central Portfolio Monitored'}</span>
           </div>
         </div>
       </div>
 
       {/* Quick Filter Presets */}
-      <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm space-y-3">
+      <div className="bg-white rounded-xl border border-[#DDD9D0] p-4 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+          <span className="text-xs font-bold text-[#26312D] uppercase tracking-wider flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-[#267A69]" />
             Quick Query Presets
           </span>
-          <span className="text-[11px] text-slate-400">Click any preset to instantly apply filter</span>
+          <span className="text-[11px] text-[#8C9893]">Click any preset to instantly apply filter</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -290,7 +292,7 @@ export const Projects: React.FC = () => {
             className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all flex items-center gap-1.5 ${
               riskBand === 'CRITICAL' && costFilter === 'ALL' && delayFilter === 'ALL'
                 ? 'bg-red-600 text-white border-red-700 shadow-sm ring-2 ring-red-200'
-                : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                : 'bg-[#F5E7E4] text-[#B74436] border-[#E5B8B2] hover:bg-red-100'
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" />
@@ -302,7 +304,7 @@ export const Projects: React.FC = () => {
             className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all flex items-center gap-1.5 ${
               costFilter === 'HIGH_ESCALATION'
                 ? 'bg-amber-600 text-white border-amber-700 shadow-sm ring-2 ring-amber-200'
-                : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+                : 'bg-[#F5EEDB] text-[#C89432] border-[#DFCBB0] hover:bg-amber-100'
             }`}
           >
             <TrendingUp className="w-3.5 h-3.5" />
@@ -359,21 +361,21 @@ export const Projects: React.FC = () => {
       </div>
 
       {/* Main Filter Command Center */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-sm overflow-hidden">
+        <div className="px-5 py-4 bg-[#FAF8F5] border-b border-[#DDD9D0] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-bold text-slate-800">
+            <Filter className="w-4 h-4 text-[#267A69]" />
+            <span className="text-sm font-bold text-[#26312D]">
               Multi-Dimensional Filter & Search System
             </span>
             {activeCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-600 text-white">
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#173F35] text-white">
                 {activeCount} active
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-xs text-[#66736D]">
             <span>Select criteria and click <strong>Apply Filters</strong></span>
           </div>
         </div>
@@ -382,23 +384,23 @@ export const Projects: React.FC = () => {
           {/* Section 1: Search & Sort Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-[#26312D] mb-1">
                 Project Free-Text Search
               </label>
               <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+                <Search className="w-4 h-4 text-[#8C9893] absolute left-3 top-2.5" />
                 <input
                   type="text"
                   placeholder="Search by Project Name, Project ID (e.g. PRJ_...), OCMS code..."
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && executeQuery(1)}
-                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                  className="w-full pl-9 pr-4 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] focus:bg-white transition"
                 />
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm('')}
-                    className="absolute right-3 top-2.5 text-xs text-slate-400 hover:text-slate-600"
+                    className="absolute right-3 top-2.5 text-xs text-[#8C9893] hover:text-slate-600"
                   >
                     &times;
                   </button>
@@ -407,13 +409,13 @@ export const Projects: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-bold text-[#26312D] mb-1">
                 Result Sort Order
               </label>
               <select
                 value={sortBy}
                 onChange={e => setSortBy(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
               >
                 <option value="risk">Overall Risk Score (Highest First)</option>
                 <option value="cost">Revised Cost (Highest First)</option>
@@ -426,21 +428,21 @@ export const Projects: React.FC = () => {
           </div>
 
           {/* Section 2: Jurisdictional & Administrative */}
-          <div className="pt-2 border-t border-slate-100">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-slate-400" />
+          <div className="pt-2 border-t border-[#EAE6DF]">
+            <h3 className="text-xs font-bold text-[#66736D] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <Building2 className="w-3.5 h-3.5 text-[#8C9893]" />
               1. Jurisdictional & Administrative Filters
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#26312D] mb-1">
                   Sector ({meta?.sectors?.length || 12})
                 </label>
                 <select
                   value={sector}
                   onChange={e => setSector(e.target.value)}
                   disabled={loadingMeta}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
                 >
                   <option value="ALL">All Sectors</option>
                   {meta?.sectors?.map(s => (
@@ -450,14 +452,14 @@ export const Projects: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#26312D] mb-1">
                   Ministry ({meta?.ministries?.length || 16})
                 </label>
                 <select
                   value={ministry}
                   onChange={e => setMinistry(e.target.value)}
                   disabled={loadingMeta}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
                 >
                   <option value="ALL">All Ministries</option>
                   {meta?.ministries?.map(m => (
@@ -467,14 +469,14 @@ export const Projects: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#26312D] mb-1">
                   State / UT ({meta?.states?.length || 34})
                 </label>
                 <select
                   value={state}
                   onChange={e => setState(e.target.value)}
                   disabled={loadingMeta}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
                 >
                   <option value="ALL">All States & UTs</option>
                   {meta?.states?.map(st => (
@@ -484,13 +486,13 @@ export const Projects: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#26312D] mb-1">
                   Geographic Footprint
                 </label>
                 <select
                   value={multiState}
                   onChange={e => setMultiState(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
                 >
                   <option value="ALL">All Geographies</option>
                   <option value="YES">Multi-State Corridors Only</option>
@@ -501,20 +503,20 @@ export const Projects: React.FC = () => {
           </div>
 
           {/* Section 3: Risk, Trajectory & Early Warning */}
-          <div className="pt-2 border-t border-slate-100">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <ShieldAlert className="w-3.5 h-3.5 text-slate-400" />
+          <div className="pt-2 border-t border-[#EAE6DF]">
+            <h3 className="text-xs font-bold text-[#66736D] uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <ShieldAlert className="w-3.5 h-3.5 text-[#8C9893]" />
               2. Risk Classification & Early Warning Signals
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#26312D] mb-1">
                   Risk Band
                 </label>
                 <select
                   value={riskBand}
                   onChange={e => setRiskBand(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
                 >
                   <option value="ALL">All Risk Bands</option>
                   <option value="CRITICAL">Critical Risk</option>
@@ -525,13 +527,13 @@ export const Projects: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#26312D] mb-1">
                   Risk Trajectory
                 </label>
                 <select
                   value={trajectory}
                   onChange={e => setTrajectory(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
                 >
                   <option value="ALL">All Trajectories</option>
                   <option value="DETERIORATING">Deteriorating (Worsening)</option>
@@ -541,13 +543,13 @@ export const Projects: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#26312D] mb-1">
                   Budget Escalation Profile
                 </label>
                 <select
                   value={costFilter}
                   onChange={e => setCostFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
                 >
                   {meta?.costFilters?.map(cf => (
                     <option key={cf.id} value={cf.id}>{cf.label}</option>
@@ -564,13 +566,13 @@ export const Projects: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#26312D] mb-1">
                   Schedule Slippage & Delay
                 </label>
                 <select
                   value={delayFilter}
                   onChange={e => setDelayFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="w-full px-3 py-2 bg-[#FAF8F5] border border-[#DDD9D0] rounded-lg text-xs text-[#26312D] focus:outline-none focus:ring-2 focus:ring-[#267A69] transition"
                 >
                   {meta?.delayFilters?.map(df => (
                     <option key={df.id} value={df.id}>{df.label}</option>
@@ -589,12 +591,12 @@ export const Projects: React.FC = () => {
           </div>
 
           {/* Action Bar */}
-          <div className="pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="pt-3 border-t border-[#DDD9D0] flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <button
                 onClick={() => executeQuery(1)}
                 disabled={loadingResults}
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition shadow flex items-center gap-2 disabled:opacity-50"
+                className="px-5 py-2.5 bg-[#173F35] hover:bg-[#267A69] text-white rounded-lg text-xs font-bold transition shadow flex items-center gap-2 disabled:opacity-50"
               >
                 {loadingResults ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -606,18 +608,18 @@ export const Projects: React.FC = () => {
 
               <button
                 onClick={resetFilters}
-                className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition border border-slate-300 flex items-center gap-1.5"
+                className="px-4 py-2.5 bg-[#F6F3EC] hover:bg-[#EAE6DF] text-[#26312D] rounded-lg text-xs font-semibold transition border border-[#DDD9D0] flex items-center gap-1.5"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reset All Filters</span>
               </button>
             </div>
 
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-[#66736D]">
               {hasApplied ? (
-                <span>Found <strong className="text-slate-800 font-bold">{total.toLocaleString()}</strong> matching projects</span>
+                <span>Found <strong className="text-[#26312D] font-bold">{total.toLocaleString()}</strong> matching projects</span>
               ) : (
-                <span className="text-slate-400 italic">Configure filters above and click Apply to view projects</span>
+                <span className="text-[#8C9893] italic">Configure filters above and click Apply to view projects</span>
               )}
             </div>
           </div>
@@ -627,33 +629,33 @@ export const Projects: React.FC = () => {
       {/* Active Filter Tags */}
       {hasApplied && activeCount > 0 && (
         <div className="flex flex-wrap items-center gap-2 pt-1 pb-2">
-          <span className="text-xs font-semibold text-slate-500 mr-1">Active Criteria:</span>
+          <span className="text-xs font-semibold text-[#66736D] mr-1">Active Criteria:</span>
           {searchTerm.trim() && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50 text-blue-800 border border-blue-200">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-[#E8F0EC] text-blue-800 border border-[#BED6CB]">
               Keyword: "{searchTerm.trim()}"
               <button onClick={() => { setSearchTerm(''); executeQuery(1); }} className="hover:text-blue-950 font-bold ml-1">&times;</button>
             </span>
           )}
           {sector !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-300">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-[#F6F3EC] text-[#26312D] border border-[#DDD9D0]">
               Sector: {sector}
               <button onClick={() => { setSector('ALL'); executeQuery(1); }} className="hover:text-slate-950 font-bold ml-1">&times;</button>
             </span>
           )}
           {ministry !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-300">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-[#F6F3EC] text-[#26312D] border border-[#DDD9D0]">
               Ministry: {ministry}
               <button onClick={() => { setMinistry('ALL'); executeQuery(1); }} className="hover:text-slate-950 font-bold ml-1">&times;</button>
             </span>
           )}
           {state !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-800 border border-slate-300">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-[#F6F3EC] text-[#26312D] border border-[#DDD9D0]">
               State: {state}
               <button onClick={() => { setState('ALL'); executeQuery(1); }} className="hover:text-slate-950 font-bold ml-1">&times;</button>
             </span>
           )}
           {riskBand !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-red-50 text-red-800 border border-red-200">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-[#F5E7E4] text-[#B74436] border border-[#E5B8B2]">
               Risk: {riskBand}
               <button onClick={() => { setRiskBand('ALL'); executeQuery(1); }} className="hover:text-red-950 font-bold ml-1">&times;</button>
             </span>
@@ -665,7 +667,7 @@ export const Projects: React.FC = () => {
             </span>
           )}
           {costFilter !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-[#F5EEDB] text-[#C89432] border border-[#DFCBB0]">
               Budget: {costFilter}
               <button onClick={() => { setCostFilter('ALL'); executeQuery(1); }} className="hover:text-amber-950 font-bold ml-1">&times;</button>
             </span>
@@ -684,7 +686,7 @@ export const Projects: React.FC = () => {
           )}
           <button
             onClick={resetFilters}
-            className="text-xs text-blue-600 hover:text-blue-800 font-semibold underline ml-2"
+            className="text-xs text-[#267A69] hover:text-blue-800 font-semibold underline ml-2"
           >
             Clear All
           </button>
@@ -694,83 +696,83 @@ export const Projects: React.FC = () => {
       {/* Results or Initial Guidance Section */}
       {!hasApplied ? (
         /* INITIAL STATE: Clean guidance panel, no mass table dump */
-        <div className="bg-white rounded-xl border border-dashed border-slate-300 p-8 text-center space-y-6">
+        <div className="bg-white rounded-xl border border-dashed border-[#DDD9D0] p-8 text-center space-y-6">
           <div className="max-w-md mx-auto space-y-3">
-            <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto border border-blue-100">
+            <div className="w-12 h-12 rounded-full bg-[#E8F0EC] text-[#267A69] flex items-center justify-center mx-auto border border-[#BED6CB]">
               <Filter className="w-6 h-6" />
             </div>
-            <h2 className="text-base font-bold text-slate-800">
+            <h2 className="text-base font-bold text-[#26312D]">
               Filter System Ready
             </h2>
-            <p className="text-xs text-slate-500 leading-relaxed">
+            <p className="text-xs text-[#66736D] leading-relaxed">
               To inspect projects, select your criteria from the filters above and click{' '}
-              <strong className="text-blue-600">"Apply Filters & Query Projects"</strong>, or choose one of the{' '}
-              <strong className="text-slate-700">Quick Query Presets</strong> above.
+              <strong className="text-[#267A69]">"Apply Filters & Query Projects"</strong>, or choose one of the{' '}
+              <strong className="text-[#26312D]">Quick Query Presets</strong> above.
             </p>
           </div>
 
           {/* Statistical Overview Badges */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-2">
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="block text-lg font-bold text-slate-800">3,977</span>
-              <span className="text-[11px] text-slate-500">Total Projects</span>
+            <div className="p-3 rounded-lg bg-[#FAF8F5] border border-[#DDD9D0]">
+              <span className="block text-lg font-bold text-[#173F35] tabular-nums">{homeSummary?.totalProjects?.toLocaleString() || '—'}</span>
+              <span className="text-[11px] text-[#66736D]">Total Projects</span>
             </div>
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="block text-lg font-bold text-slate-800">12</span>
-              <span className="text-[11px] text-slate-500">Sectors</span>
+            <div className="p-3 rounded-lg bg-[#FAF8F5] border border-[#DDD9D0]">
+              <span className="block text-lg font-bold text-[#173F35] tabular-nums">{meta?.sectors?.length || 12}</span>
+              <span className="text-[11px] text-[#66736D]">Sectors</span>
             </div>
-            <div className="p-3 rounded-lg bg-slate-50 border border-slate-200">
-              <span className="block text-lg font-bold text-slate-800">16</span>
-              <span className="text-[11px] text-slate-500">Ministries</span>
+            <div className="p-3 rounded-lg bg-[#FAF8F5] border border-[#DDD9D0]">
+              <span className="block text-lg font-bold text-[#173F35] tabular-nums">{meta?.ministries?.length || 16}</span>
+              <span className="text-[11px] text-[#66736D]">Ministries</span>
             </div>
-            <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-              <span className="block text-lg font-bold text-red-700">1,052</span>
-              <span className="text-[11px] text-red-600 font-medium">Critical / High Risk</span>
+            <div className="p-3 rounded-lg bg-[#F5E7E4] border border-[#E5B8B2]">
+              <span className="block text-lg font-bold text-[#B74436] tabular-nums">{homeSummary?.projectsRequiringAttentionCount?.toLocaleString() || '—'}</span>
+              <span className="text-[11px] text-[#B74436] font-medium">Critical / High Risk</span>
             </div>
           </div>
         </div>
       ) : loadingResults ? (
         /* LOADING STATE */
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+        <div className="bg-white rounded-xl border border-[#DDD9D0] p-12 text-center">
           <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-xs font-semibold text-slate-700">Querying canonical database...</p>
-          <p className="text-[11px] text-slate-400 mt-1">Evaluating multi-dimensional filters across 3,977 projects</p>
+          <p className="text-xs font-semibold text-[#26312D]">Querying canonical database...</p>
+          <p className="text-[11px] text-[#8C9893] mt-1">Evaluating multi-dimensional filters across the central infrastructure portfolio</p>
         </div>
       ) : results.length === 0 ? (
         /* EMPTY STATE */
-        <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
+        <div className="bg-white rounded-xl border border-[#DDD9D0] p-12 text-center">
           <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
-          <h2 className="text-base font-bold text-slate-800">No Projects Matched Selected Criteria</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+          <h2 className="text-base font-bold text-[#26312D]">No Projects Matched Selected Criteria</h2>
+          <p className="text-xs text-[#66736D] mt-1 max-w-md mx-auto">
             No projects in the canonical repository satisfied all your active filter conditions. 
             Try clearing some filters or selecting "All" on specific criteria.
           </p>
           <button
             onClick={resetFilters}
-            className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold shadow transition"
+            className="mt-4 px-4 py-2 bg-[#173F35] hover:bg-[#267A69] text-white rounded-lg text-xs font-semibold shadow transition"
           >
             Clear Filters & Reset
           </button>
         </div>
       ) : (
         /* RESULTS TABLE */
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-sm overflow-hidden">
           
-          <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="px-5 py-3.5 bg-[#FAF8F5] border-b border-[#DDD9D0] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-800">Matching Projects</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-700">
+              <span className="text-xs font-bold text-[#26312D]">Matching Projects</span>
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-[#173F35]">
                 {total.toLocaleString()} Records
               </span>
             </div>
-            <div className="text-xs text-slate-500">
-              Click <span className="font-semibold text-blue-600">"Explore"</span> on any project row to view all 15 analytical dimensions
+            <div className="text-xs text-[#66736D]">
+              Click <span className="font-semibold text-[#267A69]">"Explore"</span> on any project row to view all 15 analytical dimensions
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100/75 text-slate-600 uppercase text-[10px] tracking-wider font-bold border-b border-slate-200">
+              <thead className="bg-[#F6F3EC]/75 text-slate-600 uppercase text-[10px] tracking-wider font-bold border-b border-[#DDD9D0]">
                 <tr>
                   <th className="px-4 py-3">Project & Identity</th>
                   <th className="px-4 py-3">Sector / Ministry</th>
@@ -787,13 +789,13 @@ export const Projects: React.FC = () => {
                 {results.map(p => (
                   <tr 
                     key={p.projectId} 
-                    className="hover:bg-slate-50/80 transition-colors group cursor-pointer"
+                    className="hover:bg-[#FAF8F5]/80 transition-colors group cursor-pointer"
                     onClick={() => navigate(`/projects/${p.projectId}`)}
                   >
                     {/* 1. Project ID & Name */}
                     <td className="px-4 py-3 max-w-xs">
                       <div className="flex items-center gap-1.5 mb-1">
-                        <span className="font-mono text-[11px] font-semibold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                        <span className="font-mono text-[11px] font-semibold text-[#267A69] bg-[#E8F0EC] px-1.5 py-0.5 rounded border border-[#BED6CB]">
                           {p.projectId}
                         </span>
                         {p.multiState && (
@@ -802,36 +804,36 @@ export const Projects: React.FC = () => {
                           </span>
                         )}
                       </div>
-                      <div className="font-bold text-slate-900 group-hover:text-blue-600 transition truncate" title={p.projectName}>
+                      <div className="font-bold text-[#173F35] group-hover:text-[#267A69] transition truncate" title={p.projectName}>
                         {p.projectName}
                       </div>
                     </td>
 
                     {/* 2. Sector & Ministry */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="font-semibold text-slate-800">{p.sectorName}</div>
-                      <div className="text-[11px] text-slate-500 truncate max-w-[180px]" title={p.ministryName}>
+                      <div className="font-semibold text-[#26312D]">{p.sectorName}</div>
+                      <div className="text-[11px] text-[#66736D] truncate max-w-[180px]" title={p.ministryName}>
                         {p.ministryName}
                       </div>
                     </td>
 
                     {/* 3. State */}
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-1 text-slate-700 font-medium">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <div className="flex items-center gap-1 text-[#26312D] font-medium">
+                        <MapPin className="w-3.5 h-3.5 text-[#8C9893] shrink-0" />
                         <span>{p.stateName || 'Multi-State'}</span>
                       </div>
                     </td>
 
                     {/* 4. Cost Exposure */}
                     <td className="px-4 py-3 text-right whitespace-nowrap">
-                      <div className="font-mono font-bold text-slate-900">
+                      <div className="font-mono font-bold text-[#173F35]">
                         ₹{(p.latestRevisedCostCr || p.originalCostCr).toLocaleString()} Cr
                       </div>
                       <div className="text-[11px] flex items-center justify-end gap-1 mt-0.5">
-                        <span className="text-slate-400">Orig: ₹{p.originalCostCr?.toLocaleString()} Cr</span>
+                        <span className="text-[#8C9893]">Orig: ₹{p.originalCostCr?.toLocaleString()} Cr</span>
                         {p.costEscalationPct > 0 ? (
-                          <span className="text-red-600 font-semibold font-mono">
+                          <span className="text-[#B74436] font-semibold font-mono">
                             (+{p.costEscalationPct}%)
                           </span>
                         ) : (
@@ -844,14 +846,14 @@ export const Projects: React.FC = () => {
 
                     {/* 5. Physical Progress */}
                     <td className="px-4 py-3 text-right whitespace-nowrap">
-                      <div className="font-bold font-mono text-slate-900">
+                      <div className="font-bold font-mono text-[#173F35]">
                         {p.physicalProgressPct}%
                       </div>
                       <div className="w-20 ml-auto bg-slate-200 rounded-full h-1.5 mt-1 overflow-hidden">
                         <div 
                           className={`h-1.5 rounded-full ${
                             p.physicalProgressPct >= 75 ? 'bg-emerald-500' :
-                            p.physicalProgressPct >= 40 ? 'bg-blue-500' : 'bg-amber-500'
+                            p.physicalProgressPct >= 40 ? 'bg-[#E8F0EC]0' : 'bg-[#F5EEDB]0'
                           }`}
                           style={{ width: `${Math.min(100, Math.max(0, p.physicalProgressPct))}%` }}
                         />
@@ -862,7 +864,7 @@ export const Projects: React.FC = () => {
                     <td className="px-4 py-3 text-center whitespace-nowrap">
                       {p.scheduleSlippageMonths > 0 ? (
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${
-                          p.scheduleSlippageMonths >= 24 ? 'bg-red-100 text-red-700' :
+                          p.scheduleSlippageMonths >= 24 ? 'bg-red-100 text-[#B74436]' :
                           p.scheduleSlippageMonths >= 12 ? 'bg-orange-100 text-orange-700' :
                           'bg-amber-100 text-amber-700'
                         }`}>
@@ -883,12 +885,12 @@ export const Projects: React.FC = () => {
                     {/* 8. Alerts */}
                     <td className="px-4 py-3 text-center whitespace-nowrap">
                       {p.activeWarningCount > 0 ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-[#B74436]">
                           <AlertTriangle className="w-3 h-3" />
                           {p.activeWarningCount}
                         </span>
                       ) : (
-                        <span className="text-slate-400 text-xs">—</span>
+                        <span className="text-[#8C9893] text-xs">—</span>
                       )}
                     </td>
 
@@ -896,7 +898,7 @@ export const Projects: React.FC = () => {
                     <td className="px-4 py-3 text-right whitespace-nowrap" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => navigate(`/projects/${p.projectId}`)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white rounded-lg font-semibold text-xs transition border border-blue-200 hover:border-blue-600 shadow-sm"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#E8F0EC] hover:bg-[#173F35] text-[#173F35] hover:text-white rounded-lg font-semibold text-xs transition border border-[#BED6CB] hover:border-blue-600 shadow-sm"
                       >
                         <span>Explore</span>
                         <ChevronRight className="w-3.5 h-3.5" />

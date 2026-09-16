@@ -205,8 +205,8 @@ export const Operations: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
-          <p className="text-slate-600 font-medium">Connecting to Intelligence Refresh Console...</p>
+          <RefreshCw className="w-8 h-8 text-[#267A69] animate-spin" />
+          <p className="text-[#66736D] font-medium">Connecting to Intelligence Refresh Console...</p>
         </div>
       </div>
     );
@@ -215,22 +215,22 @@ export const Operations: React.FC = () => {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[#DDD9D0] pb-6">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Intelligence Refresh Operations</h1>
+            <h1 className="text-3xl font-bold text-[#173F35] tracking-tight">Intelligence Refresh Operations</h1>
             <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               {status?.status || 'OPERATIONAL'}
             </span>
           </div>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-[#66736D] mt-1">
             End-to-end orchestration: monthly report ingestion, empirical web deep dives, deterministic analytics, and CatBoost MLOps.
           </p>
         </div>
         <button
           onClick={fetchStatusAndRuns}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-sm self-start md:self-auto"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[#26312D] bg-white border border-[#DDD9D0] rounded-lg hover:bg-[#FAF8F5] transition-colors shadow-sm self-start md:self-auto"
         >
           <RefreshCw className="w-4 h-4" />
           Refresh Console
@@ -246,65 +246,65 @@ export const Operations: React.FC = () => {
 
       {/* SECTION A: SYSTEM HEALTH */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-white p-4 rounded-xl border border-[#DDD9D0] shadow-sm">
+          <div className="flex items-center justify-between text-[#66736D]">
             <span className="text-xs font-semibold uppercase tracking-wider">Canonical Baseline</span>
-            <Database className="w-4 h-4 text-blue-600" />
+            <Database className="w-4 h-4 text-[#267A69]" />
           </div>
-          <p className="text-xl font-bold text-slate-900 mt-1">{(status?.totalProjects || 3977).toLocaleString()}</p>
-          <p className="text-[11px] text-slate-500">{(status?.totalFacts || 23724).toLocaleString()} monthly facts</p>
+          <p className="text-xl font-bold text-[#173F35] mt-1">{(status?.totalProjects || 3977).toLocaleString()}</p>
+          <p className="text-[11px] text-[#66736D]">{(status?.totalFacts || 23724).toLocaleString()} monthly facts</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-white p-4 rounded-xl border border-[#DDD9D0] shadow-sm">
+          <div className="flex items-center justify-between text-[#66736D]">
             <span className="text-xs font-semibold uppercase tracking-wider">Cycle Period</span>
             <Clock className="w-4 h-4 text-indigo-600" />
           </div>
-          <p className="text-xl font-bold text-slate-900 mt-1">{status?.latestReportingPeriod || '2026-07'}</p>
-          <p className="text-[11px] text-slate-500">Dataset: {status?.currentDatasetVersion || 'v2026.07'}</p>
+          <p className="text-xl font-bold text-[#173F35] mt-1">{status?.latestReportingPeriod || '2026-07'}</p>
+          <p className="text-[11px] text-[#66736D]">Dataset: {status?.currentDatasetVersion || 'v2026.07'}</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-white p-4 rounded-xl border border-[#DDD9D0] shadow-sm">
+          <div className="flex items-center justify-between text-[#66736D]">
             <span className="text-xs font-semibold uppercase tracking-wider">Production Model</span>
             <Cpu className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-xl font-bold text-slate-900 mt-1">v{status?.activeModelVersion || '1.0.0'}</p>
-          <p className="text-[11px] text-slate-500">CatBoost Ensemble + SHAP</p>
+          <p className="text-xl font-bold text-[#173F35] mt-1">v{status?.activeModelVersion || '1.0.0'}</p>
+          <p className="text-[11px] text-[#66736D]">CatBoost Ensemble + SHAP</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-white p-4 rounded-xl border border-[#DDD9D0] shadow-sm">
+          <div className="flex items-center justify-between text-[#66736D]">
             <span className="text-xs font-semibold uppercase tracking-wider">Search Engine</span>
             <Search className="w-4 h-4 text-purple-600" />
           </div>
-          <p className="text-xl font-bold text-slate-900 mt-1">Active</p>
-          <p className="text-[11px] text-slate-500">Tier-1 Gov + Offline Fallback</p>
+          <p className="text-xl font-bold text-[#173F35] mt-1">Active</p>
+          <p className="text-[11px] text-[#66736D]">Tier-1 Gov + Offline Fallback</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500">
+        <div className="bg-white p-4 rounded-xl border border-[#DDD9D0] shadow-sm">
+          <div className="flex items-center justify-between text-[#66736D]">
             <span className="text-xs font-semibold uppercase tracking-wider">Data Quarantine</span>
             <ShieldCheck className="w-4 h-4 text-amber-600" />
           </div>
           <p className="text-xl font-bold text-amber-700 mt-1">{(status?.quarantineRecordsCount || 4896).toLocaleString()}</p>
-          <p className="text-[11px] text-slate-500">Isolated anomalies</p>
+          <p className="text-[11px] text-[#66736D]">Isolated anomalies</p>
         </div>
       </div>
 
       {/* SECTION B: MONTHLY REPORT INGESTION & 12-STAGE TRACKER */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-[#DDD9D0] bg-[#FAF8F5]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <UploadCloud className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-bold text-[#173F35] flex items-center gap-2">
+              <UploadCloud className="w-5 h-5 text-[#267A69]" />
               Monthly Intelligence Refresh Pipeline
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#66736D] mt-0.5">
               Upload a newly received MoSPI Flash Report or CPR document. The system automatically executes official extraction, external evidence deep dives, deterministic recomputations, and ML forecasts.
             </p>
           </div>
-          <span className="text-xs px-2.5 py-1 bg-blue-50 text-blue-700 font-semibold rounded-full border border-blue-200 shrink-0">
+          <span className="text-xs px-2.5 py-1 bg-[#E8F0EC] text-[#173F35] font-semibold rounded-full border border-[#BED6CB] shrink-0">
             12-Stage Automated Workflow
           </span>
         </div>
@@ -313,36 +313,36 @@ export const Operations: React.FC = () => {
           <form onSubmit={handleIntelligenceRefresh} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#66736D] mb-1.5">
                   Select Project PDF Document
                 </label>
                 <input
                   type="file"
                   accept=".pdf"
                   onChange={(e) => setUploadFile(e.target.files ? e.target.files[0] : null)}
-                  className="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-slate-300 rounded-lg cursor-pointer bg-slate-50/50"
+                  className="block w-full text-sm text-[#66736D] file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#E8F0EC] file:text-[#173F35] hover:file:bg-blue-100 border border-[#DDD9D0] rounded-lg cursor-pointer bg-[#FAF8F5]/50"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#66736D] mb-1.5">
                   Reporting Month
                 </label>
                 <input
                   type="month"
                   value={reportingMonth}
                   onChange={(e) => setReportingMonth(e.target.value)}
-                  className="w-full text-sm py-2.5 px-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full text-sm py-2.5 px-3 border border-[#DDD9D0] rounded-lg focus:ring-2 focus:ring-[#267A69] focus:outline-none"
                 />
               </div>
 
               <div className="flex flex-col justify-end">
-                <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer pb-3">
+                <label className="flex items-center gap-2 text-xs text-[#66736D] cursor-pointer pb-3">
                   <input
                     type="checkbox"
                     checked={forceReprocess}
                     onChange={(e) => setForceReprocess(e.target.checked)}
-                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded border-[#DDD9D0] text-[#267A69] focus:ring-[#267A69]"
                   />
                   <span>Force Reprocess if already ingested</span>
                 </label>
@@ -350,14 +350,14 @@ export const Operations: React.FC = () => {
             </div>
 
             {uploadFile && (
-              <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 flex items-center gap-2">
-                <FileText className="w-4 h-4 text-blue-600" />
+              <div className="text-xs text-[#66736D] bg-[#FAF8F5] p-3 rounded-lg border border-[#DDD9D0] flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#267A69]" />
                 <span>Selected: <strong>{uploadFile.name}</strong> ({(uploadFile.size / 1024).toFixed(1)} KB)</span>
               </div>
             )}
 
             <div className="flex items-center justify-between pt-2">
-              <span className="text-xs text-slate-500">
+              <span className="text-xs text-[#66736D]">
                 Guaranteed: Authoritative official fields are never overwritten by web evidence.
               </span>
               <button
@@ -365,8 +365,8 @@ export const Operations: React.FC = () => {
                 disabled={!uploadFile || uploading || (jobProgress?.status === 'IN_PROGRESS')}
                 className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm ${
                   !uploadFile || uploading || (jobProgress?.status === 'IN_PROGRESS')
-                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/25'
+                    ? 'bg-slate-200 text-[#8C9893] cursor-not-allowed'
+                    : 'bg-[#173F35] text-white hover:bg-[#267A69] shadow-blue-500/25'
                 }`}
               >
                 {uploading ? (
@@ -386,13 +386,13 @@ export const Operations: React.FC = () => {
 
           {/* 12-STAGE LIVE TRACKER */}
           {jobProgress && (
-            <div className="mt-6 border border-slate-200 rounded-xl bg-slate-50/70 p-5 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+            <div className="mt-6 border border-[#DDD9D0] rounded-xl bg-[#FAF8F5]/70 p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#DDD9D0] pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-blue-100 text-[#173F35]">
                     {jobProgress.job_id}
                   </span>
-                  <span className="text-xs text-slate-600">
+                  <span className="text-xs text-[#66736D]">
                     Report: <strong>{jobProgress.report_file || 'Flash Report'}</strong> ({jobProgress.reporting_month || 'Current'})
                   </span>
                 </div>
@@ -402,11 +402,11 @@ export const Operations: React.FC = () => {
                     jobProgress.status === 'COMPLETED_WITH_WARNINGS' ? 'bg-amber-100 text-amber-800' :
                     jobProgress.status === 'FAILED' ? 'bg-red-100 text-red-800' :
                     jobProgress.status === 'ALREADY_PROCESSED' ? 'bg-purple-100 text-purple-800' :
-                    'bg-blue-100 text-blue-800 animate-pulse'
+                    'bg-blue-100 text-[#173F35] animate-pulse'
                   }`}>
                     {jobProgress.status}
                   </span>
-                  <span className="text-xs text-slate-400 font-mono">
+                  <span className="text-xs text-[#8C9893] font-mono">
                     {jobProgress.elapsed_seconds.toFixed(1)}s elapsed
                   </span>
                 </div>
@@ -421,9 +421,9 @@ export const Operations: React.FC = () => {
                     <div
                       key={stg.key}
                       className={`p-2.5 rounded-lg border text-xs transition-all ${
-                        isCurrent ? 'bg-blue-50 border-blue-400 text-blue-900 shadow-sm ring-1 ring-blue-400' :
+                        isCurrent ? 'bg-[#E8F0EC] border-blue-400 text-blue-900 shadow-sm ring-1 ring-blue-400' :
                         isPast ? 'bg-emerald-50/60 border-emerald-200 text-emerald-800' :
-                        'bg-white border-slate-200 text-slate-400'
+                        'bg-white border-[#DDD9D0] text-[#8C9893]'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
@@ -431,7 +431,7 @@ export const Operations: React.FC = () => {
                         {isPast ? (
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         ) : isCurrent ? (
-                          <RefreshCw className="w-3.5 h-3.5 text-blue-600 animate-spin" />
+                          <RefreshCw className="w-3.5 h-3.5 text-[#267A69] animate-spin" />
                         ) : (
                           <span className="w-2 h-2 rounded-full bg-slate-200" />
                         )}
@@ -443,22 +443,22 @@ export const Operations: React.FC = () => {
               </div>
 
               {/* Telemetry Chips */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs text-slate-600">
-                <div className="bg-white p-2.5 rounded-lg border border-slate-200">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold">Affected Projects</span>
-                  <p className="text-base font-bold text-slate-900 mt-0.5">{jobProgress.affected_projects_count}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs text-[#66736D]">
+                <div className="bg-white p-2.5 rounded-lg border border-[#DDD9D0]">
+                  <span className="text-[10px] text-[#8C9893] uppercase font-semibold">Affected Projects</span>
+                  <p className="text-base font-bold text-[#173F35] mt-0.5">{jobProgress.affected_projects_count}</p>
                 </div>
-                <div className="bg-white p-2.5 rounded-lg border border-slate-200">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold">Researched</span>
-                  <p className="text-base font-bold text-slate-900 mt-0.5">{jobProgress.researched_count}</p>
+                <div className="bg-white p-2.5 rounded-lg border border-[#DDD9D0]">
+                  <span className="text-[10px] text-[#8C9893] uppercase font-semibold">Researched</span>
+                  <p className="text-base font-bold text-[#173F35] mt-0.5">{jobProgress.researched_count}</p>
                 </div>
-                <div className="bg-white p-2.5 rounded-lg border border-slate-200">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold">Claims Extracted</span>
-                  <p className="text-base font-bold text-slate-900 mt-0.5">{jobProgress.claims_count}</p>
+                <div className="bg-white p-2.5 rounded-lg border border-[#DDD9D0]">
+                  <span className="text-[10px] text-[#8C9893] uppercase font-semibold">Claims Extracted</span>
+                  <p className="text-base font-bold text-[#173F35] mt-0.5">{jobProgress.claims_count}</p>
                 </div>
-                <div className="bg-white p-2.5 rounded-lg border border-slate-200">
-                  <span className="text-[10px] text-slate-400 uppercase font-semibold">Conflicts Flagged</span>
-                  <p className={`text-base font-bold mt-0.5 ${jobProgress.conflicts_count > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
+                <div className="bg-white p-2.5 rounded-lg border border-[#DDD9D0]">
+                  <span className="text-[10px] text-[#8C9893] uppercase font-semibold">Conflicts Flagged</span>
+                  <p className={`text-base font-bold mt-0.5 ${jobProgress.conflicts_count > 0 ? 'text-amber-600' : 'text-[#173F35]'}`}>
                     {jobProgress.conflicts_count}
                   </p>
                 </div>
@@ -478,28 +478,28 @@ export const Operations: React.FC = () => {
       {/* SECTION C: SCOPED INTELLIGENCE REFRESH CONTROLS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Scoped External Deep Dive */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white p-6 rounded-xl border border-[#DDD9D0] shadow-sm flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <h3 className="text-base font-bold text-[#173F35] flex items-center gap-2">
                 <Search className="w-4 h-4 text-purple-600" />
                 Refresh External Intelligence
               </h3>
-              <span className="text-xs text-slate-400">Targeted Research</span>
+              <span className="text-xs text-[#8C9893]">Targeted Research</span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#66736D] mt-1">
               Rerun empirical internet deep dives on demand for stale or high-priority projects without waiting for a new monthly report upload.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#66736D] mb-1">
                   Scope
                 </label>
                 <select
                   value={researchScope}
                   onChange={(e) => setResearchScope(e.target.value)}
-                  className="w-full text-xs py-2 px-2.5 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-xs py-2 px-2.5 border border-[#DDD9D0] rounded-lg bg-white focus:ring-2 focus:ring-[#267A69]"
                 >
                   <option value="AFFECTED">Affected by Latest Report</option>
                   <option value="CRITICAL_HIGH_RISK">Critical & High Risk Projects</option>
@@ -509,7 +509,7 @@ export const Operations: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-600 mb-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#66736D] mb-1">
                   Project Limit
                 </label>
                 <input
@@ -518,7 +518,7 @@ export const Operations: React.FC = () => {
                   max={50}
                   value={researchLimit}
                   onChange={(e) => setResearchLimit(parseInt(e.target.value) || 15)}
-                  className="w-full text-xs py-2 px-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full text-xs py-2 px-2.5 border border-[#DDD9D0] rounded-lg focus:ring-2 focus:ring-[#267A69]"
                 />
               </div>
             </div>
@@ -535,20 +535,20 @@ export const Operations: React.FC = () => {
         </div>
 
         {/* Recalculate Derived Values */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white p-6 rounded-xl border border-[#DDD9D0] shadow-sm flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Layers className="w-4 h-4 text-blue-600" />
+              <h3 className="text-base font-bold text-[#173F35] flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[#267A69]" />
                 Recalculate Derived Values
               </h3>
-              <span className="text-xs text-slate-400">Zero-Web Calculation</span>
+              <span className="text-xs text-[#8C9893]">Zero-Web Calculation</span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#66736D] mt-1">
               Recompute deterministic metrics (cost escalation, progress velocity, slippage, physical-financial gap), risk indices, and early-warning alerts from stored canonical facts without making external web calls.
             </p>
-            <div className="mt-4 p-3 bg-slate-50 rounded-lg text-xs text-slate-600 border border-slate-200">
-              <p className="font-semibold text-slate-800 mb-0.5">Deterministic Invariant:</p>
+            <div className="mt-4 p-3 bg-[#FAF8F5] rounded-lg text-xs text-[#66736D] border border-[#DDD9D0]">
+              <p className="font-semibold text-[#26312D] mb-0.5">Deterministic Invariant:</p>
               <p>Recomputes Parts A through G of the Whole Computational Stack with strict reproducible mathematical formulas.</p>
             </div>
           </div>
@@ -556,7 +556,7 @@ export const Operations: React.FC = () => {
           <button
             onClick={handleRecalculateDerived}
             disabled={actionLoading === 'recalc' || (jobProgress?.status === 'IN_PROGRESS')}
-            className="w-full py-2.5 px-4 bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
+            className="w-full py-2.5 px-4 bg-[#E8F0EC] hover:bg-blue-100 text-[#173F35] border border-blue-300 font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${actionLoading === 'recalc' ? 'animate-spin' : ''}`} />
             Recalculate Deterministic Metrics & Risks
@@ -565,14 +565,14 @@ export const Operations: React.FC = () => {
       </div>
 
       {/* SECTION D: MLOPS LIFECYCLE MANAGEMENT */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-[#DDD9D0] bg-[#FAF8F5]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-[#173F35] flex items-center gap-2">
               <Cpu className="w-5 h-5 text-indigo-600" />
               Machine Learning Operations (MLOps)
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#66736D] mt-0.5">
               Production models, candidate evaluation, zero-leakage temporal validation, and whole-portfolio prediction refresh.
             </p>
           </div>
@@ -580,8 +580,8 @@ export const Operations: React.FC = () => {
 
         <div className="p-6 space-y-6">
           {actionMessage && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl text-blue-900 text-sm flex items-center gap-3">
-              <Activity className="w-5 h-5 text-blue-600 shrink-0" />
+            <div className="p-4 bg-[#E8F0EC] border border-[#BED6CB] rounded-xl text-blue-900 text-sm flex items-center gap-3">
+              <Activity className="w-5 h-5 text-[#267A69] shrink-0" />
               <span>{actionMessage}</span>
             </div>
           )}
@@ -593,22 +593,22 @@ export const Operations: React.FC = () => {
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-full">
                   Active Production Model
                 </span>
-                <span className="text-xs text-slate-500">Status: Serving</span>
+                <span className="text-xs text-[#66736D]">Status: Serving</span>
               </div>
               <div>
-                <p className="text-xl font-bold text-slate-900">CatBoost Multi-Target v{status?.activeModelVersion || '1.0.0'}</p>
-                <p className="text-xs text-slate-600 mt-1">
+                <p className="text-xl font-bold text-[#173F35]">CatBoost Multi-Target v{status?.activeModelVersion || '1.0.0'}</p>
+                <p className="text-xs text-[#66736D] mt-1">
                   Targets: Cost Overrun (PR-AUC 0.94), Final Cost (MAE ₹88Cr), Delay Duration (MAE 3.8mo)
                 </p>
               </div>
-              <div className="text-xs text-slate-500 space-y-1 pt-2 border-t border-emerald-200/60">
+              <div className="text-xs text-[#66736D] space-y-1 pt-2 border-t border-emerald-200/60">
                 <div className="flex justify-between">
                   <span>Feature Schema:</span>
-                  <span className="font-semibold text-slate-700">v2.1-temporal-features</span>
+                  <span className="font-semibold text-[#26312D]">v2.1-temporal-features</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Calibration:</span>
-                  <span className="font-semibold text-slate-700">Temporal Platt-Scaled</span>
+                  <span className="font-semibold text-[#26312D]">Temporal Platt-Scaled</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Temporal Integrity:</span>
@@ -618,15 +618,15 @@ export const Operations: React.FC = () => {
             </div>
 
             {/* Candidate Retrain & Promotion Actions */}
-            <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col justify-between space-y-4">
+            <div className="p-5 rounded-xl border border-[#DDD9D0] bg-[#FAF8F5]/50 flex flex-col justify-between space-y-4">
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-600">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#66736D]">
                     Model Lifecycle Controls
                   </span>
-                  <span className="text-xs text-slate-500">Zero-downtime hot swap</span>
+                  <span className="text-xs text-[#66736D]">Zero-downtime hot swap</span>
                 </div>
-                <p className="text-sm text-slate-600 mt-2">
+                <p className="text-sm text-[#66736D] mt-2">
                   Retrain candidate models on latest canonical facts, evaluate validation metrics, promote to production, or refresh predictions across all projects.
                 </p>
               </div>
@@ -635,7 +635,7 @@ export const Operations: React.FC = () => {
                 <button
                   onClick={handleRetrain}
                   disabled={actionLoading !== null}
-                  className="px-3 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  className="px-3 py-2 text-xs font-semibold text-[#26312D] bg-white border border-[#DDD9D0] rounded-lg hover:bg-[#FAF8F5] transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${actionLoading === 'retrain' ? 'animate-spin' : ''}`} />
                   Train Candidate
@@ -653,7 +653,7 @@ export const Operations: React.FC = () => {
                 <button
                   onClick={handleRefreshPredictions}
                   disabled={actionLoading !== null}
-                  className="px-3 py-2 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  className="px-3 py-2 text-xs font-semibold text-[#173F35] bg-[#E8F0EC] border border-blue-300 rounded-lg hover:bg-blue-100 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-1.5"
                 >
                   <Activity className={`w-3.5 h-3.5 ${actionLoading === 'refresh' ? 'animate-spin' : ''}`} />
                   Refresh Predictions
@@ -665,17 +665,17 @@ export const Operations: React.FC = () => {
       </div>
 
       {/* SECTION E: RECENT PIPELINE EXECUTION RUNS */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-            <Server className="w-4 h-4 text-blue-600" />
+      <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-[#DDD9D0] bg-[#FAF8F5] flex items-center justify-between">
+          <h3 className="text-sm font-bold text-[#173F35] flex items-center gap-2">
+            <Server className="w-4 h-4 text-[#267A69]" />
             Recent Pipeline Execution History
           </h3>
-          <span className="text-xs text-slate-500">Full Audit Provenance</span>
+          <span className="text-xs text-[#66736D]">Full Audit Provenance</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+            <thead className="bg-[#FAF8F5] text-[#66736D] font-semibold border-b border-[#DDD9D0]">
               <tr>
                 <th className="px-4 py-3">Run / Job ID</th>
                 <th className="px-4 py-3">Trigger Type</th>
@@ -691,30 +691,30 @@ export const Operations: React.FC = () => {
             <tbody className="divide-y divide-slate-100">
               {recentRuns.length > 0 ? (
                 recentRuns.map((r, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/70">
-                    <td className="px-4 py-3 font-mono font-semibold text-slate-800">{r.job_id}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.trigger_type}</td>
-                    <td className="px-4 py-3 text-slate-700 truncate max-w-[160px]">{r.report_file || 'Direct Refresh'}</td>
+                  <tr key={idx} className="hover:bg-[#FAF8F5]/70">
+                    <td className="px-4 py-3 font-mono font-semibold text-[#26312D]">{r.job_id}</td>
+                    <td className="px-4 py-3 text-[#66736D]">{r.trigger_type}</td>
+                    <td className="px-4 py-3 text-[#26312D] truncate max-w-[160px]">{r.report_file || 'Direct Refresh'}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                         r.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' :
                         r.status === 'COMPLETED_WITH_WARNINGS' ? 'bg-amber-100 text-amber-800' :
                         r.status === 'FAILED' ? 'bg-red-100 text-red-800' :
-                        'bg-blue-100 text-blue-800'
+                        'bg-blue-100 text-[#173F35]'
                       }`}>
                         {r.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 font-semibold text-slate-800">{r.researched_count || 0}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.claims_count || 0}</td>
+                    <td className="px-4 py-3 font-semibold text-[#26312D]">{r.researched_count || 0}</td>
+                    <td className="px-4 py-3 text-[#66736D]">{r.claims_count || 0}</td>
                     <td className="px-4 py-3 font-semibold text-amber-600">{r.conflicts_count || 0}</td>
-                    <td className="px-4 py-3 text-slate-500 font-mono">{(r.elapsed_seconds || 0).toFixed(1)}s</td>
-                    <td className="px-4 py-3 text-slate-400 font-mono">{r.completed_at || r.started_at}</td>
+                    <td className="px-4 py-3 text-[#66736D] font-mono">{(r.elapsed_seconds || 0).toFixed(1)}s</td>
+                    <td className="px-4 py-3 text-[#8C9893] font-mono">{r.completed_at || r.started_at}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className="px-4 py-6 text-center text-slate-500">
+                  <td colSpan={9} className="px-4 py-6 text-center text-[#66736D]">
                     No pipeline runs recorded in canonical audit ledger yet.
                   </td>
                 </tr>

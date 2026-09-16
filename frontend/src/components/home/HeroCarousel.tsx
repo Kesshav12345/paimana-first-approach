@@ -24,28 +24,28 @@ const SLIDES: Slide[] = [
     image: '/banner4-BesNf3Ns.png',
     objectPosition: 'center 45%',
     sectorTag: 'National Expressways & Urban Transit',
-    caption: 'Multi-level expressways, elevated transit corridors, and grade-separated interchanges.'
+    caption: 'Grade-separated transit corridors, multi-level expressways, and high-speed road networks.'
   },
   {
     id: 2,
     image: '/banner2-AZrNp54C.png',
     objectPosition: 'center 40%',
-    sectorTag: 'Strategic Aerospace & Maritime Infrastructure',
-    caption: 'Deep-water logistics berths, launch complexes, and coastal connectivity hubs.'
+    sectorTag: 'Strategic Aerospace & Maritime Logistics',
+    caption: 'Deep-water logistics terminals, container handling berths, and coastal multi-modal hubs.'
   },
   {
     id: 3,
     image: '/banner3-BkFJVKqW.png',
     objectPosition: 'center 45%',
     sectorTag: 'Civil Aviation & National Air Corridors',
-    caption: 'Modern airport passenger terminals, integrated air cargo, and runway expansions.'
+    caption: 'Modern passenger terminals, integrated air cargo complexes, and runway expansion corridors.'
   },
   {
     id: 4,
     image: '/banner1-1razA4xw.jpeg',
     objectPosition: 'center 65%',
-    sectorTag: 'Thermal & Renewable Energy Grid',
-    caption: 'Supercritical power complexes, high-voltage transmission, and clean solar infrastructure.'
+    sectorTag: 'Thermal & Clean Energy Grid',
+    caption: 'Supercritical power generation units, high-voltage transmission, and clean energy parks.'
   }
 ];
 
@@ -66,7 +66,7 @@ export const HeroCarousel: React.FC = () => {
     if (!isPlaying) return;
     const timer = setInterval(() => {
       nextSlide();
-    }, 6500);
+    }, 7000);
     return () => clearInterval(timer);
   }, [isPlaying, nextSlide]);
 
@@ -84,14 +84,14 @@ export const HeroCarousel: React.FC = () => {
 
   return (
     <div 
-      className="relative w-full overflow-hidden bg-slate-950 text-white border-b border-[#D9E1EA]"
+      className="relative w-full overflow-hidden bg-[#173F35] text-white border-b border-[#DDD9D0]"
       aria-roledescription="carousel"
       aria-label="National Infrastructure Highlights"
       onMouseEnter={() => setIsPlaying(false)}
       onMouseLeave={() => setIsPlaying(true)}
     >
-      {/* Full-bleed Cinematic Viewport: stretches across the screen */}
-      <div className="relative w-full h-[440px] sm:h-[480px] lg:h-[520px]">
+      {/* Full-bleed Cinematic Viewport */}
+      <div className="relative w-full h-[450px] sm:h-[490px] lg:h-[530px]">
         {SLIDES.map((slide, index) => {
           const isActive = index === current;
           return (
@@ -102,19 +102,19 @@ export const HeroCarousel: React.FC = () => {
               }`}
               aria-hidden={!isActive}
             >
-              {/* Natural Photo with gentle slow pan across screen width, without blue tint */}
+              {/* Natural Infrastructure Photography with subtle pan */}
               <img
                 src={slide.image}
                 alt={slide.sectorTag}
-                className={`w-full h-full object-cover transition-transform duration-[7000ms] ease-out ${
+                className={`w-full h-full object-cover transition-transform duration-[8000ms] ease-out ${
                   isActive ? 'scale-105 translate-x-1.5' : 'scale-100 translate-x-0'
                 }`}
                 style={{ objectPosition: slide.objectPosition }}
                 loading={index === 0 ? 'eager' : 'lazy'}
               />
-              {/* Neutral dark gradient focused on left text area for high readability without color tinting the image */}
+              {/* Editorial neutral vignette: high legibility without artificial color wash */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent pointer-events-none" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
             </div>
           );
         })}
@@ -125,45 +125,45 @@ export const HeroCarousel: React.FC = () => {
           {/* Top Row: Eyebrow Tag & Sector Badge */}
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 rounded bg-[#1877C9] text-white font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-xs">
-                PAIMANA INTELLIGENCE
+              <span className="px-3 py-1 rounded bg-[#173F35]/90 border border-white/20 text-white font-mono text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-xs">
+                PAIMANA ATLAS
               </span>
-              <span className="hidden sm:inline-block px-2.5 py-1 rounded bg-black/60 text-slate-200 border border-white/20 text-[11px] font-medium backdrop-blur-xs">
+              <span className="hidden sm:inline-block px-2.5 py-1 rounded bg-black/50 text-[#C5D4CD] border border-white/20 text-[11px] font-medium backdrop-blur-xs">
                 Central Sector Monitoring (₹150 Cr+)
               </span>
             </div>
 
-            {/* Slide Counter */}
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/60 border border-white/20 text-xs font-mono font-bold text-slate-200 backdrop-blur-xs">
-              <span>0{current + 1}</span>
-              <span className="text-slate-400">/</span>
-              <span className="text-slate-400">0{SLIDES.length}</span>
+            {/* Slide Counter (01 / 04) */}
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-white/20 text-xs font-mono font-bold text-[#E8F0EC] backdrop-blur-xs">
+              <span className="text-[#F5EEDB]">0{current + 1}</span>
+              <span className="text-[#8C9893]">/</span>
+              <span className="text-[#8C9893]">0{SLIDES.length}</span>
             </div>
           </div>
 
-          {/* Center Text Block */}
-          <div className="max-w-2xl space-y-3 sm:space-y-4 my-auto">
-            <div className="inline-flex items-center gap-1.5 text-xs text-[#F59E0B] font-bold tracking-wide drop-shadow-sm">
-              <span>●</span>
+          {/* Center Text Block: Editorial & Authoritative */}
+          <div className="max-w-2xl space-y-3.5 my-auto">
+            <div className="inline-flex items-center gap-2 text-xs text-[#F5EEDB] font-bold tracking-wide drop-shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[#C89432]" />
               <span>{activeSlide.sectorTag}</span>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
               Infrastructure Intelligence for Evidence-Based Governance
-            </h2>
+            </h1>
 
-            <p className="text-xs sm:text-sm text-slate-100 leading-relaxed drop-shadow-sm max-w-xl font-normal">
-              Monitor project milestones, anticipate cost and schedule escalations through deterministic metrics and CatBoost ML, and mobilize timely interventions across India&apos;s critical infrastructure portfolio.
+            <p className="text-xs sm:text-sm text-[#F6F3EC] leading-relaxed drop-shadow-sm max-w-xl font-normal">
+              Monitor progress, detect emerging risk, understand underlying drivers and prioritize intervention across India&apos;s major infrastructure portfolio.
             </p>
 
-            {/* Action Buttons */}
+            {/* Action Buttons: Institutional Forest & Translucent */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={() => navigate('/projects')}
-                className="px-4 py-2.5 rounded-lg bg-[#1877C9] hover:bg-[#123B63] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-lg bg-[#267A69] hover:bg-[#173F35] text-white text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-sm border border-[#3CA38F]/40 transition-colors cursor-pointer"
               >
-                <FolderKanban className="w-4 h-4" />
+                <FolderKanban className="w-4 h-4 text-[#F5EEDB]" />
                 <span>Explore Infrastructure Portfolio</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
@@ -171,17 +171,17 @@ export const HeroCarousel: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate('/early-warning')}
-                className="px-4 py-2.5 rounded-lg bg-black/50 hover:bg-black/70 text-white border border-white/40 text-xs sm:text-sm font-semibold flex items-center gap-2 backdrop-blur-xs transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-lg bg-black/40 hover:bg-black/60 text-white border border-white/30 text-xs sm:text-sm font-semibold flex items-center gap-2 backdrop-blur-xs transition-colors cursor-pointer"
               >
-                <ShieldAlert className="w-4 h-4 text-[#F59E0B]" />
-                <span>View Early Warning Center</span>
+                <ShieldAlert className="w-4 h-4 text-[#C89432]" />
+                <span>Explore Early Warning</span>
               </button>
             </div>
           </div>
 
           {/* Bottom Bar: Caption & Controls */}
-          <div className="flex items-center justify-between pt-4 border-t border-white/20 text-xs text-slate-200">
-            <div className="hidden sm:block text-[11px] text-slate-200 max-w-md truncate drop-shadow-xs">
+          <div className="flex items-center justify-between pt-4 border-t border-white/20 text-xs text-[#E8F0EC]">
+            <div className="hidden sm:block text-[11px] text-[#C5D4CD] max-w-md truncate drop-shadow-xs">
               {activeSlide.caption}
             </div>
 
@@ -197,7 +197,7 @@ export const HeroCarousel: React.FC = () => {
                     aria-label={`Go to slide ${idx + 1}`}
                     onClick={() => setCurrent(idx)}
                     className={`h-2 rounded-full transition-all cursor-pointer ${
-                      idx === current ? 'w-6 bg-[#1877C9]' : 'w-2 bg-white/40 hover:bg-white/70'
+                      idx === current ? 'w-6 bg-[#C89432]' : 'w-2 bg-white/40 hover:bg-white/70'
                     }`}
                   />
                 ))}
@@ -208,7 +208,7 @@ export const HeroCarousel: React.FC = () => {
                 type="button"
                 onClick={() => setIsPlaying(!isPlaying)}
                 aria-label={isPlaying ? 'Pause slideshow' : 'Play slideshow'}
-                className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-slate-200 border border-white/20 transition cursor-pointer"
+                className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 text-[#E8F0EC] border border-white/20 transition cursor-pointer"
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
               </button>
@@ -219,7 +219,7 @@ export const HeroCarousel: React.FC = () => {
                   type="button"
                   onClick={prevSlide}
                   aria-label="Previous slide"
-                  className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-slate-200 border border-white/20 transition cursor-pointer"
+                  className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 text-[#E8F0EC] border border-white/20 transition cursor-pointer"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -227,7 +227,7 @@ export const HeroCarousel: React.FC = () => {
                   type="button"
                   onClick={nextSlide}
                   aria-label="Next slide"
-                  className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-slate-200 border border-white/20 transition cursor-pointer"
+                  className="p-1.5 rounded-full bg-black/40 hover:bg-black/60 text-[#E8F0EC] border border-white/20 transition cursor-pointer"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

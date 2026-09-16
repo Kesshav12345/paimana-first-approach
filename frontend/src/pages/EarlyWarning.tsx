@@ -374,29 +374,29 @@ export const EarlyWarning: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header & Analytical Scope Question */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#D9E1EA] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#DDD9D0] pb-4">
         <div>
-          <div className="flex items-center gap-2 text-[#1877C9] text-xs font-bold uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 text-[#267A69] text-xs font-bold uppercase tracking-wider mb-1">
             <span className="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
             <span>Operational Triage & Decision Support</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[#0B2945] tracking-tight flex items-center gap-2.5">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[#173F35] tracking-tight flex items-center gap-2.5">
             <ShieldAlert className="w-6 h-6 text-amber-500 flex-shrink-0" />
-            <span>Infrastructure Early Warning & Intervention System</span>
+            <span>Infrastructure Early Warning & Intervention Center</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
-            Deterministic trigger rules, anomaly persistence duration, compound alerts, and structured operational remediation
+          <p className="text-xs sm:text-sm text-[#66736D] mt-1 font-medium">
+            Signal detection, risk driver investigation, executive triage, and verified operational intervention
           </p>
         </div>
 
         {/* Dual Tab Switcher with Dynamic Counts */}
-        <div className="flex bg-slate-100 border border-[#D9E1EA] p-1 rounded-lg text-xs self-start sm:self-auto">
+        <div className="flex bg-[#FAF8F5] border border-[#DDD9D0] p-1 rounded-lg text-xs self-start sm:self-auto">
           <button
             onClick={() => handleTabSwitch('alerts')}
             className={`px-3.5 py-2 rounded-md font-semibold transition flex items-center gap-1.5 cursor-pointer ${
               tab === 'alerts'
-                ? 'bg-[#1877C9] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                ? 'bg-[#173F35] text-white shadow-xs'
+                : 'text-[#66736D] hover:text-[#173F35] hover:bg-white/60'
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" />
@@ -406,8 +406,8 @@ export const EarlyWarning: React.FC = () => {
             onClick={() => handleTabSwitch('interventions')}
             className={`px-3.5 py-2 rounded-md font-semibold transition flex items-center gap-1.5 cursor-pointer ${
               tab === 'interventions'
-                ? 'bg-[#1877C9] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                ? 'bg-[#173F35] text-white shadow-xs'
+                : 'text-[#66736D] hover:text-[#173F35] hover:bg-white/60'
             }`}
           >
             <Workflow className="w-3.5 h-3.5" />
@@ -439,18 +439,18 @@ export const EarlyWarning: React.FC = () => {
           >
             {/* Search Input */}
             <div className="sm:col-span-2">
-              <label className="block text-[11px] font-medium text-slate-700 mb-1">
+              <label className="block text-[11px] font-medium text-[#26312D] mb-1">
                 Project Search
               </label>
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-[#8C9893] absolute left-2.5 top-2.5" />
                 <input
                   type="text"
                   placeholder="Search by project name or project ID..."
                   value={draftAlertFilters.search || ''}
                   onChange={(e) => setDraftAlertFilters(prev => ({ ...prev, search: e.target.value }))}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleApplyAlertFilters(); }}
-                  className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                  className="w-full bg-white border border-[#DDD9D0] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#26312D] placeholder-slate-400 focus:outline-none focus:border-[#267A69] focus:ring-1 focus:ring-[#267A69] shadow-2xs"
                 />
               </div>
             </div>
@@ -551,16 +551,16 @@ export const EarlyWarning: React.FC = () => {
 
           {/* INITIAL UNQUERIED LANDING STATE */}
           {!hasAppliedAlerts && (
-            <div className="bg-white border border-[#D9E1EA] rounded-xl p-8 text-center space-y-4 shadow-xs">
-              <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-200 text-[#1877C9] flex items-center justify-center mx-auto">
+            <div className="bg-white border border-[#DDD9D0] rounded-xl p-8 text-center space-y-4 shadow-xs">
+              <div className="w-12 h-12 rounded-full bg-[#E8F0EC] border border-[#BED6CB] text-[#267A69] flex items-center justify-center mx-auto">
                 <SlidersHorizontal className="w-6 h-6" />
               </div>
               <div className="max-w-md mx-auto">
-                <h3 className="text-base font-bold text-[#0B2945]">Define Scope & Apply Criteria</h3>
-                <p className="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                <h3 className="text-base font-bold text-[#173F35]">Define Scope & Apply Criteria</h3>
+                <p className="text-xs text-[#66736D] mt-1.5 leading-relaxed">
                   Early warning alerts are derived from deterministic project telemetry spanning cost escalation, schedule slippage, physical stagnation, and physical-financial divergence.
                 </p>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-[#66736D] mt-2">
                   Configure criteria in the filter panel above or select a quick preset to isolate projects requiring investigation.
                 </p>
               </div>
@@ -569,7 +569,7 @@ export const EarlyWarning: React.FC = () => {
                   <button
                     key={preset.id}
                     onClick={preset.onApply}
-                    className="px-3.5 py-2 bg-slate-50 hover:bg-blue-50 text-xs font-semibold text-slate-700 hover:text-[#1877C9] rounded-lg border border-slate-200 hover:border-blue-200 transition cursor-pointer"
+                    className="px-3.5 py-2 bg-[#FAF8F5] hover:bg-[#E8F0EC] text-xs font-semibold text-[#26312D] hover:text-[#267A69] rounded-lg border border-[#DDD9D0] hover:border-[#BED6CB] transition cursor-pointer"
                   >
                     {preset.label} &rarr;
                   </button>
@@ -585,45 +585,45 @@ export const EarlyWarning: React.FC = () => {
               {/* Filtered KPI Snapshot */}
               {alertSummary && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase">Matching Projects</p>
-                    <p className="text-lg font-extrabold text-[#0B2945] mt-0.5">{alertSummary.matchingProjects.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Unique entities flagged</p>
+                  <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-[#66736D] uppercase">Matching Projects</p>
+                    <p className="text-lg font-extrabold text-[#173F35] mt-0.5">{alertSummary.matchingProjects.toLocaleString()}</p>
+                    <p className="text-[10px] text-[#66736D] mt-0.5">Unique entities flagged</p>
                   </div>
-                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase">Active Signals</p>
+                  <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-[#66736D] uppercase">Active Signals</p>
                     <p className="text-lg font-extrabold text-amber-700 mt-0.5">{alertSummary.activeWarnings.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Total rule triggers</p>
+                    <p className="text-[10px] text-[#66736D] mt-0.5">Total rule triggers</p>
                   </div>
-                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase">Critical Signals</p>
-                    <p className="text-lg font-extrabold text-[#C62828] mt-0.5">{alertSummary.criticalSignals.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Urgent severity</p>
+                  <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-[#66736D] uppercase">Critical Signals</p>
+                    <p className="text-lg font-extrabold text-[#B74436] mt-0.5">{alertSummary.criticalSignals.toLocaleString()}</p>
+                    <p className="text-[10px] text-[#66736D] mt-0.5">Urgent severity</p>
                   </div>
-                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase">Compound Risk</p>
-                    <p className="text-lg font-extrabold text-[#0B2945] mt-0.5">{alertSummary.multiWarningProjects.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">≥ 2 concurrent alerts</p>
+                  <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-[#66736D] uppercase">Compound Risk</p>
+                    <p className="text-lg font-extrabold text-[#173F35] mt-0.5">{alertSummary.multiWarningProjects.toLocaleString()}</p>
+                    <p className="text-[10px] text-[#66736D] mt-0.5">≥ 2 concurrent alerts</p>
                   </div>
-                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase">Intervention Need</p>
-                    <p className="text-lg font-extrabold text-[#1877C9] mt-0.5">{alertSummary.interventionCandidates.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Priority score ≥ 50</p>
+                  <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-[#66736D] uppercase">Intervention Need</p>
+                    <p className="text-lg font-extrabold text-[#267A69] mt-0.5">{alertSummary.interventionCandidates.toLocaleString()}</p>
+                    <p className="text-[10px] text-[#66736D] mt-0.5">Priority score ≥ 50</p>
                   </div>
-                  <div className="bg-white border border-[#D9E1EA] rounded-xl p-3.5 shadow-xs">
-                    <p className="text-[11px] font-bold text-slate-500 uppercase">Active In-Progress</p>
+                  <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-xs">
+                    <p className="text-[11px] font-bold text-[#66736D] uppercase">Active In-Progress</p>
                     <p className="text-lg font-extrabold text-emerald-800 mt-0.5">{alertSummary.activeInterventions.toLocaleString()}</p>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Workflow active</p>
+                    <p className="text-[10px] text-[#66736D] mt-0.5">Workflow active</p>
                   </div>
                 </div>
               )}
 
               {/* Context Summary Sentence */}
-              <div className="flex items-center justify-between text-xs text-slate-600 px-1">
+              <div className="flex items-center justify-between text-xs text-[#66736D] px-1">
                 <span>
-                  Showing <strong className="text-slate-900">{alerts.length}</strong> alerts across <strong className="text-slate-900">{alertSummary?.matchingProjects || 0}</strong> projects ({alertTotal.toLocaleString()} total warning records matching cohort)
+                  Showing <strong className="text-[#173F35]">{alerts.length}</strong> alerts across <strong className="text-[#173F35]">{alertSummary?.matchingProjects || 0}</strong> projects ({alertTotal.toLocaleString()} total warning records matching cohort)
                 </span>
-                <span className="text-[11px] text-slate-500">
+                <span className="text-[11px] text-[#66736D]">
                   Ordered by persistence duration & intervention priority
                 </span>
               </div>
@@ -639,10 +639,10 @@ export const EarlyWarning: React.FC = () => {
               )}
 
               {/* Table */}
-              <div className="bg-white border border-[#D9E1EA] rounded-xl overflow-hidden shadow-xs">
+              <div className="bg-white border border-[#DDD9D0] rounded-xl overflow-hidden shadow-xs">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-slate-800 gov-table">
-                    <thead className="bg-[#F8FAFC] border-b border-[#D9E1EA] uppercase text-[11px] font-bold text-slate-600">
+                  <table className="w-full text-left text-xs text-[#26312D] atlas-table">
+                    <thead className="bg-[#F8FAFC] border-b border-[#DDD9D0] uppercase text-[11px] font-bold text-[#66736D]">
                       <tr>
                         <th className="px-4 py-3">Project ID & Name</th>
                         <th className="px-4 py-3">Administrative Scope</th>
@@ -657,18 +657,18 @@ export const EarlyWarning: React.FC = () => {
                     <tbody className="divide-y divide-slate-100">
                       {loadingAlerts ? (
                         <tr>
-                          <td colSpan={8} className="text-center py-12 text-slate-500">
+                          <td colSpan={8} className="text-center py-12 text-[#66736D]">
                             Applying warning filters and retrieving project telemetry...
                           </td>
                         </tr>
                       ) : alerts.length === 0 ? (
                         <tr>
                           <td colSpan={8} className="text-center py-12 space-y-2">
-                            <p className="text-sm font-medium text-slate-400">No active warnings matched the selected criteria.</p>
-                            <p className="text-xs text-slate-500">Try broadening your search or resetting restrictive filters.</p>
+                            <p className="text-sm font-medium text-[#8C9893]">No active warnings matched the selected criteria.</p>
+                            <p className="text-xs text-[#66736D]">Try broadening your search or resetting restrictive filters.</p>
                             <button
                               onClick={handleResetAlertFilters}
-                              className="mt-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-semibold"
+                              className="mt-2 px-3 py-1.5 bg-blue-600 hover:bg-[#E8F0EC]0 text-white rounded text-xs font-semibold"
                             >
                               Reset Warning Filters
                             </button>
@@ -678,24 +678,24 @@ export const EarlyWarning: React.FC = () => {
                         alerts.map((a) => (
                           <tr 
                             key={a.alertId} 
-                            className={`hover:bg-slate-50/80 transition-colors ${
-                              a.severity === 'CRITICAL' ? 'border-l-3 border-l-[#C62828] bg-red-50/15' : ''
+                            className={`hover:bg-[#FAF8F5]/80 transition-colors ${
+                              a.severity === 'CRITICAL' ? 'border-l-3 border-l-[#B74436] bg-red-50/15' : ''
                             }`}
                           >
                             <td className="px-4 py-3 max-w-xs">
-                              <div className="font-mono text-[11px] text-slate-500 font-semibold">{a.projectId}</div>
-                              <div className="font-bold text-slate-900 hover:text-[#1877C9] transition truncate cursor-pointer" title={a.projectName} onClick={() => navigate(`/projects/${a.projectId}`)}>
+                              <div className="font-mono text-[11px] text-[#66736D] font-semibold">{a.projectId}</div>
+                              <div className="font-bold text-[#173F35] hover:text-[#267A69] transition truncate cursor-pointer" title={a.projectName} onClick={() => navigate(`/projects/${a.projectId}`)}>
                                 {a.projectName}
                               </div>
                             </td>
-                            <td className="px-4 py-3 text-xs text-slate-600">
-                              <div className="font-semibold text-slate-800">{a.sectorName}</div>
-                              <div className="truncate max-w-[160px] text-[11px] text-slate-500" title={a.ministryName}>{a.ministryName}</div>
-                              <div className="text-[11px] text-slate-500">{a.stateName}</div>
+                            <td className="px-4 py-3 text-xs text-[#66736D]">
+                              <div className="font-semibold text-[#26312D]">{a.sectorName}</div>
+                              <div className="truncate max-w-[160px] text-[11px] text-[#66736D]" title={a.ministryName}>{a.ministryName}</div>
+                              <div className="text-[11px] text-[#66736D]">{a.stateName}</div>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="font-semibold text-slate-900">{a.warningType}</div>
-                              <div className="text-[11px] text-slate-500 max-w-xs truncate" title={a.triggerCondition}>
+                              <div className="font-semibold text-[#173F35]">{a.warningType}</div>
+                              <div className="text-[11px] text-[#66736D] max-w-xs truncate" title={a.triggerCondition}>
                                 {a.triggerCondition}
                               </div>
                             </td>
@@ -706,7 +706,7 @@ export const EarlyWarning: React.FC = () => {
                               <RiskBadge band={a.riskBand || 'LOW'} />
                             </td>
                             <td className="px-4 py-3 text-right font-mono">
-                              <span className={a.persistencePeriods >= 3 ? 'text-rose-700 font-bold' : 'text-slate-600'}>
+                              <span className={a.persistencePeriods >= 3 ? 'text-rose-700 font-bold' : 'text-[#66736D]'}>
                                 {a.persistencePeriods} mo{a.persistencePeriods > 1 ? 's' : ''}
                               </span>
                             </td>
@@ -714,7 +714,7 @@ export const EarlyWarning: React.FC = () => {
                               <div className="text-xs">
                                 <StatusChip status={a.projectInterventionStatus || 'PENDING_REVIEW'} />
                               </div>
-                              <div className="text-[11px] text-slate-500 max-w-xs truncate mt-0.5" title={a.recommendedIntervention}>
+                              <div className="text-[11px] text-[#66736D] max-w-xs truncate mt-0.5" title={a.recommendedIntervention}>
                                 {a.recommendedIntervention || 'Milestone review recommended'}
                               </div>
                             </td>
@@ -750,7 +750,7 @@ export const EarlyWarning: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => navigate(`/projects/${a.projectId}`)}
-                                  className="px-2 py-1 bg-blue-50 hover:bg-[#1877C9] text-[#1877C9] hover:text-white rounded text-[11px] border border-blue-200 transition cursor-pointer"
+                                  className="px-2 py-1 bg-[#E8F0EC] hover:bg-[#267A69] text-[#267A69] hover:text-white rounded text-[11px] border border-[#BED6CB] transition cursor-pointer"
                                   title="Open Project Intelligence"
                                 >
                                   <ExternalLink className="w-3 h-3" />
@@ -803,18 +803,18 @@ export const EarlyWarning: React.FC = () => {
           >
             {/* Search Input */}
             <div className="sm:col-span-2">
-              <label className="block text-[11px] font-medium text-slate-700 mb-1">
+              <label className="block text-[11px] font-medium text-[#26312D] mb-1">
                 Project Search
               </label>
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+                <Search className="w-3.5 h-3.5 text-[#8C9893] absolute left-2.5 top-2.5" />
                 <input
                   type="text"
                   placeholder="Search intervention by project name or ID..."
                   value={draftIntFilters.search || ''}
                   onChange={(e) => setDraftIntFilters(prev => ({ ...prev, search: e.target.value }))}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleApplyIntFilters(); }}
-                  className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-2xs"
+                  className="w-full bg-white border border-[#DDD9D0] rounded-lg pl-8 pr-3 py-1.5 text-xs text-[#26312D] placeholder-slate-400 focus:outline-none focus:border-[#267A69] focus:ring-1 focus:ring-[#267A69] shadow-2xs"
                 />
               </div>
             </div>
@@ -888,7 +888,7 @@ export const EarlyWarning: React.FC = () => {
             {[
               { id: 'UNDER_REVIEW', title: 'Under Review', count: stageCounts.UNDER_REVIEW, color: 'text-purple-700 bg-purple-50 border-purple-200' },
               { id: 'ACTION_INITIATED', title: 'Action Initiated', count: stageCounts.ACTION_INITIATED, color: 'text-amber-800 bg-amber-50 border-amber-200' },
-              { id: 'MONITORING', title: 'Monitoring', count: stageCounts.MONITORING, color: 'text-blue-700 bg-blue-50 border-blue-200' },
+              { id: 'MONITORING', title: 'Monitoring', count: stageCounts.MONITORING, color: 'text-[#173F35] bg-[#E8F0EC] border-[#BED6CB]' },
               { id: 'RESOLVED', title: 'Resolved', count: stageCounts.RESOLVED, color: 'text-emerald-800 bg-emerald-50 border-emerald-200' },
             ].map(stage => {
               const isActive = appliedIntFilters.status === stage.id;
@@ -905,15 +905,15 @@ export const EarlyWarning: React.FC = () => {
                   }}
                   className={`p-3 rounded-xl border text-left transition flex items-center justify-between cursor-pointer ${
                     isActive 
-                      ? 'bg-blue-50/80 border-[#1877C9] shadow-xs ring-1 ring-[#1877C9]' 
-                      : 'bg-white border-[#D9E1EA] hover:border-slate-300 hover:bg-slate-50/60 shadow-xs'
+                      ? 'bg-[#E8F0EC]/80 border-[#267A69] shadow-xs ring-1 ring-[#267A69]' 
+                      : 'bg-white border-[#DDD9D0] hover:border-[#DDD9D0] hover:bg-[#FAF8F5]/60 shadow-xs'
                   }`}
                 >
                   <div>
-                    <p className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">{stage.title}</p>
+                    <p className="text-[11px] font-bold text-[#66736D] uppercase tracking-wider">{stage.title}</p>
                     <p className={`text-lg font-extrabold mt-0.5 ${stage.color.split(' ')[0]}`}>{stage.count.toLocaleString()}</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                  <ChevronRight className="w-4 h-4 text-[#8C9893]" />
                 </button>
               );
             })}
@@ -930,10 +930,10 @@ export const EarlyWarning: React.FC = () => {
           )}
 
           {/* Interventions Table */}
-          <div className="bg-white border border-[#D9E1EA] rounded-xl overflow-hidden shadow-xs">
+          <div className="bg-white border border-[#DDD9D0] rounded-xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-800 gov-table">
-                <thead className="bg-[#F8FAFC] border-b border-[#D9E1EA] uppercase text-[11px] font-bold text-slate-600">
+              <table className="w-full text-left text-xs text-[#26312D] atlas-table">
+                <thead className="bg-[#F8FAFC] border-b border-[#DDD9D0] uppercase text-[11px] font-bold text-[#66736D]">
                   <tr>
                     <th className="px-4 py-3">Project ID & Name</th>
                     <th className="px-4 py-3">Administrative Entity</th>
@@ -947,18 +947,18 @@ export const EarlyWarning: React.FC = () => {
                 <tbody className="divide-y divide-slate-100">
                   {loadingInt ? (
                     <tr>
-                      <td colSpan={7} className="text-center py-12 text-slate-500">
+                      <td colSpan={7} className="text-center py-12 text-[#66736D]">
                         Loading interventions and operational remediation log...
                       </td>
                     </tr>
                   ) : interventions.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="text-center py-12 space-y-2">
-                        <p className="text-sm font-medium text-slate-500">No intervention records matched the selected criteria.</p>
-                        <p className="text-xs text-slate-400">Modify filters to view other operational remediation records.</p>
+                        <p className="text-sm font-medium text-[#66736D]">No intervention records matched the selected criteria.</p>
+                        <p className="text-xs text-[#8C9893]">Modify filters to view other operational remediation records.</p>
                         <button
                           onClick={handleResetIntFilters}
-                          className="mt-2 px-3 py-1.5 bg-[#1877C9] hover:bg-[#123B63] text-white rounded-md text-xs font-semibold shadow-xs cursor-pointer"
+                          className="mt-2 px-3 py-1.5 bg-[#267A69] hover:bg-[#173F35] text-white rounded-md text-xs font-semibold shadow-xs cursor-pointer"
                         >
                           Reset Filters
                         </button>
@@ -966,22 +966,22 @@ export const EarlyWarning: React.FC = () => {
                     </tr>
                   ) : (
                     interventions.map((iv) => (
-                      <tr key={iv.projectId} className="hover:bg-slate-50/80 transition-colors">
+                      <tr key={iv.projectId} className="hover:bg-[#FAF8F5]/80 transition-colors">
                         <td className="px-4 py-3 max-w-xs">
-                          <div className="font-mono text-[11px] text-slate-500 font-semibold">{iv.projectId}</div>
+                          <div className="font-mono text-[11px] text-[#66736D] font-semibold">{iv.projectId}</div>
                           <div 
-                            className="font-bold text-slate-900 hover:text-[#1877C9] transition truncate cursor-pointer" 
+                            className="font-bold text-[#173F35] hover:text-[#267A69] transition truncate cursor-pointer" 
                             title={iv.projectName}
                             onClick={() => navigate(`/projects/${iv.projectId}`)}
                           >
                             {iv.projectName}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-xs text-slate-600">
-                          <div className="font-semibold text-slate-800">{iv.responsibleAuthority || iv.ministryName}</div>
-                          <div className="text-[11px] text-slate-500">{iv.sectorName} · {iv.stateName}</div>
+                        <td className="px-4 py-3 text-xs text-[#66736D]">
+                          <div className="font-semibold text-[#26312D]">{iv.responsibleAuthority || iv.ministryName}</div>
+                          <div className="text-[11px] text-[#66736D]">{iv.sectorName} · {iv.stateName}</div>
                         </td>
-                        <td className="px-4 py-3 text-slate-700 max-w-xs truncate" title={iv.recommendedIntervention}>
+                        <td className="px-4 py-3 text-[#26312D] max-w-xs truncate" title={iv.recommendedIntervention}>
                           {iv.recommendedIntervention}
                         </td>
                         <td className="px-4 py-3 text-center">
@@ -990,7 +990,7 @@ export const EarlyWarning: React.FC = () => {
                         <td className="px-4 py-3 text-right font-mono font-bold text-amber-700">
                           {iv.interventionPriorityScore.toFixed(1)}
                         </td>
-                        <td className="px-4 py-3 text-slate-600 text-xs max-w-xs truncate">
+                        <td className="px-4 py-3 text-[#66736D] text-xs max-w-xs truncate">
                           {iv.latestActionNotes || 'No notes logged yet'}
                         </td>
                         <td className="px-4 py-3 text-center">
@@ -1009,7 +1009,7 @@ export const EarlyWarning: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => navigate(`/projects/${iv.projectId}`)}
-                              className="px-2 py-1 bg-blue-50 hover:bg-[#1877C9] text-[#1877C9] hover:text-white rounded text-[11px] border border-blue-200 transition cursor-pointer"
+                              className="px-2 py-1 bg-[#E8F0EC] hover:bg-[#267A69] text-[#267A69] hover:text-white rounded text-[11px] border border-[#BED6CB] transition cursor-pointer"
                               title="Open Project Intelligence"
                             >
                               <ExternalLink className="w-3 h-3" />
@@ -1043,21 +1043,21 @@ export const EarlyWarning: React.FC = () => {
       {/* ========================================================================= */}
       {modalProject && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white border border-[#D9E1EA] rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl">
-            <div className="border-b border-slate-100 pb-3">
-              <h3 className="text-sm font-bold text-[#0B2945] flex items-center gap-2">
-                <Workflow className="w-4 h-4 text-[#1877C9]" />
+          <div className="bg-white border border-[#DDD9D0] rounded-xl max-w-md w-full p-6 space-y-4 shadow-xl">
+            <div className="border-b border-[#EAE6DF] pb-3">
+              <h3 className="text-sm font-bold text-[#173F35] flex items-center gap-2">
+                <Workflow className="w-4 h-4 text-[#267A69]" />
                 Update Intervention Workflow Status
               </h3>
-              <p className="text-xs text-slate-500 mt-1 truncate">{modalProject.projectName} ({modalProject.projectId})</p>
+              <p className="text-xs text-[#66736D] mt-1 truncate">{modalProject.projectName} ({modalProject.projectId})</p>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">State Machine Lifecycle Transition</label>
+              <label className="block text-xs font-semibold text-[#26312D] mb-1.5">State Machine Lifecycle Transition</label>
               <select
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
-                className="w-full bg-white border border-[#D9E1EA] rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#1877C9] shadow-2xs"
+                className="w-full bg-white border border-[#DDD9D0] rounded-lg px-3 py-2 text-xs text-[#26312D] focus:outline-none focus:border-[#267A69] shadow-2xs"
               >
                 <option value="UNDER_REVIEW">Under Review</option>
                 <option value="ACTION_INITIATED">Action Initiated</option>
@@ -1067,22 +1067,22 @@ export const EarlyWarning: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Action Notes / Directive Details</label>
+              <label className="block text-xs font-semibold text-[#26312D] mb-1.5">Action Notes / Directive Details</label>
               <textarea
                 rows={3}
                 value={newNotes}
                 onChange={(e) => setNewNotes(e.target.value)}
                 placeholder="Log official meeting decisions, committee orders, or contractor directives..."
-                className="w-full bg-white border border-[#D9E1EA] rounded-lg p-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#1877C9] shadow-2xs"
+                className="w-full bg-white border border-[#DDD9D0] rounded-lg p-2.5 text-xs text-[#26312D] placeholder-slate-400 focus:outline-none focus:border-[#267A69] shadow-2xs"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <div className="flex justify-end gap-2 pt-3 border-t border-[#EAE6DF]">
               <button
                 type="button"
                 onClick={() => setModalProject(null)}
                 disabled={isUpdatingStatus}
-                className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-[#D9E1EA] text-xs font-semibold text-slate-700 transition cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-white hover:bg-[#FAF8F5] border border-[#DDD9D0] text-xs font-semibold text-[#26312D] transition cursor-pointer"
               >
                 Cancel
               </button>
@@ -1090,7 +1090,7 @@ export const EarlyWarning: React.FC = () => {
                 type="button"
                 onClick={handleUpdateStatus}
                 disabled={isUpdatingStatus}
-                className="px-4 py-1.5 rounded-lg bg-[#1877C9] hover:bg-[#123B63] text-xs font-semibold text-white transition disabled:opacity-50 cursor-pointer shadow-xs"
+                className="px-4 py-1.5 rounded-lg bg-[#267A69] hover:bg-[#173F35] text-xs font-semibold text-white transition disabled:opacity-50 cursor-pointer shadow-xs"
               >
                 {isUpdatingStatus ? 'Saving...' : 'Save Transition'}
               </button>
