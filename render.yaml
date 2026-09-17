@@ -6,6 +6,7 @@ services:
     dockerfilePath: ml-service/Dockerfile
     dockerContext: .
     plan: free
+    healthCheckPath: /health
     envVars:
       - key: PORT
         value: 8000
@@ -17,6 +18,7 @@ services:
     dockerfilePath: backend/Dockerfile
     dockerContext: .
     plan: free
+    healthCheckPath: /api/portfolio/kpis
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: default
@@ -34,6 +36,9 @@ services:
     dockerfilePath: frontend/Dockerfile
     dockerContext: .
     plan: free
+    healthCheckPath: /health
     envVars:
+      - key: PORT
+        value: 80
       - key: BACKEND_URL
         value: https://paimana-backend.onrender.com

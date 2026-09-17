@@ -188,6 +188,14 @@ def sanitize_features(req: PredictRequest) -> pd.DataFrame:
 # -------------------------------------------------------------
 # Endpoints
 # -------------------------------------------------------------
+@app.get("/")
+def root_check():
+    return {
+        "status": "UP",
+        "service": "PAIMANA-INTEL Python ML Service",
+        "version": "1.0.0"
+    }
+
 @app.get("/health")
 def health_check():
     return {
