@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { GovAuthModal } from './components/auth/GovAuthModal';
 import { GovernmentHeader } from './components/layout/GovernmentHeader';
 import { Navbar } from './components/layout/Navbar';
 import { AppFooter } from './components/layout/AppFooter';
@@ -16,52 +14,47 @@ import { Methodology } from './pages/Methodology';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen flex flex-col bg-[#F0F6FB] text-[#0F2942] antialiased selection:bg-[#1BA0E2] selection:text-white">
-          {/* National Government Masthead */}
-          <GovernmentHeader />
-          
-          {/* Primary Navigation with RBAC Role Switcher */}
-          <Navbar />
-          
-          {/* Main Workspace */}
-          <main className="flex-1 w-full">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/sectors" element={<SectorAnalytics />} />
-              <Route path="/ministries" element={<MinistryAnalytics />} />
-              <Route path="/states" element={<StateAnalytics />} />
-              <Route path="/early-warning" element={<EarlyWarning />} />
-              <Route path="/projects/:id" element={<ProjectIntelligence />} />
-              <Route path="/operations" element={<Operations />} />
-              <Route path="/methodology" element={<Methodology />} />
-              
-              {/* 404 Fallback */}
-              <Route path="*" element={
-                <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-8">
-                  <h1 className="text-4xl font-extrabold text-[#0A365C]">404</h1>
-                  <p className="text-[#4B647D] mt-2 text-sm">The requested official dashboard or project record was not found.</p>
-                  <a
-                    href="/"
-                    className="mt-4 px-4 py-2 bg-[#0A365C] text-white rounded-lg text-xs font-semibold hover:bg-[#1BA0E2] transition-colors shadow-xs"
-                  >
-                    Return to National Overview
-                  </a>
-                </div>
-              } />
-            </Routes>
-          </main>
+    <Router>
+      <div className="min-h-screen flex flex-col bg-[#F6F7F8] text-[#25313B] antialiased selection:bg-[#EBF6FA] selection:text-[#123F63]">
+        {/* National Government Masthead */}
+        <GovernmentHeader />
+        
+        {/* Primary Navigation */}
+        <Navbar />
+        
+        {/* Main Workspace */}
+        <main className="flex-1 w-full">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/sectors" element={<SectorAnalytics />} />
+            <Route path="/ministries" element={<MinistryAnalytics />} />
+            <Route path="/states" element={<StateAnalytics />} />
+            <Route path="/early-warning" element={<EarlyWarning />} />
+            <Route path="/projects/:id" element={<ProjectIntelligence />} />
+            <Route path="/operations" element={<Operations />} />
+            <Route path="/methodology" element={<Methodology />} />
+            
+            {/* 404 Fallback */}
+            <Route path="*" element={
+              <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-8">
+                <h1 className="text-4xl font-extrabold text-[#123F63]">404</h1>
+                <p className="text-[#66737D] mt-2 text-sm">The requested official dashboard or project record was not found.</p>
+                <a
+                  href="/"
+                  className="mt-4 px-4 py-2 bg-[#187A9E] text-white rounded-xs text-xs font-semibold hover:bg-[#156586] transition-colors shadow-none"
+                >
+                  Return to National Overview
+                </a>
+              </div>
+            } />
+          </Routes>
+        </main>
 
-          {/* Institutional Government Footer */}
-          <AppFooter />
-
-          {/* Role-Based Access Control Modal */}
-          <GovAuthModal />
-        </div>
-      </Router>
-    </AuthProvider>
+        {/* Institutional Government Footer */}
+        <AppFooter />
+      </div>
+    </Router>
   );
 }
 

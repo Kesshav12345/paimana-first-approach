@@ -9,6 +9,7 @@ COPY frontend/ ./
 RUN npm run build
 
 FROM nginx:alpine
+ENV NGINX_ENVSUBST_FILTER=BACKEND_URL
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY frontend/nginx.conf /etc/nginx/templates/default.conf.template
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf

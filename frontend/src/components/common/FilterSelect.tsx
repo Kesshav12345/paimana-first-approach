@@ -51,12 +51,12 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
   const allLabel = typeof allOption === 'string' ? allOption : defaultAllLabel;
 
   return (
-    <div className={`space-y-1 ${className}`} title={tooltip}>
+    <div className={`space-y-1.5 ${className}`} title={tooltip}>
       <label
         htmlFor={selectId}
-        className="block text-[11px] font-semibold text-[#26312D] tracking-wide flex items-center gap-1"
+        className="block text-xs sm:text-sm font-bold text-[#66737D] tracking-wide flex items-center gap-1.5"
       >
-        {icon && <span className="text-[#8C9893] shrink-0">{icon}</span>}
+        {icon && <span className="text-[#66737D] shrink-0">{icon}</span>}
         <span>{label}</span>
       </label>
       <div className="relative">
@@ -65,10 +65,10 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
           value={value || 'ALL'}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
-          className="w-full bg-white border border-[#B8D9F2] rounded-lg px-2.5 py-1.5 text-xs text-[#0A365C] font-semibold shadow-2xs hover:border-[#1BA0E2] focus:outline-none focus:ring-2 focus:ring-[#1BA0E2]/30 focus:border-[#1BA0E2] disabled:bg-[#F0F6FB] disabled:text-[#4A6572]/50 disabled:cursor-not-allowed transition-all truncate cursor-pointer"
+          className="w-full bg-[#FFFFFF] border border-[#D9E0E5] rounded-xs px-3 py-2 text-sm text-[#25313B] font-medium hover:border-[#187A9E] focus:outline-none focus:ring-1 focus:ring-[#187A9E] focus:border-[#187A9E] disabled:bg-[#F6F7F8] disabled:text-[#66737D] disabled:cursor-not-allowed transition-all truncate cursor-pointer"
         >
           {allOption !== false && !hasAll && (
-            <option value="ALL" className="text-[#0A365C] font-bold">
+            <option value="ALL" className="text-[#123F63] font-bold">
               {allLabel}
             </option>
           )}
@@ -79,7 +79,7 @@ export const FilterSelect: React.FC<FilterSelectProps> = ({
             const optCount = isObj && opt.count !== undefined ? ` (${opt.count.toLocaleString()})` : '';
 
             return (
-              <option key={optVal} value={optVal} className="text-[#0A365C]">
+              <option key={optVal} value={optVal} className="text-[#25313B]">
                 {optLabel}
                 {optCount}
               </option>

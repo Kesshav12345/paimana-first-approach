@@ -1,81 +1,72 @@
 @import "tailwindcss";
 
 :root {
-  /* Government of India / MoSPI Digital Portal — Official Palette Tokens */
-  --atlas-canvas: #F0F6FB;         /* Official Luminous Gov-Blue canvas background */
-  --atlas-surface: #FFFFFF;        /* Content surface */
-  --atlas-surface-subtle: #F4F9FD; /* Subtle card/nested surface */
-  --atlas-gov-blue: #1BA0E2;       /* Exact Primary Brand Blue (User Specification) */
-  --atlas-gov-blue-hover: #148AC4; /* Deepened interaction blue */
-  --atlas-gov-navy: #0A365C;       /* Official Institutional Deep Navy */
-  --atlas-gov-navy-deep: #072540;  /* High-authority header / masthead navy */
-  --atlas-forest-deep: #0A365C;    /* Compatibility map to Deep Navy */
-  --atlas-forest: #1BA0E2;         /* Compatibility map to Primary Brand Blue */
-  --atlas-forest-light: #E1EFF9;   /* Soft Gov-Blue tint */
-  --atlas-charcoal: #0F2942;       /* High-contrast deep navy-charcoal typography */
-  --atlas-secondary: #4B647D;      /* Secondary metadata & labels */
-  --atlas-muted: #7E97B0;          /* Muted borders / faint text */
-  --atlas-ochre: #D97706;          /* Attention & elevated risk (Gov Amber) */
-  --atlas-ochre-soft: #FEF3C7;     /* Soft amber badge background */
-  --atlas-terracotta: #C53030;     /* Critical status & alerts (Gov Crimson) */
-  --atlas-terracotta-soft: #FEE2E2;/* Soft crimson badge background */
-  --atlas-border: #B8D9F2;         /* Primary crisp structural borders */
-  --atlas-border-subtle: #D8EBF8;  /* Nested / divider rules */
+  /* PAIMANA Institutional Portal Palette */
+  --gov-canvas: #F6F7F8;         /* Canvas Background */
+  --gov-surface: #FFFFFF;        /* Surface White */
+  --gov-text: #25313B;           /* Primary Text */
+  --gov-muted: #66737D;          /* Muted Text */
+  --gov-border: #D9E0E5;         /* Border */
+  --paimana-blue: #187A9E;       /* PAIMANA Blue Brand Accent */
+  --paimana-deep: #123F63;       /* Deep Blue Institutional */
+  --paimana-saffron: #D99A2B;    /* Saffron Tiny Accent */
+  --paimana-green: #4D8A67;      /* Green Healthy/Positive */
+  --paimana-red: #B94A45;        /* Red Critical */
+  --paimana-blue-soft: #EBF6FA;  /* Soft Blue Interactive Highlight */
 }
 
 body {
-  background-color: var(--atlas-canvas);
-  color: var(--atlas-charcoal);
-  font-family: 'Open Sans', 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  font-size: 15px;
-  line-height: 1.55;
+  background-color: var(--gov-canvas);
+  color: var(--gov-text);
+  font-family: 'Source Sans 3', 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Numeric alignment helper */
+/* Numeric tabular data alignment */
 .tabular-nums {
-  font-family: 'Noto Sans', 'Open Sans', monospace;
+  font-family: 'Noto Sans', 'Source Sans 3', monospace;
   font-variant-numeric: tabular-nums;
 }
 
-/* Official Government Blue Institutional Scrollbar */
+/* Institutional Clean Scrollbar */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #E8F3FA;
+  background: #F6F7F8;
 }
 ::-webkit-scrollbar-thumb {
-  background: #90C3E8;
-  border-radius: 4px;
+  background: #D9E0E5;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #1BA0E2;
+  background: #187A9E;
 }
 
-/* Authoritative Government Registry Table Helpers */
+/* Institutional Government Registry Table Helpers */
 .atlas-table th {
-  background-color: #E1EFF9;
-  color: #0A365C;
+  background-color: #F0F4F7;
+  color: #123F63;
   font-size: 0.8125rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.875rem 1rem;
-  border-bottom: 1.5px solid #B8D9F2;
+  border-bottom: 1px solid #D9E0E5;
 }
 
 .atlas-table td {
-  padding: 0.9375rem 1rem;
-  border-bottom: 1px solid #D8EBF8;
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid #EBF0F4;
   font-size: 0.875rem;
-  color: #0F2942;
+  color: #25313B;
 }
 
 .atlas-table tr:hover td {
-  background-color: #F4F9FD;
+  background-color: #F0F4F7;
 }
-

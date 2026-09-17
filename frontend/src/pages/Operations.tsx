@@ -2,17 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Database, Cpu, RefreshCw, UploadCloud, AlertTriangle, 
   Clock, Server, Activity, ShieldCheck, ArrowUpRight, Play, FileText,
-  Search, CheckCircle2, AlertCircle, Layers, Lock
+  Search, CheckCircle2, AlertCircle, Layers
 } from 'lucide-react';
 import { api } from '../services/api';
-import { useAuth } from '../context/AuthContext';
 import type { OperationsStatus, PipelineJobProgress, PipelineRunHistoryItem } from '../types';
 
 export const Operations: React.FC = () => {
-  const { role, user, hasPermission, setIsAuthModalOpen } = useAuth();
   const [status, setStatus] = useState<OperationsStatus | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const canRunPipeline = true;
 
   // PDF Upload state
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -226,142 +225,107 @@ export const Operations: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <RefreshCw className="w-8 h-8 text-[#1BA0E2] animate-spin" />
-          <p className="text-[#4A6572] font-semibold text-sm">Connecting to Intelligence Refresh Console...</p>
+          <RefreshCw className="w-8 h-8 text-[#187A9E] animate-spin" />
+          <p className="text-[#66737D] font-semibold text-sm">Connecting to Intelligence Refresh Console...</p>
         </div>
       </div>
     );
   }
 
-  const canRunPipeline = hasPermission('PIPELINE_RUN');
-  const canAdminML = hasPermission('ADMIN_ACCESS');
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b-2 border-[#B8D9F2] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[#D9E0E5] pb-6">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-extrabold text-[#0A365C] tracking-tight">Intelligence Refresh Operations</h1>
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-[#E1EFF9] text-[#0A365C] border border-[#B8D9F2]">
-              <span className="w-2 h-2 rounded-full bg-[#1BA0E2] animate-pulse"></span>
+            <h1 className="text-3xl font-extrabold text-[#123F63] tracking-tight">Intelligence Refresh Operations</h1>
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-xs text-xs font-bold bg-[#F6F7F8] text-[#156586] border border-[#D9E0E5]">
+              <span className="w-2 h-2 rounded-full bg-[#187A9E] animate-pulse"></span>
               {status?.status || 'OPERATIONAL'}
             </span>
           </div>
-          <p className="text-sm text-[#4A6572] mt-1 font-medium">
+          <p className="text-sm text-[#66737D] mt-1 font-medium">
             End-to-end orchestration: monthly report ingestion, empirical web deep dives, deterministic analytics, and CatBoost MLOps.
           </p>
         </div>
         <button
           onClick={fetchStatusAndRuns}
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-[#0A365C] bg-white border border-[#B8D9F2] rounded-lg hover:bg-[#E1EFF9] transition-colors shadow-2xs self-start md:self-auto cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-[#156586] bg-white border border-[#D9E0E5] rounded-xs hover:bg-[#F6F7F8] hover:text-[#123F63] transition-colors shadow-2xs self-start md:self-auto cursor-pointer"
         >
-          <RefreshCw className="w-4 h-4 text-[#1BA0E2]" />
+          <RefreshCw className="w-4 h-4 text-[#187A9E]" />
           Refresh Console
         </button>
       </div>
 
-      {/* Institutional RBAC Access & Authorization Bar */}
-      <div className="bg-white border-2 border-[#B8D9F2] rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-lg bg-[#E1EFF9] border border-[#B8D9F2] flex items-center justify-center shrink-0">
-            <ShieldCheck className="w-5 h-5 text-[#1BA0E2]" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#0A365C] uppercase tracking-wider">Jan Parichay Role:</span>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                role === 'ADMIN' ? 'bg-purple-100 text-purple-900 border-purple-200' :
-                role === 'NODAL_OFFICER' ? 'bg-blue-100 text-blue-900 border-blue-200' :
-                'bg-slate-100 text-slate-800 border-slate-300'
-              }`}>
-                {user.name} ({role.replace('_', ' ')})
-              </span>
-            </div>
-            <p className="text-xs text-[#4A6572] mt-0.5 font-medium">
-              {role === 'ADMIN' && 'Full System Administrator Access: Production model hot-swapping, candidate retraining, and canonical ingestion unrestricted.'}
-              {role === 'NODAL_OFFICER' && 'Ministry Nodal Officer Access: Flash report PDF upload & scoped analytics recomputation permitted for monitored portfolio.'}
-              {role === 'PUBLIC' && 'Public Citizen Gateway (Read-Only): System telemetry & model metrics audit mode. Mutation actions require verified SSO login.'}
-            </p>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsAuthModalOpen(true)}
-          className="px-3.5 py-2 bg-[#F0F6FB] hover:bg-[#E1EFF9] text-[#0A365C] border border-[#B8D9F2] rounded-lg text-xs font-bold transition-all shrink-0 cursor-pointer"
-        >
-          Switch Persona &rarr;
-        </button>
-      </div>
-
       {error && (
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm flex items-center gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
+        <div className="p-4 bg-[#FDF2F1] border border-[#F6D3D1] rounded-xs text-[#B94A45] text-sm flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-[#B94A45] shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* SECTION A: SYSTEM HEALTH */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div className="bg-white p-4 rounded-xl border-2 border-[#B8D9F2] shadow-xs">
-          <div className="flex items-center justify-between text-[#4A6572]">
+        <div className="bg-white p-4 rounded-xs border border-[#D9E0E5] shadow-xs">
+          <div className="flex items-center justify-between text-[#66737D]">
             <span className="text-xs font-bold uppercase tracking-wider">Canonical Baseline</span>
-            <Database className="w-4 h-4 text-[#1BA0E2]" />
+            <Database className="w-4 h-4 text-[#187A9E]" />
           </div>
-          <p className="text-xl font-extrabold text-[#0A365C] mt-1">{(status?.totalProjects || 3977).toLocaleString()}</p>
-          <p className="text-[11px] text-[#4A6572] font-medium">{(status?.totalFacts || 23724).toLocaleString()} monthly facts</p>
+          <p className="text-xl font-extrabold text-[#156586] mt-1">{(status?.totalProjects || 3977).toLocaleString()}</p>
+          <p className="text-[11px] text-[#66737D] font-medium">{(status?.totalFacts || 23724).toLocaleString()} monthly facts</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border-2 border-[#B8D9F2] shadow-xs">
-          <div className="flex items-center justify-between text-[#4A6572]">
+        <div className="bg-white p-4 rounded-xs border border-[#D9E0E5] shadow-xs">
+          <div className="flex items-center justify-between text-[#66737D]">
             <span className="text-xs font-bold uppercase tracking-wider">Cycle Period</span>
-            <Clock className="w-4 h-4 text-[#1BA0E2]" />
+            <Clock className="w-4 h-4 text-[#187A9E]" />
           </div>
-          <p className="text-xl font-extrabold text-[#0A365C] mt-1">{status?.latestReportingPeriod || '2026-07'}</p>
-          <p className="text-[11px] text-[#4A6572] font-medium">Dataset: {status?.currentDatasetVersion || 'v2026.07'}</p>
+          <p className="text-xl font-extrabold text-[#156586] mt-1">{status?.latestReportingPeriod || '2026-07'}</p>
+          <p className="text-[11px] text-[#66737D] font-medium">Dataset: {status?.currentDatasetVersion || 'v2026.07'}</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border-2 border-[#B8D9F2] shadow-xs">
-          <div className="flex items-center justify-between text-[#4A6572]">
+        <div className="bg-white p-4 rounded-xs border border-[#D9E0E5] shadow-xs">
+          <div className="flex items-center justify-between text-[#66737D]">
             <span className="text-xs font-bold uppercase tracking-wider">Production Model</span>
-            <Cpu className="w-4 h-4 text-[#1BA0E2]" />
+            <Cpu className="w-4 h-4 text-[#187A9E]" />
           </div>
-          <p className="text-xl font-extrabold text-[#0A365C] mt-1">v{status?.activeModelVersion || '1.0.0'}</p>
-          <p className="text-[11px] text-[#4A6572] font-medium">CatBoost Ensemble + SHAP</p>
+          <p className="text-xl font-extrabold text-[#156586] mt-1">v{status?.activeModelVersion || '1.0.0'}</p>
+          <p className="text-[11px] text-[#66737D] font-medium">CatBoost Ensemble + SHAP</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border-2 border-[#B8D9F2] shadow-xs">
-          <div className="flex items-center justify-between text-[#4A6572]">
+        <div className="bg-white p-4 rounded-xs border border-[#D9E0E5] shadow-xs">
+          <div className="flex items-center justify-between text-[#66737D]">
             <span className="text-xs font-bold uppercase tracking-wider">Search Engine</span>
-            <Search className="w-4 h-4 text-[#1BA0E2]" />
+            <Search className="w-4 h-4 text-[#187A9E]" />
           </div>
-          <p className="text-xl font-extrabold text-[#0A365C] mt-1">Active</p>
-          <p className="text-[11px] text-[#4A6572] font-medium">Tier-1 Gov + Offline Fallback</p>
+          <p className="text-xl font-extrabold text-[#156586] mt-1">Active</p>
+          <p className="text-[11px] text-[#66737D] font-medium">Tier-1 Gov + Offline Fallback</p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border-2 border-[#B8D9F2] shadow-xs">
-          <div className="flex items-center justify-between text-[#4A6572]">
+        <div className="bg-white p-4 rounded-xs border border-[#D9E0E5] shadow-xs">
+          <div className="flex items-center justify-between text-[#66737D]">
             <span className="text-xs font-bold uppercase tracking-wider">Data Quarantine</span>
-            <ShieldCheck className="w-4 h-4 text-amber-600" />
+            <ShieldCheck className="w-4 h-4 text-[#D99A2B]" />
           </div>
-          <p className="text-xl font-extrabold text-amber-700 mt-1">{(status?.quarantineRecordsCount || 4896).toLocaleString()}</p>
-          <p className="text-[11px] text-[#4A6572] font-medium">Isolated anomalies</p>
+          <p className="text-xl font-extrabold text-[#156586] mt-1">{(status?.quarantineRecordsCount || 4896).toLocaleString()}</p>
+          <p className="text-[11px] text-[#66737D] font-medium">Isolated anomalies</p>
         </div>
       </div>
 
       {/* SECTION B: MONTHLY REPORT INGESTION & 12-STAGE TRACKER */}
-      <div className="bg-white rounded-xl border-2 border-[#B8D9F2] shadow-xs overflow-hidden">
-        <div className="p-6 border-b-2 border-[#B8D9F2] bg-[#F0F6FB] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-white rounded-xs border border-[#D9E0E5] shadow-xs overflow-hidden">
+        <div className="p-6 border-b border-[#D9E0E5] bg-[#F6F7F8] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-lg font-bold text-[#0A365C] flex items-center gap-2">
-              <UploadCloud className="w-5 h-5 text-[#1BA0E2]" />
+            <h2 className="text-lg font-bold text-[#123F63] flex items-center gap-2">
+              <UploadCloud className="w-5 h-5 text-[#187A9E]" />
               Monthly Intelligence Refresh Pipeline
             </h2>
-            <p className="text-xs text-[#4A6572] mt-0.5 font-medium">
+            <p className="text-xs text-[#66737D] mt-0.5 font-medium">
               Upload a newly received MoSPI Flash Report or CPR document. The system automatically executes official extraction, external evidence deep dives, deterministic recomputations, and ML forecasts.
             </p>
           </div>
-          <span className="text-xs px-3 py-1 bg-[#E1EFF9] text-[#0A365C] font-bold rounded-full border border-[#B8D9F2] shrink-0">
+          <span className="text-xs px-3 py-1 bg-[#FFFFFF] text-[#156586] font-bold rounded-xs border border-[#D9E0E5] shrink-0">
             12-Stage Automated Workflow
           </span>
         </div>
@@ -370,7 +334,7 @@ export const Operations: React.FC = () => {
           <form onSubmit={handleIntelligenceRefresh} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#4A6572] mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#66737D] mb-1.5">
                   Select Project PDF Document
                 </label>
                 <input
@@ -378,12 +342,12 @@ export const Operations: React.FC = () => {
                   accept=".pdf"
                   disabled={!canRunPipeline}
                   onChange={(e) => setUploadFile(e.target.files ? e.target.files[0] : null)}
-                  className="block w-full text-sm text-[#4A6572] file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#E1EFF9] file:text-[#0A365C] hover:file:bg-[#B8D9F2] border border-[#B8D9F2] rounded-lg cursor-pointer bg-[#F0F6FB]/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="block w-full text-sm text-[#66737D] file:mr-4 file:py-2.5 file:px-4 file:rounded-xs file:border-0 file:text-xs file:font-bold file:bg-[#F6F7F8] file:text-[#187A9E] hover:file:bg-[#D9E0E5] border border-[#D9E0E5] rounded-xs cursor-pointer bg-[#F6F7F8]/50 disabled:opacity-60 disabled:cursor-not-allowed"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#4A6572] mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#66737D] mb-1.5">
                   Reporting Month
                 </label>
                 <input
@@ -391,18 +355,18 @@ export const Operations: React.FC = () => {
                   value={reportingMonth}
                   disabled={!canRunPipeline}
                   onChange={(e) => setReportingMonth(e.target.value)}
-                  className="w-full text-sm py-2.5 px-3 border border-[#B8D9F2] text-[#0A365C] font-semibold rounded-lg focus:ring-2 focus:ring-[#1BA0E2] focus:outline-none disabled:bg-[#F0F6FB]"
+                  className="w-full text-sm py-2.5 px-3 border border-[#D9E0E5] text-[#156586] font-semibold rounded-xs focus:ring-1 focus:ring-[#187A9E] focus:border-[#187A9E] focus:outline-none disabled:bg-[#F6F7F8]"
                 />
               </div>
 
               <div className="flex flex-col justify-end">
-                <label className="flex items-center gap-2 text-xs text-[#4A6572] cursor-pointer pb-3 font-medium">
+                <label className="flex items-center gap-2 text-xs text-[#66737D] cursor-pointer pb-3 font-medium">
                   <input
                     type="checkbox"
                     checked={forceReprocess}
                     disabled={!canRunPipeline}
                     onChange={(e) => setForceReprocess(e.target.checked)}
-                    className="rounded border-[#B8D9F2] text-[#1BA0E2] focus:ring-[#1BA0E2]"
+                    className="rounded-none border-[#D9E0E5] text-[#187A9E] focus:ring-[#187A9E]"
                   />
                   <span>Force Reprocess if already ingested</span>
                 </label>
@@ -410,33 +374,23 @@ export const Operations: React.FC = () => {
             </div>
 
             {uploadFile && (
-              <div className="text-xs text-[#0A365C] bg-[#F0F6FB] p-3 rounded-lg border border-[#B8D9F2] flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#1BA0E2]" />
+              <div className="text-xs text-[#156586] bg-[#F6F7F8] p-3 rounded-xs border border-[#D9E0E5] flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#187A9E]" />
                 <span>Selected: <strong>{uploadFile.name}</strong> ({(uploadFile.size / 1024).toFixed(1)} KB)</span>
               </div>
             )}
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
-              <span className="text-xs text-[#4A6572] font-medium">
+              <span className="text-xs text-[#66737D] font-medium">
                 Guaranteed: Authoritative official fields are never overwritten by web evidence.
               </span>
-              {!canRunPipeline ? (
-                <button
-                  type="button"
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold bg-[#E1EFF9] text-[#0A365C] border border-[#B8D9F2] hover:bg-[#B8D9F2] transition-all cursor-pointer shadow-2xs"
-                >
-                  <Lock className="w-4 h-4 text-[#1BA0E2]" />
-                  Authenticate as Nodal Officer to Ingest
-                </button>
-              ) : (
                 <button
                   type="submit"
                   disabled={!uploadFile || uploading || (jobProgress?.status === 'IN_PROGRESS')}
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer ${
+                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xs text-xs font-bold transition-all shadow-sm cursor-pointer ${
                     !uploadFile || uploading || (jobProgress?.status === 'IN_PROGRESS')
                       ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                      : 'bg-[#1BA0E2] text-white hover:bg-[#0A365C]'
+                      : 'bg-[#187A9E] text-white hover:bg-[#156586]'
                   }`}
                 >
                   {uploading ? (
@@ -451,33 +405,32 @@ export const Operations: React.FC = () => {
                     </>
                   )}
                 </button>
-              )}
             </div>
           </form>
 
           {/* 12-STAGE LIVE TRACKER */}
           {jobProgress && (
-            <div className="mt-6 border border-[#DDD9D0] rounded-xl bg-[#FAF8F5]/70 p-5 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#DDD9D0] pb-3">
+            <div className="mt-6 border border-[#D9E0E5] rounded-xs bg-[#F6F7F8]/70 p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#D9E0E5] pb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-blue-100 text-[#173F35]">
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-xs bg-[#F6F7F8] border border-[#D9E0E5] text-[#156586]">
                     {jobProgress.job_id}
                   </span>
-                  <span className="text-xs text-[#66736D]">
+                  <span className="text-xs text-[#66737D]">
                     Report: <strong>{jobProgress.report_file || 'Flash Report'}</strong> ({jobProgress.reporting_month || 'Current'})
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                    jobProgress.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' :
-                    jobProgress.status === 'COMPLETED_WITH_WARNINGS' ? 'bg-amber-100 text-amber-800' :
-                    jobProgress.status === 'FAILED' ? 'bg-red-100 text-red-800' :
+                  <span className={`px-2.5 py-0.5 rounded-xs text-xs font-bold ${
+                    jobProgress.status === 'COMPLETED' ? 'bg-[#D9E0E5] text-[#25313B] border border-[#D9E0E5]' :
+                    jobProgress.status === 'COMPLETED_WITH_WARNINGS' ? 'bg-[#FEF9EE] text-[#156586] border border-[#FCE7BE]' :
+                    jobProgress.status === 'FAILED' ? 'bg-[#FDF2F1] text-[#B94A45] border border-[#F6D3D1]' :
                     jobProgress.status === 'ALREADY_PROCESSED' ? 'bg-purple-100 text-purple-800' :
-                    'bg-blue-100 text-[#173F35] animate-pulse'
+                    'bg-[#F6F7F8] text-[#156586] border border-[#D9E0E5] animate-pulse'
                   }`}>
                     {jobProgress.status}
                   </span>
-                  <span className="text-xs text-[#8C9893] font-mono">
+                  <span className="text-xs text-[#66737D] font-mono">
                     {jobProgress.elapsed_seconds.toFixed(1)}s elapsed
                   </span>
                 </div>
@@ -491,18 +444,18 @@ export const Operations: React.FC = () => {
                   return (
                     <div
                       key={stg.key}
-                      className={`p-2.5 rounded-lg border text-xs transition-all ${
-                        isCurrent ? 'bg-[#E8F0EC] border-blue-400 text-blue-900 shadow-sm ring-1 ring-blue-400' :
-                        isPast ? 'bg-emerald-50/60 border-emerald-200 text-emerald-800' :
-                        'bg-white border-[#DDD9D0] text-[#8C9893]'
+                      className={`p-2.5 rounded-xs border text-xs transition-all ${
+                        isCurrent ? 'bg-[#FFFFFF] border-[#187A9E] text-[#156586] shadow-sm ring-1 ring-[#187A9E]' :
+                        isPast ? 'bg-[#D9E0E5] border-[#D9E0E5] text-[#25313B]' :
+                        'bg-white border-[#D9E0E5] text-[#66737D]'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-mono text-[10px] font-bold">0{idx + 1}</span>
                         {isPast ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#25313B]" />
                         ) : isCurrent ? (
-                          <RefreshCw className="w-3.5 h-3.5 text-[#267A69] animate-spin" />
+                          <RefreshCw className="w-3.5 h-3.5 text-[#187A9E] animate-spin" />
                         ) : (
                           <span className="w-2 h-2 rounded-full bg-slate-200" />
                         )}
@@ -514,29 +467,29 @@ export const Operations: React.FC = () => {
               </div>
 
               {/* Telemetry Chips */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs text-[#66736D]">
-                <div className="bg-white p-2.5 rounded-lg border border-[#DDD9D0]">
-                  <span className="text-[10px] text-[#8C9893] uppercase font-semibold">Affected Projects</span>
-                  <p className="text-base font-bold text-[#173F35] mt-0.5">{jobProgress.affected_projects_count}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs text-[#66737D]">
+                <div className="bg-white p-2.5 rounded-xs border border-[#D9E0E5]">
+                  <span className="text-[10px] text-[#66737D] uppercase font-semibold">Affected Projects</span>
+                  <p className="text-base font-bold text-[#156586] mt-0.5">{jobProgress.affected_projects_count}</p>
                 </div>
-                <div className="bg-white p-2.5 rounded-lg border border-[#DDD9D0]">
-                  <span className="text-[10px] text-[#8C9893] uppercase font-semibold">Researched</span>
-                  <p className="text-base font-bold text-[#173F35] mt-0.5">{jobProgress.researched_count}</p>
+                <div className="bg-white p-2.5 rounded-xs border border-[#D9E0E5]">
+                  <span className="text-[10px] text-[#66737D] uppercase font-semibold">Researched</span>
+                  <p className="text-base font-bold text-[#156586] mt-0.5">{jobProgress.researched_count}</p>
                 </div>
-                <div className="bg-white p-2.5 rounded-lg border border-[#DDD9D0]">
-                  <span className="text-[10px] text-[#8C9893] uppercase font-semibold">Claims Extracted</span>
-                  <p className="text-base font-bold text-[#173F35] mt-0.5">{jobProgress.claims_count}</p>
+                <div className="bg-white p-2.5 rounded-xs border border-[#D9E0E5]">
+                  <span className="text-[10px] text-[#66737D] uppercase font-semibold">Claims Extracted</span>
+                  <p className="text-base font-bold text-[#156586] mt-0.5">{jobProgress.claims_count}</p>
                 </div>
-                <div className="bg-white p-2.5 rounded-lg border border-[#DDD9D0]">
-                  <span className="text-[10px] text-[#8C9893] uppercase font-semibold">Conflicts Flagged</span>
-                  <p className={`text-base font-bold mt-0.5 ${jobProgress.conflicts_count > 0 ? 'text-amber-600' : 'text-[#173F35]'}`}>
+                <div className="bg-white p-2.5 rounded-xs border border-[#D9E0E5]">
+                  <span className="text-[10px] text-[#66737D] uppercase font-semibold">Conflicts Flagged</span>
+                  <p className={`text-base font-bold mt-0.5 ${jobProgress.conflicts_count > 0 ? 'text-[#B94A45]' : 'text-[#156586]'}`}>
                     {jobProgress.conflicts_count}
                   </p>
                 </div>
               </div>
 
               {jobProgress.error_summary && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-xs flex items-center gap-2">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xs text-red-800 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
                   <span>{jobProgress.error_summary}</span>
                 </div>
@@ -549,28 +502,28 @@ export const Operations: React.FC = () => {
       {/* SECTION C: SCOPED INTELLIGENCE REFRESH CONTROLS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Scoped External Deep Dive */}
-        <div className="bg-white p-6 rounded-xl border border-[#DDD9D0] shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white p-6 rounded-xs border border-[#D9E0E5] shadow-sm flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#173F35] flex items-center gap-2">
+              <h3 className="text-base font-bold text-[#123F63] flex items-center gap-2">
                 <Search className="w-4 h-4 text-purple-600" />
                 Refresh External Intelligence
               </h3>
-              <span className="text-xs text-[#8C9893]">Targeted Research</span>
+              <span className="text-xs text-[#66737D]">Targeted Research</span>
             </div>
-            <p className="text-xs text-[#66736D] mt-1">
+            <p className="text-xs text-[#66737D] mt-1">
               Rerun empirical internet deep dives on demand for stale or high-priority projects without waiting for a new monthly report upload.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#66736D] mb-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#66737D] mb-1">
                   Scope
                 </label>
                 <select
                   value={researchScope}
                   onChange={(e) => setResearchScope(e.target.value)}
-                  className="w-full text-xs py-2 px-2.5 border border-[#DDD9D0] rounded-lg bg-white focus:ring-2 focus:ring-[#267A69]"
+                  className="w-full text-xs py-2 px-2.5 border border-[#D9E0E5] rounded-xs bg-white focus:ring-2 focus:ring-[#187A9E]"
                 >
                   <option value="AFFECTED">Affected by Latest Report</option>
                   <option value="CRITICAL_HIGH_RISK">Critical & High Risk Projects</option>
@@ -580,7 +533,7 @@ export const Operations: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#66736D] mb-1">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#66737D] mb-1">
                   Project Limit
                 </label>
                 <input
@@ -589,7 +542,7 @@ export const Operations: React.FC = () => {
                   max={50}
                   value={researchLimit}
                   onChange={(e) => setResearchLimit(parseInt(e.target.value) || 15)}
-                  className="w-full text-xs py-2 px-2.5 border border-[#DDD9D0] rounded-lg focus:ring-2 focus:ring-[#267A69]"
+                  className="w-full text-xs py-2 px-2.5 border border-[#D9E0E5] rounded-xs focus:ring-2 focus:ring-[#187A9E]"
                 />
               </div>
             </div>
@@ -598,7 +551,7 @@ export const Operations: React.FC = () => {
           <button
             onClick={handleScopedResearch}
             disabled={researching || (jobProgress?.status === 'IN_PROGRESS')}
-            className="w-full py-2.5 px-4 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-300 font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
+            className="w-full py-2.5 px-4 bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-300 font-semibold text-xs rounded-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
           >
             <Search className={`w-3.5 h-3.5 ${researching ? 'animate-spin' : ''}`} />
             Run Scoped Research Deep Dive
@@ -606,20 +559,20 @@ export const Operations: React.FC = () => {
         </div>
 
         {/* Recalculate Derived Values */}
-        <div className="bg-white p-6 rounded-xl border border-[#DDD9D0] shadow-sm flex flex-col justify-between space-y-4">
+        <div className="bg-white p-6 rounded-xs border border-[#D9E0E5] shadow-sm flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-[#173F35] flex items-center gap-2">
-                <Layers className="w-4 h-4 text-[#267A69]" />
+              <h3 className="text-base font-bold text-[#123F63] flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[#187A9E]" />
                 Recalculate Derived Values
               </h3>
-              <span className="text-xs text-[#8C9893]">Zero-Web Calculation</span>
+              <span className="text-xs text-[#66737D]">Zero-Web Calculation</span>
             </div>
-            <p className="text-xs text-[#66736D] mt-1">
+            <p className="text-xs text-[#66737D] mt-1">
               Recompute deterministic metrics (cost escalation, progress velocity, slippage, physical-financial gap), risk indices, and early-warning alerts from stored canonical facts without making external web calls.
             </p>
-            <div className="mt-4 p-3 bg-[#FAF8F5] rounded-lg text-xs text-[#66736D] border border-[#DDD9D0]">
-              <p className="font-semibold text-[#26312D] mb-0.5">Deterministic Invariant:</p>
+            <div className="mt-4 p-3 bg-[#F6F7F8] rounded-xs text-xs text-[#66737D] border border-[#D9E0E5]">
+              <p className="font-semibold text-[#25313B] mb-0.5">Deterministic Invariant:</p>
               <p>Recomputes Parts A through G of the Whole Computational Stack with strict reproducible mathematical formulas.</p>
             </div>
           </div>
@@ -631,7 +584,7 @@ export const Operations: React.FC = () => {
               description: 'This will recompute deterministic progress metrics, velocity, slippages, composite risk indices, and early-warning alerts across all 3,414 monitored projects without external web calls.'
             })}
             disabled={actionLoading === 'recalc' || (jobProgress?.status === 'IN_PROGRESS')}
-            className="w-full py-2.5 px-4 bg-[#E8F0EC] hover:bg-[#BED6CB] text-[#173F35] border border-[#BED6CB] font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-2xs disabled:opacity-50 cursor-pointer"
+            className="w-full py-2.5 px-4 bg-[#F6F7F8] hover:bg-[#D9E0E5] text-[#156586] hover:text-[#123F63] border border-[#D9E0E5] font-semibold text-xs rounded-xs transition-colors flex items-center justify-center gap-1.5 shadow-2xs disabled:opacity-50 cursor-pointer"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${actionLoading === 'recalc' ? 'animate-spin' : ''}`} />
             Recalculate Deterministic Metrics & Risks
@@ -640,14 +593,14 @@ export const Operations: React.FC = () => {
       </div>
 
       {/* SECTION D: MLOPS LIFECYCLE MANAGEMENT */}
-      <div className="bg-white rounded-xl border border-[#DDD9D0] shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-[#DDD9D0] bg-[#FAF8F5]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="bg-white rounded-xs border border-[#D9E0E5] shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-[#D9E0E5] bg-[#F6F7F8]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-lg font-bold text-[#173F35] flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-[#267A69]" />
+            <h2 className="text-lg font-bold text-[#123F63] flex items-center gap-2">
+              <Cpu className="w-5 h-5 text-[#187A9E]" />
               Machine Learning Operations (MLOps)
             </h2>
-            <p className="text-xs text-[#66736D] mt-0.5">
+            <p className="text-xs text-[#66737D] mt-0.5">
               Production models, candidate evaluation, zero-leakage temporal validation, and whole-portfolio prediction refresh.
             </p>
           </div>
@@ -655,79 +608,68 @@ export const Operations: React.FC = () => {
 
         <div className="p-6 space-y-6">
           {actionMessage && (
-            <div className="p-4 bg-[#E8F0EC] border border-[#BED6CB] rounded-xl text-[#173F35] text-sm flex items-center gap-3">
-              <Activity className="w-5 h-5 text-[#267A69] shrink-0" />
+            <div className="p-4 bg-[#F6F7F8] border border-[#D9E0E5] rounded-xs text-[#156586] text-sm flex items-center gap-3">
+              <Activity className="w-5 h-5 text-[#187A9E] shrink-0" />
               <span>{actionMessage}</span>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Active Production Model */}
-            <div className="p-5 rounded-xl border border-[#BED6CB] bg-[#E8F0EC]/30 space-y-3">
+            <div className="p-5 rounded-xs border border-[#D9E0E5] bg-[#F6F7F8]/30 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#173F35] bg-[#E8F0EC] px-2.5 py-1 rounded-full border border-[#BED6CB]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#156586] bg-[#F6F7F8] px-2.5 py-1 rounded-full border border-[#D9E0E5]">
                   Active Production Model
                 </span>
-                <span className="text-xs text-[#66736D]">Status: Serving</span>
+                <span className="text-xs text-[#66737D]">Status: Serving</span>
               </div>
               <div>
-                <p className="text-xl font-bold text-[#173F35]">CatBoost Multi-Target v{status?.activeModelVersion || '1.0.0'}</p>
-                <p className="text-xs text-[#66736D] mt-1">
+                <p className="text-xl font-bold text-[#123F63]">CatBoost Multi-Target v{status?.activeModelVersion || '1.0.0'}</p>
+                <p className="text-xs text-[#66737D] mt-1">
                   Targets: Cost Overrun (PR-AUC 0.94), Final Cost (MAE ₹88Cr), Delay Duration (MAE 3.8mo)
                 </p>
               </div>
-              <div className="text-xs text-[#66736D] space-y-1 pt-2 border-t border-[#BED6CB]/60">
+              <div className="text-xs text-[#66737D] space-y-1 pt-2 border-t border-[#D9E0E5]/60">
                 <div className="flex justify-between">
                   <span>Feature Schema:</span>
-                  <span className="font-semibold text-[#26312D]">v2.1-temporal-features</span>
+                  <span className="font-semibold text-[#25313B]">v2.1-temporal-features</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Calibration:</span>
-                  <span className="font-semibold text-[#26312D]">Temporal Platt-Scaled</span>
+                  <span className="font-semibold text-[#25313B]">Temporal Platt-Scaled</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Temporal Integrity:</span>
-                  <span className="font-semibold text-[#267A69]">Point-in-Time Safe (Zero Leakage)</span>
+                  <span className="font-semibold text-[#156586]">Point-in-Time Safe (Zero Leakage)</span>
                 </div>
               </div>
             </div>
 
             {/* Candidate Retrain & Promotion Actions */}
-            <div className="p-5 rounded-xl border-2 border-[#B8D9F2] bg-[#F0F6FB]/60 flex flex-col justify-between space-y-4">
+            <div className="p-5 rounded-xs border border-[#D9E0E5] bg-[#F6F7F8]/60 flex flex-col justify-between space-y-4">
               <div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#4A6572]">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#66737D]">
                     Model Lifecycle Controls
                   </span>
-                  <span className="text-xs font-semibold text-[#1BA0E2]">Zero-downtime hot swap</span>
+                  <span className="text-xs font-semibold text-[#156586]">Zero-downtime hot swap</span>
                 </div>
-                <p className="text-sm text-[#4A6572] mt-2 font-medium">
+                <p className="text-sm text-[#66737D] mt-2 font-medium">
                   Retrain candidate models on latest canonical facts, evaluate validation metrics, promote to production, or refresh predictions across all projects.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
-                {!canAdminML ? (
-                  <button
-                    type="button"
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className="col-span-1 sm:col-span-3 px-4 py-2.5 text-xs font-bold text-[#0A365C] bg-[#E1EFF9] border border-[#B8D9F2] rounded-lg hover:bg-[#B8D9F2] transition-colors shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Lock className="w-3.5 h-3.5 text-[#1BA0E2]" />
-                    Authenticate as System Administrator for MLOps Controls
-                  </button>
-                ) : (
-                  <>
-                    <button
+                <button
                       onClick={() => setPendingConfirm({
                         action: 'retrain',
                         title: 'Train Candidate ML Models',
                         description: 'Initiates background training of CatBoost cost and schedule models on latest canonical facts to produce an evaluated candidate model.'
                       })}
                       disabled={actionLoading !== null}
-                      className="px-3 py-2 text-xs font-bold text-[#0A365C] bg-white border border-[#B8D9F2] rounded-lg hover:bg-[#E1EFF9] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="px-3 py-2 text-xs font-bold text-[#156586] bg-white border border-[#D9E0E5] rounded-xs hover:bg-[#F6F7F8] hover:text-[#123F63] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <RefreshCw className={`w-3.5 h-3.5 ${actionLoading === 'retrain' ? 'animate-spin text-[#1BA0E2]' : 'text-[#1BA0E2]'}`} />
+                      <RefreshCw className={`w-3.5 h-3.5 ${actionLoading === 'retrain' ? 'animate-spin text-[#187A9E]' : 'text-[#187A9E]'}`} />
                       Train Candidate
                     </button>
 
@@ -738,9 +680,9 @@ export const Operations: React.FC = () => {
                         description: 'Promotes candidate model to active serving. All subsequent project predictions will use this newly calibrated model version.'
                       })}
                       disabled={actionLoading !== null}
-                      className="px-3 py-2 text-xs font-bold text-[#0A365C] bg-[#E1EFF9] border border-[#B8D9F2] rounded-lg hover:bg-[#B8D9F2] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="px-3 py-2 text-xs font-bold text-[#156586] bg-[#F6F7F8] border border-[#D9E0E5] rounded-xs hover:bg-[#D9E0E5] hover:text-[#123F63] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <ArrowUpRight className="w-3.5 h-3.5 text-[#1BA0E2]" />
+                      <ArrowUpRight className="w-3.5 h-3.5 text-[#187A9E]" />
                       Promote Candidate
                     </button>
 
@@ -751,13 +693,11 @@ export const Operations: React.FC = () => {
                         description: 'Reruns CatBoost production model inference and risk scoring across all active projects in the canonical database.'
                       })}
                       disabled={actionLoading !== null}
-                      className="px-3 py-2 text-xs font-bold text-white bg-[#1BA0E2] border border-[#1BA0E2] rounded-lg hover:bg-[#0A365C] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="px-3 py-2 text-xs font-bold text-white bg-[#187A9E] border border-[#187A9E] rounded-xs hover:bg-[#156586] transition-colors shadow-2xs disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <Activity className={`w-3.5 h-3.5 ${actionLoading === 'refresh' ? 'animate-spin' : ''}`} />
                       Refresh Predictions
                     </button>
-                  </>
-                )}
               </div>
             </div>
           </div>
@@ -765,17 +705,17 @@ export const Operations: React.FC = () => {
       </div>
 
       {/* SECTION E: RECENT PIPELINE EXECUTION RUNS */}
-      <div className="bg-white rounded-xl border-2 border-[#B8D9F2] shadow-xs overflow-hidden">
-        <div className="p-5 border-b-2 border-[#B8D9F2] bg-[#F0F6FB] flex items-center justify-between">
-          <h3 className="text-sm font-extrabold text-[#0A365C] flex items-center gap-2">
-            <Server className="w-4 h-4 text-[#1BA0E2]" />
+      <div className="bg-white rounded-xs border border-[#D9E0E5] shadow-xs overflow-hidden">
+        <div className="p-5 border-b border-[#D9E0E5] bg-[#F6F7F8] flex items-center justify-between">
+          <h3 className="text-sm font-extrabold text-[#123F63] flex items-center gap-2">
+            <Server className="w-4 h-4 text-[#187A9E]" />
             Recent Pipeline Execution History
           </h3>
-          <span className="text-xs font-semibold text-[#4A6572]">Full Audit Provenance</span>
+          <span className="text-xs font-semibold text-[#66737D]">Full Audit Provenance</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs atlas-table">
-            <thead className="bg-[#E1EFF9] text-[#0A365C] font-bold border-b border-[#B8D9F2]">
+            <thead className="bg-[#F6F7F8] text-[#123F63] font-bold border-b border-[#D9E0E5]">
               <tr>
                 <th className="px-4 py-3">Run / Job ID</th>
                 <th className="px-4 py-3">Trigger Type</th>
@@ -791,30 +731,30 @@ export const Operations: React.FC = () => {
             <tbody className="divide-y divide-slate-100">
               {recentRuns.length > 0 ? (
                 recentRuns.map((r, idx) => (
-                  <tr key={idx} className="hover:bg-[#F0F6FB]">
-                    <td className="px-4 py-3 font-mono font-bold text-[#0A365C]">{r.job_id}</td>
-                    <td className="px-4 py-3 text-[#4A6572] font-medium">{r.trigger_type}</td>
-                    <td className="px-4 py-3 text-[#0A365C] font-semibold truncate max-w-[160px]">{r.report_file || 'Direct Refresh'}</td>
+                  <tr key={idx} className="hover:bg-[#F6F7F8]">
+                    <td className="px-4 py-3 font-mono font-bold text-[#156586]">{r.job_id}</td>
+                    <td className="px-4 py-3 text-[#66737D] font-medium">{r.trigger_type}</td>
+                    <td className="px-4 py-3 text-[#25313B] font-semibold truncate max-w-[160px]">{r.report_file || 'Direct Refresh'}</td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                         r.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
                         r.status === 'COMPLETED_WITH_WARNINGS' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
                         r.status === 'FAILED' ? 'bg-red-100 text-red-800 border border-red-200' :
-                        'bg-blue-100 text-[#0A365C] border border-[#B8D9F2]'
+                        'bg-[#EBF6FA] text-[#156586] border border-[#D9E0E5]'
                       }`}>
                         {r.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 font-semibold text-[#0A365C]">{r.researched_count || 0}</td>
-                    <td className="px-4 py-3 text-[#4A6572]">{r.claims_count || 0}</td>
+                    <td className="px-4 py-3 font-semibold text-[#156586]">{r.researched_count || 0}</td>
+                    <td className="px-4 py-3 text-[#66737D]">{r.claims_count || 0}</td>
                     <td className="px-4 py-3 font-semibold text-amber-600">{r.conflicts_count || 0}</td>
-                    <td className="px-4 py-3 text-[#4A6572] font-mono">{(r.elapsed_seconds || 0).toFixed(1)}s</td>
-                    <td className="px-4 py-3 text-[#4A6572] font-mono">{r.completed_at || r.started_at}</td>
+                    <td className="px-4 py-3 text-[#66737D] font-mono">{(r.elapsed_seconds || 0).toFixed(1)}s</td>
+                    <td className="px-4 py-3 text-[#66737D] font-mono">{r.completed_at || r.started_at}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={9} className="px-4 py-6 text-center text-[#4A6572] font-medium">
+                  <td colSpan={9} className="px-4 py-6 text-center text-[#66737D] font-medium">
                     No pipeline runs recorded in canonical audit ledger yet.
                   </td>
                 </tr>
@@ -831,37 +771,37 @@ export const Operations: React.FC = () => {
           onClick={() => setPendingConfirm(null)}
         >
           <div 
-            className="bg-white border-2 border-[#B8D9F2] rounded-xl max-w-lg w-full p-6 shadow-2xl space-y-4"
+            className="bg-white border border-[#D9E0E5] rounded-xs max-w-lg w-full p-6 shadow-2xl space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start gap-3">
-              <div className="p-2.5 rounded-lg bg-[#E1EFF9] border border-[#B8D9F2] text-[#0A365C]">
-                <ShieldCheck className="w-5 h-5 text-[#1BA0E2]" />
+              <div className="p-2.5 rounded-xs bg-[#F6F7F8] border border-[#D9E0E5] text-[#187A9E]">
+                <ShieldCheck className="w-5 h-5 text-[#187A9E]" />
               </div>
               <div className="space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">
                   Authorized Operator Confirmation
                 </span>
-                <h3 className="text-base font-extrabold text-[#0A365C] leading-tight">
+                <h3 className="text-base font-extrabold text-[#123F63] leading-tight">
                   {pendingConfirm.title}
                 </h3>
               </div>
             </div>
 
-            <p className="text-xs text-[#4A6572] leading-relaxed bg-[#F0F6FB] p-3 rounded-lg border border-[#B8D9F2] font-medium">
+            <p className="text-xs text-[#66737D] leading-relaxed bg-[#F6F7F8] p-3 rounded-xs border border-[#D9E0E5] font-medium">
               {pendingConfirm.description}
             </p>
 
-            <div className="text-[11px] text-[#4A6572] space-y-1 pt-1 font-medium">
+            <div className="text-[11px] text-[#66737D] space-y-1 pt-1 font-medium">
               <p>• Action will be recorded in the canonical pipeline audit history.</p>
               <p>• Point-in-time safety and dataset idempotency are guaranteed.</p>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-3 border-t-2 border-[#B8D9F2]">
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#D9E0E5]">
               <button
                 type="button"
                 onClick={() => setPendingConfirm(null)}
-                className="px-4 py-2 text-xs font-semibold text-[#4A6572] hover:text-[#0A365C] rounded-lg cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold text-[#66737D] hover:text-[#187A9E] rounded-xs cursor-pointer"
               >
                 Cancel
               </button>
@@ -875,7 +815,7 @@ export const Operations: React.FC = () => {
                   else if (act === 'promote') handlePromote();
                   else if (act === 'refresh') handleRefreshPredictions();
                 }}
-                className="px-4 py-2 text-xs font-bold text-white bg-[#1BA0E2] hover:bg-[#0A365C] rounded-lg shadow-xs transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-bold text-white bg-[#187A9E] hover:bg-[#156586] rounded-xs shadow-xs transition-colors cursor-pointer"
               >
                 Confirm &amp; Authorize
               </button>

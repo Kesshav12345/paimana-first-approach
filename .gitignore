@@ -20,6 +20,7 @@ frontend/dist/
 
 # ─── Heavy data / source PDFs (NOT needed at runtime) ─────────────────────────
 /primary dataset/
+/primary_dataset/
 /scratch/
 /data/
 /src/

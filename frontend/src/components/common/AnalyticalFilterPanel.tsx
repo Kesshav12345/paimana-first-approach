@@ -34,7 +34,7 @@ interface AnalyticalFilterPanelProps {
 export const AnalyticalFilterPanel: React.FC<AnalyticalFilterPanelProps> = ({
   title,
   subtitle,
-  icon = <Filter className="w-4 h-4 text-[#267A69]" />,
+  icon = <Filter className="w-4 h-4 text-[#187A9E]" />,
   children,
   onApply,
   onReset,
@@ -53,20 +53,20 @@ export const AnalyticalFilterPanel: React.FC<AnalyticalFilterPanelProps> = ({
   const [expanded, setExpanded] = useState(defaultExpanded);
 
   return (
-    <div className={`bg-white border-2 border-[#B8D9F2] rounded-xl shadow-xs overflow-hidden transition-all ${className}`}>
+    <div className={`bg-[#FFFFFF] border border-[#D9E0E5] rounded-xs shadow-xs overflow-hidden transition-all ${className}`}>
       {/* Panel Header */}
-      <div className="p-4 sm:p-5 border-b-2 border-[#B8D9F2] bg-[#F0F6FB] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-3.5 sm:p-4 border-b border-[#D9E0E5] bg-[#F6F7F8] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#E1EFF9] border border-[#B8D9F2] flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-xs bg-[#FFFFFF] border border-[#D9E0E5] flex items-center justify-center shrink-0">
               {icon}
             </div>
-            <h2 className="text-sm sm:text-base font-bold text-[#0A365C] tracking-tight">
+            <h2 className="text-sm sm:text-base font-bold text-[#123F63] tracking-tight">
               {title}
             </h2>
           </div>
           {subtitle && (
-            <p className="text-xs text-[#4A6572] mt-0.5 ml-9 font-medium">
+            <p className="text-xs text-[#66737D] mt-0.5 ml-9.5 font-normal">
               {subtitle}
             </p>
           )}
@@ -74,8 +74,8 @@ export const AnalyticalFilterPanel: React.FC<AnalyticalFilterPanelProps> = ({
 
         <div className="flex items-center gap-2 self-end sm:self-auto">
           {hasUnsavedChanges && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200 text-[11px] font-semibold animate-pulse">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xs bg-[#FEF9EE] text-[#D99A2B] border border-[#FCE7BE] text-[11px] font-semibold animate-pulse">
+              <AlertCircle className="w-3.5 h-3.5 text-[#D99A2B]" />
               Criteria modified — Click Apply
             </span>
           )}
@@ -84,7 +84,7 @@ export const AnalyticalFilterPanel: React.FC<AnalyticalFilterPanelProps> = ({
             <button
               type="button"
               onClick={() => setExpanded(!expanded)}
-              className="p-1.5 text-[#4A6572] hover:text-[#0A365C] hover:bg-[#E1EFF9] rounded-md transition-colors cursor-pointer"
+              className="p-1.5 text-[#66737D] hover:text-[#187A9E] hover:bg-[#EBF6FA] rounded-xs transition-colors cursor-pointer"
               title={expanded ? 'Collapse Filters' : 'Expand Filters'}
             >
               {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -95,9 +95,9 @@ export const AnalyticalFilterPanel: React.FC<AnalyticalFilterPanelProps> = ({
 
       {/* Quick Presets Bar */}
       {presets.length > 0 && expanded && (
-        <div className="px-4 sm:px-5 py-2.5 bg-[#F0F6FB]/70 border-b border-[#B8D9F2] flex flex-wrap items-center gap-2 text-xs">
-          <span className="text-[11px] font-bold text-[#4A6572] uppercase tracking-wider flex items-center gap-1 mr-1">
-            <Sparkles className="w-3 h-3 text-[#1BA0E2]" />
+        <div className="px-4 sm:px-5 py-2.5 bg-[#FFFFFF] border-b border-[#D9E0E5] flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-[11px] font-bold text-[#66737D] uppercase tracking-wider flex items-center gap-1 mr-1">
+            <Sparkles className="w-3 h-3 text-[#D99A2B]" />
             Quick Presets:
           </span>
           {presets.map((p) => (
@@ -106,7 +106,7 @@ export const AnalyticalFilterPanel: React.FC<AnalyticalFilterPanelProps> = ({
               type="button"
               onClick={p.onApply}
               disabled={loading}
-              className="px-2.5 py-1 rounded-md bg-white border border-[#B8D9F2] hover:border-[#1BA0E2] hover:bg-[#E1EFF9] text-[#0A365C] text-xs font-semibold transition-all shadow-2xs flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="px-2.5 py-1 rounded-xs bg-[#F6F7F8] border border-[#D9E0E5] hover:border-[#187A9E] hover:text-[#187A9E] text-[#25313B] text-xs font-semibold transition-all flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               title={p.description || p.label}
             >
               {p.icon && <span>{p.icon}</span>}
@@ -124,13 +124,13 @@ export const AnalyticalFilterPanel: React.FC<AnalyticalFilterPanelProps> = ({
           </div>
 
           {/* Actions & Commit Buttons */}
-          <div className="pt-3 border-t border-[#B8D9F2]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="pt-3 border-t border-[#D9E0E5] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={onApply}
                 disabled={loading}
-                className="px-5 py-2 bg-[#1BA0E2] hover:bg-[#0A365C] text-white rounded-lg text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                className="px-5 py-2 bg-[#187A9E] hover:bg-[#156586] text-white rounded-xs text-xs font-semibold shadow-xs transition-all flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -149,16 +149,16 @@ export const AnalyticalFilterPanel: React.FC<AnalyticalFilterPanelProps> = ({
                 type="button"
                 onClick={onReset}
                 disabled={loading}
-                className="px-3.5 py-2 bg-[#F0F6FB] hover:bg-[#E1EFF9] text-[#0A365C] border border-[#B8D9F2] rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 disabled:opacity-50 cursor-pointer"
+                className="px-3.5 py-2 bg-[#FFFFFF] hover:bg-[#F6F7F8] text-[#25313B] border border-[#D9E0E5] rounded-xs text-xs font-semibold transition-colors flex items-center gap-1 disabled:opacity-50 cursor-pointer"
                 title="Reset all filters to default national scope"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-[#4A6572]" />
+                <RotateCcw className="w-3.5 h-3.5 text-[#66737D]" />
                 <span>Reset to Default</span>
               </button>
             </div>
 
-            <div className="text-[11px] text-[#4A6572] text-right font-medium">
-              Configure criteria, then click <strong className="text-[#0A365C] font-bold">{applyButtonLabel}</strong> to commit cohort
+            <div className="text-[11px] text-[#66737D] text-right font-medium">
+              Configure criteria, then click <strong className="text-[#123F63] font-bold">{applyButtonLabel}</strong> to commit cohort
             </div>
           </div>
 

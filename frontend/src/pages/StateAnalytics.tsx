@@ -308,37 +308,37 @@ export const StateAnalytics: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
       {/* Header & Analytical Orientation */}
-      <div className="bg-[#FAF8F5] border border-[#DDD9D0] rounded-xl p-5 sm:p-6 shadow-xs relative overflow-hidden border-l-4 border-l-[#173F35] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-[#F6F7F8] border border-[#D9E0E5] rounded-xs p-5 sm:p-6 shadow-xs relative overflow-hidden border-l-4 border-l-[#123F63] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         {/* Subtle authentic infrastructure contextual backdrop */}
         <div 
           className="absolute right-0 top-0 bottom-0 w-1/3 opacity-15 pointer-events-none bg-cover bg-center hidden md:block"
           style={{ 
-            backgroundImage: 'url(/banner1-1razA4xw.jpeg)',
+            backgroundImage: 'url(/banner1.jpg)',
             maskImage: 'linear-gradient(to right, transparent, black 80%)',
             WebkitMaskImage: 'linear-gradient(to right, transparent, black 80%)'
           }} 
         />
 
         <div className="relative z-10">
-          <div className="flex items-center gap-2 text-[#267A69] font-semibold text-xs uppercase tracking-wider mb-1">
+          <div className="flex items-center gap-2 text-[#156586] font-semibold text-xs uppercase tracking-wider mb-1">
             {selectedState ? (
               <button
                 onClick={() => { setSelectedState(null); setSelectedSector(null); syncUrl(appliedFilters, null, null); }}
-                className="flex items-center gap-1 hover:underline text-[#52605B] hover:text-[#267A69]"
+                className="flex items-center gap-1 hover:underline text-[#66737D] hover:text-[#187A9E]"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to State Overview
               </button>
             ) : (
               <>
-                <MapPin className="w-4 h-4 text-[#267A69]" />
+                <MapPin className="w-4 h-4 text-[#187A9E]" />
                 <span>Regional & State Portfolio</span>
               </>
             )}
           </div>
-          <h1 className="text-2xl font-extrabold text-[#173F35] tracking-tight">
+          <h1 className="text-2xl font-extrabold text-[#123F63] tracking-tight">
             {selectedState ? `${selectedState} Regional Analytics` : 'State & Regional Infrastructure Analytics'}
           </h1>
-          <p className="text-xs text-[#52605B] mt-1 max-w-3xl leading-relaxed">
+          <p className="text-xs text-[#66737D] mt-1 max-w-3xl leading-relaxed">
             {selectedState
               ? `Sectoral distribution, capital delivery, and project triage within ${selectedState}.`
               : 'Formulate an analytical cohort across states and Union Territories to compare regional capital allocation, delivery delays, and risk concentration.'}
@@ -346,8 +346,8 @@ export const StateAnalytics: React.FC = () => {
         </div>
 
         <div className="relative z-10 flex items-center gap-3">
-          <div className="px-3.5 py-2 rounded-lg bg-white border border-[#DDD9D0] text-[#173F35] text-xs font-semibold flex items-center gap-2 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-[#267A69]" />
+          <div className="px-3.5 py-2 rounded-xs bg-white border border-[#D9E0E5] text-[#156586] text-xs font-semibold flex items-center gap-2 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-[#187A9E]" />
             <span>{states.length} States / UTs Active</span>
           </div>
         </div>
@@ -476,60 +476,60 @@ export const StateAnalytics: React.FC = () => {
 
           {/* Filtered KPI Summary Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-[#66736D]">Matching Projects</p>
-              <p className="text-lg font-bold text-[#173F35] mt-0.5">{kpi.totalProjects.toLocaleString()}</p>
-              <p className="text-[10px] text-[#8C9893] mt-0.5">{kpi.statesCount} States/UTs</p>
+            <div className="bg-white border border-[#D9E0E5] rounded-xs p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66737D]">Matching Projects</p>
+              <p className="text-lg font-bold text-[#156586] mt-0.5">{kpi.totalProjects.toLocaleString()}</p>
+              <p className="text-[10px] text-[#66737D] mt-0.5">{kpi.statesCount} States/UTs</p>
             </div>
-            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-[#66736D]">Revised Outlay</p>
-              <p className="text-lg font-bold text-[#173F35] mt-0.5">₹{Math.round(kpi.totalRevised).toLocaleString()}</p>
-              <p className="text-[10px] text-[#8C9893] mt-0.5">Cr Capital Exposure</p>
+            <div className="bg-white border border-[#D9E0E5] rounded-xs p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66737D]">Revised Outlay</p>
+              <p className="text-lg font-bold text-[#156586] mt-0.5">₹{Math.round(kpi.totalRevised).toLocaleString()}</p>
+              <p className="text-[10px] text-[#66737D] mt-0.5">Cr Capital Exposure</p>
             </div>
-            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-[#66736D]">Cumulative Spend</p>
+            <div className="bg-white border border-[#D9E0E5] rounded-xs p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66737D]">Cumulative Spend</p>
               <p className="text-lg font-bold text-emerald-600 mt-0.5">₹{Math.round(kpi.totalExp).toLocaleString()}</p>
-              <p className="text-[10px] text-[#8C9893] mt-0.5">Cr Expenditure</p>
+              <p className="text-[10px] text-[#66737D] mt-0.5">Cr Expenditure</p>
             </div>
-            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-[#66736D]">Weighted Escalation</p>
-              <p className={`text-lg font-bold mt-0.5 ${kpi.weightedEscalation > 15 ? 'text-amber-600' : 'text-[#173F35]'}`}>
+            <div className="bg-white border border-[#D9E0E5] rounded-xs p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66737D]">Weighted Escalation</p>
+              <p className={`text-lg font-bold mt-0.5 ${kpi.weightedEscalation > 15 ? 'text-amber-600' : 'text-[#156586]'}`}>
                 +{kpi.weightedEscalation.toFixed(1)}%
               </p>
-              <p className="text-[10px] text-[#8C9893] mt-0.5">Cost Growth vs Sanction</p>
+              <p className="text-[10px] text-[#66737D] mt-0.5">Cost Growth vs Sanction</p>
             </div>
-            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-[#66736D]">Average Delay</p>
-              <p className={`text-lg font-bold mt-0.5 ${kpi.avgDelay > 12 ? 'text-orange-600' : 'text-[#173F35]'}`}>
+            <div className="bg-white border border-[#D9E0E5] rounded-xs p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66737D]">Average Delay</p>
+              <p className={`text-lg font-bold mt-0.5 ${kpi.avgDelay > 12 ? 'text-orange-600' : 'text-[#156586]'}`}>
                 {kpi.avgDelay.toFixed(1)} Mo
               </p>
-              <p className="text-[10px] text-[#8C9893] mt-0.5">Weighted Slippage</p>
+              <p className="text-[10px] text-[#66737D] mt-0.5">Weighted Slippage</p>
             </div>
-            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-[#66736D]">High / Critical Risk</p>
+            <div className="bg-white border border-[#D9E0E5] rounded-xs p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66737D]">High / Critical Risk</p>
               <p className="text-lg font-bold text-rose-600 mt-0.5">{kpi.totalHighCritical.toLocaleString()}</p>
-              <p className="text-[10px] text-[#8C9893] mt-0.5">Flagged Projects</p>
+              <p className="text-[10px] text-[#66737D] mt-0.5">Flagged Projects</p>
             </div>
-            <div className="bg-white border border-[#DDD9D0] rounded-xl p-3.5 shadow-2xs">
-              <p className="text-[11px] font-medium text-[#66736D]">Active Warnings</p>
+            <div className="bg-white border border-[#D9E0E5] rounded-xs p-3.5 shadow-2xs">
+              <p className="text-[11px] font-medium text-[#66737D]">Active Warnings</p>
               <p className="text-lg font-bold text-amber-500 mt-0.5">{kpi.totalWarnings.toLocaleString()}</p>
-              <p className="text-[10px] text-[#8C9893] mt-0.5">Rule Anomaly Signals</p>
+              <p className="text-[10px] text-[#66737D] mt-0.5">Rule Anomaly Signals</p>
             </div>
           </div>
 
           {/* Context statement */}
-          <div className="flex items-center justify-between text-xs text-[#66736D] px-1">
+          <div className="flex items-center justify-between text-xs text-[#66737D] px-1">
             <span>
-              Comparing <strong className="text-[#26312D]">{states.length} states/UTs</strong> across <strong className="text-[#26312D]">{kpi.totalProjects.toLocaleString()} projects</strong> matching applied analytical scope.
+              Comparing <strong className="text-[#25313B]">{states.length} states/UTs</strong> across <strong className="text-[#25313B]">{kpi.totalProjects.toLocaleString()} projects</strong> matching applied analytical scope.
             </span>
-            <span className="text-[11px] text-[#8C9893]">
+            <span className="text-[11px] text-[#66737D]">
               Click any state row or bar to inspect active sectors & project cohort
             </span>
           </div>
 
           {/* Error Banner */}
           {error && (
-            <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 text-xs text-rose-700 flex items-center justify-between">
+            <div className="bg-rose-50 border border-rose-200 rounded-xs p-4 text-xs text-rose-700 flex items-center justify-between">
               <span>{error}</span>
               <button onClick={() => fetchStates(appliedFilters)} className="underline hover:text-rose-900 font-semibold">
                 Retry
@@ -538,21 +538,21 @@ export const StateAnalytics: React.FC = () => {
           )}
 
           {/* Graphical Pictorial Comparison Tabs */}
-          <div className="bg-white rounded-xl border-2 border-[#B8D9F2] shadow-xs overflow-hidden">
-            <div className="p-4 border-b border-[#B8D9F2] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F0F6FB]">
+          <div className="bg-white rounded-xs border border-[#D9E0E5] shadow-xs overflow-hidden">
+            <div className="p-4 border-b border-[#D9E0E5] flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F6F7F8]">
               <div className="flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-[#0A365C]" />
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0A365C]">
+                <BarChart3 className="w-4 h-4 text-[#187A9E]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#156586]">
                   Regional Comparative Visual Analytics
                 </span>
               </div>
 
               {/* Chart Tabs */}
-              <div className="flex bg-[#E1EFF9] p-0.5 rounded-lg text-xs self-start sm:self-auto border border-[#B8D9F2]">
+              <div className="flex bg-[#F6F7F8] p-0.5 rounded-xs text-xs self-start sm:self-auto border border-[#D9E0E5]">
                 <button
                   onClick={() => setActiveChartTab('CAPITAL')}
                   className={`px-3 py-1.5 rounded-md font-semibold transition ${
-                    activeChartTab === 'CAPITAL' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
+                    activeChartTab === 'CAPITAL' ? 'bg-[#187A9E] text-white shadow-xs' : 'text-[#66737D] hover:text-[#187A9E]'
                   }`}
                 >
                   Capital &amp; Delivery
@@ -560,7 +560,7 @@ export const StateAnalytics: React.FC = () => {
                 <button
                   onClick={() => setActiveChartTab('COST_DELAY')}
                   className={`px-3 py-1.5 rounded-md font-semibold transition ${
-                    activeChartTab === 'COST_DELAY' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
+                    activeChartTab === 'COST_DELAY' ? 'bg-[#187A9E] text-white shadow-xs' : 'text-[#66737D] hover:text-[#187A9E]'
                   }`}
                 >
                   Cost vs Schedule Delay
@@ -568,7 +568,7 @@ export const StateAnalytics: React.FC = () => {
                 <button
                   onClick={() => setActiveChartTab('RISK')}
                   className={`px-3 py-1.5 rounded-md font-semibold transition ${
-                    activeChartTab === 'RISK' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
+                    activeChartTab === 'RISK' ? 'bg-[#187A9E] text-white shadow-xs' : 'text-[#66737D] hover:text-[#187A9E]'
                   }`}
                 >
                   Risk Concentration &amp; Alerts
@@ -576,7 +576,7 @@ export const StateAnalytics: React.FC = () => {
                 <button
                   onClick={() => setActiveChartTab('PROGRESS')}
                   className={`px-3 py-1.5 rounded-md font-semibold transition ${
-                    activeChartTab === 'PROGRESS' ? 'bg-[#0A365C] text-white shadow-xs' : 'text-[#4B647D] hover:text-[#0A365C]'
+                    activeChartTab === 'PROGRESS' ? 'bg-[#187A9E] text-white shadow-xs' : 'text-[#66737D] hover:text-[#187A9E]'
                   }`}
                 >
                   Execution Progress
@@ -585,9 +585,9 @@ export const StateAnalytics: React.FC = () => {
             </div>
 
             {/* Sub-controls: Cohort Selection & View Mode */}
-            <div className="px-4 sm:px-6 py-2.5 bg-[#F4F9FD] border-b border-[#D8EBF8] flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="text-[#4B647D] text-[11px] font-medium flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#1BA0E2]" />
+            <div className="px-4 sm:px-6 py-2.5 bg-[#F6F7F8] border-b border-[#D9E0E5] flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="text-[#66737D] text-[11px] font-medium flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#187A9E]" />
                 {activeChartTab === 'CAPITAL' && 'Regional fiscal outlay: Original Sanction vs Revised Outlay vs Certified Cumulative Spend.'}
                 {activeChartTab === 'COST_DELAY' && 'Dual-axis comparison: Weighted Cost Escalation (% left) vs Average Schedule Delay (Months right).'}
                 {activeChartTab === 'RISK' && (riskViewMode === 'COUNT' ? 'Volume distribution: Absolute project count in each risk category.' : 'Normalized risk exposure: Percentage share of regional portfolio in each risk band.')}
@@ -596,24 +596,24 @@ export const StateAnalytics: React.FC = () => {
 
               <div className="flex items-center gap-2">
                 {/* Cohort Selector with Live Counts */}
-                <div className="flex items-center gap-1 bg-white border border-[#B8D9F2] p-0.5 rounded-lg text-[11px]">
-                  <span className="px-2 py-0.5 text-[#7E97B0] font-semibold uppercase text-[9px] tracking-wider">Cohort:</span>
+                <div className="flex items-center gap-1 bg-white border border-[#D9E0E5] p-0.5 rounded-xs text-[11px]">
+                  <span className="px-2 py-0.5 text-[#66737D] font-semibold uppercase text-[9px] tracking-wider">Cohort:</span>
                   <button
                     onClick={() => setChartCohort('ALL')}
-                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'ALL' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'ALL' ? 'bg-[#187A9E] text-white shadow-2xs' : 'text-[#66737D] hover:text-[#187A9E]'}`}
                   >
                     All ({states.length})
                   </button>
                   <button
                     onClick={() => setChartCohort('MEGA')}
-                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'MEGA' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'MEGA' ? 'bg-[#187A9E] text-white shadow-2xs' : 'text-[#66737D] hover:text-[#187A9E]'}`}
                     title="States & Multi-State with Outlay ≥ ₹1,00,000 Cr"
                   >
                     Major (≥₹1L Cr) ({megaStatesCount})
                   </button>
                   <button
                     onClick={() => setChartCohort('SPECIALIZED')}
-                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'SPECIALIZED' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
+                    className={`px-2 py-0.5 rounded-md font-semibold transition ${chartCohort === 'SPECIALIZED' ? 'bg-[#187A9E] text-white shadow-2xs' : 'text-[#66737D] hover:text-[#187A9E]'}`}
                     title="States and Union Territories with Outlay < ₹1,00,000 Cr (Scaled to make smaller jurisdictions distinguishable)"
                   >
                     Regional &amp; UTs (&lt;₹1L Cr) ({specializedStatesCount})
@@ -622,17 +622,17 @@ export const StateAnalytics: React.FC = () => {
 
                 {/* Risk Mode Toggle */}
                 {activeChartTab === 'RISK' && (
-                  <div className="flex items-center gap-1 bg-white border border-[#B8D9F2] p-0.5 rounded-lg text-[11px]">
-                    <span className="px-2 py-0.5 text-[#7E97B0] font-semibold uppercase text-[9px] tracking-wider">Metric:</span>
+                  <div className="flex items-center gap-1 bg-white border border-[#D9E0E5] p-0.5 rounded-xs text-[11px]">
+                    <span className="px-2 py-0.5 text-[#66737D] font-semibold uppercase text-[9px] tracking-wider">Metric:</span>
                     <button
                       onClick={() => setRiskViewMode('COUNT')}
-                      className={`px-2 py-0.5 rounded-md font-semibold transition ${riskViewMode === 'COUNT' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
+                      className={`px-2 py-0.5 rounded-md font-semibold transition ${riskViewMode === 'COUNT' ? 'bg-[#187A9E] text-white shadow-2xs' : 'text-[#66737D] hover:text-[#187A9E]'}`}
                     >
                       Project Count (#)
                     </button>
                     <button
                       onClick={() => setRiskViewMode('PERCENT')}
-                      className={`px-2 py-0.5 rounded-md font-semibold transition ${riskViewMode === 'PERCENT' ? 'bg-[#1BA0E2] text-white shadow-2xs' : 'text-[#4B647D] hover:text-[#0A365C]'}`}
+                      className={`px-2 py-0.5 rounded-md font-semibold transition ${riskViewMode === 'PERCENT' ? 'bg-[#187A9E] text-white shadow-2xs' : 'text-[#66737D] hover:text-[#187A9E]'}`}
                       title="100% Stacked Bar: Risk share percentage"
                     >
                       Risk Share (%)
@@ -644,19 +644,19 @@ export const StateAnalytics: React.FC = () => {
 
             <div className="p-4 sm:p-6 h-[420px]">
               {loading ? (
-                <div className="h-full flex items-center justify-center text-xs text-[#7E97B0]">
+                <div className="h-full flex items-center justify-center text-xs text-[#66737D]">
                   Recomputing visual comparison across regional states...
                 </div>
               ) : chartData.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-xs text-[#4B647D] p-6 text-center">
-                  <BarChart3 className="w-8 h-8 text-[#90C3E8] mb-2" />
-                  <p className="font-semibold text-[#0A365C]">
+                <div className="h-full flex flex-col items-center justify-center text-xs text-[#66737D] p-6 text-center">
+                  <BarChart3 className="w-8 h-8 text-[#D99A2B] mb-2" />
+                  <p className="font-semibold text-[#156586]">
                     No states found in the {chartCohort === 'MEGA' ? 'Major (≥₹1L Cr)' : chartCohort === 'SPECIALIZED' ? 'Regional & UTs (<₹1L Cr)' : ''} cohort.
                   </p>
-                  <p className="text-[11px] text-[#7E97B0] mt-1">Adjust your filters or switch back to the complete portfolio.</p>
+                  <p className="text-[11px] text-[#66737D] mt-1">Adjust your filters or switch back to the complete portfolio.</p>
                   <button 
                     onClick={() => setChartCohort('ALL')} 
-                    className="mt-3 px-3.5 py-1.5 bg-[#1BA0E2] text-white rounded-md text-xs font-semibold hover:bg-[#148AC4] transition-colors shadow-xs"
+                    className="mt-3 px-3.5 py-1.5 bg-[#187A9E] text-white rounded-md text-xs font-semibold hover:bg-[#156586] transition-colors shadow-xs"
                   >
                     View All States ({states.length})
                   </button>
@@ -665,25 +665,25 @@ export const StateAnalytics: React.FC = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   {activeChartTab === 'CAPITAL' ? (
                     <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => v >= 1000 ? `₹${(v/1000).toFixed(0)}k Cr` : `₹${v} Cr`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D9E0E5" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66737D' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#66737D' }} tickFormatter={(v) => v >= 1000 ? `₹${(v/1000).toFixed(0)}k Cr` : `₹${v} Cr`} />
                       <Tooltip 
                         formatter={(val: any, name: any) => [`₹${Number(val).toLocaleString()} Cr`, name]}
                         labelFormatter={(label) => `State / Territory: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#D9E0E5', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="originalCost" name="Original Sanction" fill="#90C3E8" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#0A365C" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
-                      <Bar dataKey="expenditure" name="Cumulative Spend" fill="#1BA0E2" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="originalCost" name="Original Sanction" fill="#D99A2B" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="revisedCost" name="Revised Outlay" fill="#187A9E" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
+                      <Bar dataKey="expenditure" name="Cumulative Spend" fill="#123F63" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   ) : activeChartTab === 'COST_DELAY' ? (
                     <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
-                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}%`} />
-                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v} Mo`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D9E0E5" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66737D' }} />
+                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#66737D' }} tickFormatter={(v) => `${v > 0 ? '+' : ''}${v}%`} />
+                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#66737D' }} tickFormatter={(v) => `${v} Mo`} />
                       <Tooltip 
                         formatter={(val: any, name: any, item: any) => [
                           item?.dataKey === 'costEscalationPct' 
@@ -692,18 +692,18 @@ export const StateAnalytics: React.FC = () => {
                           name
                         ]}
                         labelFormatter={(label) => `State / Territory: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#D9E0E5', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation" fill="#D97706" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
-                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Schedule Delay" stroke="#C53030" strokeWidth={3} dot={{ r: 4, fill: '#C53030' }} />
+                      <Bar yAxisId="left" dataKey="costEscalationPct" name="Weighted Cost Escalation" fill="#D99A2B" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
+                      <Line yAxisId="right" type="monotone" dataKey="scheduleDelayMonths" name="Average Schedule Delay" stroke="#B94A45" strokeWidth={3} dot={{ r: 4, fill: '#B94A45' }} />
                     </ComposedChart>
                   ) : activeChartTab === 'RISK' ? (
                     <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D9E0E5" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66737D' }} />
                       <YAxis 
-                        tick={{ fontSize: 11, fill: '#4B647D' }} 
+                        tick={{ fontSize: 11, fill: '#66737D' }} 
                         domain={riskViewMode === 'PERCENT' ? [0, 100] : ['auto', 'auto']}
                         tickFormatter={riskViewMode === 'PERCENT' ? (v) => `${v}%` : undefined}
                       />
@@ -717,14 +717,14 @@ export const StateAnalytics: React.FC = () => {
                           return [`${val} projects`, name];
                         }}
                         labelFormatter={(label) => `State / Territory: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#D9E0E5', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
                       <Bar 
                         dataKey={riskViewMode === 'PERCENT' ? 'criticalRiskPct' : 'criticalRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'Critical Risk (%)' : 'Critical Risk'} 
                         stackId="a" 
-                        fill="#C53030" 
+                        fill="#B94A45" 
                         onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} 
                         className="cursor-pointer" 
                       />
@@ -732,29 +732,29 @@ export const StateAnalytics: React.FC = () => {
                         dataKey={riskViewMode === 'PERCENT' ? 'highRiskPct' : 'highRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'High Risk (%)' : 'High Risk'} 
                         stackId="a" 
-                        fill="#D97706" 
+                        fill="#D99A2B" 
                       />
                       <Bar 
                         dataKey={riskViewMode === 'PERCENT' ? 'moderateLowRiskPct' : 'moderateLowRiskCount'} 
                         name={riskViewMode === 'PERCENT' ? 'Moderate / Low Risk (%)' : 'Moderate / Low Risk'} 
                         stackId="a" 
-                        fill="#7E97B0" 
+                        fill="#66737D" 
                         radius={[4, 4, 0, 0]} 
                       />
                     </BarChart>
                   ) : (
                     <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 65 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#D8EBF8" />
-                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#4B647D' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#4B647D' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#D9E0E5" />
+                      <XAxis dataKey="shortName" angle={-25} textAnchor="end" interval={0} tick={{ fontSize: 11, fill: '#66737D' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#66737D' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
                       <Tooltip 
                         formatter={(val: any, name: any) => [`${val}%`, name]}
                         labelFormatter={(label) => `State / Territory: ${chartData.find(d => d.shortName === label)?.name || label}`}
-                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#B8D9F2', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#D9E0E5', borderRadius: '8px', fontSize: '11px', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                       />
                       <Legend verticalAlign="top" height={36} />
-                      <Bar dataKey="physicalProgressPct" name="Average Physical Progress" fill="#1BA0E2" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
-                      <Line type="monotone" dataKey="expenditurePct" name="Cumulative Expenditure / Revised Outlay" stroke="#0A365C" strokeWidth={3} dot={{ r: 4, fill: '#0A365C' }} />
+                      <Bar dataKey="physicalProgressPct" name="Average Physical Progress" fill="#187A9E" radius={[4, 4, 0, 0]} onClick={(d: any) => { if (d?.name) handleSelectState(d.name); }} className="cursor-pointer" />
+                      <Line type="monotone" dataKey="expenditurePct" name="Cumulative Expenditure / Revised Outlay" stroke="#156586" strokeWidth={3} dot={{ r: 4, fill: '#156586' }} />
                     </ComposedChart>
                   )}
                 </ResponsiveContainer>
@@ -763,19 +763,19 @@ export const StateAnalytics: React.FC = () => {
           </div>
 
           {/* Numerical State Comparison Table */}
-          <div className="bg-white border border-[#DDD9D0] rounded-xl overflow-hidden shadow-2xs">
-            <div className="p-4 border-b border-[#DDD9D0] bg-[#FAF8F5]/70 flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#26312D]">
+          <div className="bg-white border border-[#D9E0E5] rounded-xs overflow-hidden shadow-2xs">
+            <div className="p-4 border-b border-[#D9E0E5] bg-[#F6F7F8]/70 flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#25313B]">
                 Detailed State & UT Portfolio Comparison ({states.length})
               </span>
-              <span className="text-xs text-[#66736D]">
+              <span className="text-xs text-[#66737D]">
                 Ordered by {appliedFilters.sortBy === 'cost' ? 'Revised Outlay' : appliedFilters.sortBy}
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#26312D]">
-                <thead className="bg-[#FAF8F5]/70 border-b border-[#DDD9D0] uppercase text-[11px] font-semibold text-[#66736D]">
+              <table className="w-full text-left text-xs text-[#25313B]">
+                <thead className="bg-[#F6F7F8]/70 border-b border-[#D9E0E5] uppercase text-[11px] font-semibold text-[#66737D]">
                   <tr>
                     <th className="px-4 py-3">State / UT</th>
                     <th className="px-4 py-3 text-right">Projects</th>
@@ -792,15 +792,15 @@ export const StateAnalytics: React.FC = () => {
                 <tbody className="divide-y divide-slate-100">
                   {loading ? (
                     <tr>
-                      <td colSpan={10} className="text-center py-12 text-[#8C9893]">
+                      <td colSpan={10} className="text-center py-12 text-[#66737D]">
                         Querying regional state cohort...
                       </td>
                     </tr>
                   ) : states.length === 0 ? (
                     <tr>
                       <td colSpan={10} className="text-center py-12 space-y-2">
-                        <p className="text-sm font-medium text-[#66736D]">No states contain projects matching the selected scope.</p>
-                        <p className="text-xs text-[#8C9893]">Broaden your filters or reset to national comparison.</p>
+                        <p className="text-sm font-medium text-[#66737D]">No states contain projects matching the selected scope.</p>
+                        <p className="text-xs text-[#66737D]">Broaden your filters or reset to national comparison.</p>
                         <button
                           onClick={handleReset}
                           className="mt-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-semibold"
@@ -812,27 +812,27 @@ export const StateAnalytics: React.FC = () => {
                   ) : (
                     states.map((st) => (
                       <tr key={st.stateName} className="hover:bg-emerald-50/40 transition">
-                        <td className="px-4 py-3 font-semibold text-[#173F35] max-w-sm truncate" title={st.stateName}>
+                        <td className="px-4 py-3 font-semibold text-[#156586] hover:text-[#123F63] max-w-sm truncate" title={st.stateName}>
                           {st.stateName}
                         </td>
-                        <td className="px-4 py-3 text-right font-mono text-[#26312D]">{st.projectCount.toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right font-mono font-semibold text-[#173F35]">
+                        <td className="px-4 py-3 text-right font-mono text-[#25313B]">{st.projectCount.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-right font-mono font-semibold text-[#156586]">
                           ₹{Math.round(st.totalRevisedCostCr ?? st.totalInvestmentCr).toLocaleString()}
                         </td>
                         <td className="px-4 py-3 text-right font-mono">
-                          <span className={st.weightedCostEscalationPct > 15 ? 'text-amber-600 font-semibold' : 'text-[#66736D]'}>
+                          <span className={st.weightedCostEscalationPct > 15 ? 'text-amber-600 font-semibold' : 'text-[#66737D]'}>
                             +{st.weightedCostEscalationPct.toFixed(1)}%
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right font-mono text-emerald-600 font-medium">₹{Math.round(st.totalCumulativeExpenditureCr).toLocaleString()}</td>
-                        <td className="px-4 py-3 text-right font-mono font-medium text-[#26312D]">{st.avgPhysicalProgressPct.toFixed(1)}%</td>
+                        <td className="px-4 py-3 text-right font-mono font-medium text-[#25313B]">{st.avgPhysicalProgressPct.toFixed(1)}%</td>
                         <td className="px-4 py-3 text-right font-mono">
-                          <span className={st.avgScheduleDelayMonths > 12 ? 'text-orange-600 font-semibold' : 'text-[#66736D]'}>
+                          <span className={st.avgScheduleDelayMonths > 12 ? 'text-orange-600 font-semibold' : 'text-[#66737D]'}>
                             {(st.avgScheduleDelayMonths || 0).toFixed(1)} Mo
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className={st.highRiskCount + st.criticalRiskCount > 0 ? 'text-rose-600 font-bold' : 'text-[#8C9893]'}>
+                          <span className={st.highRiskCount + st.criticalRiskCount > 0 ? 'text-rose-600 font-bold' : 'text-[#66737D]'}>
                             {st.highRiskCount + st.criticalRiskCount}
                           </span>
                         </td>
@@ -863,20 +863,20 @@ export const StateAnalytics: React.FC = () => {
         <div className="space-y-6">
           
           {/* Top Drill-Down Selectors Panel */}
-          <div className="bg-white rounded-xl border border-[#DDD9D0] p-4 sm:p-5 shadow-2xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EAE6DF] pb-3">
+          <div className="bg-white rounded-xs border border-[#D9E0E5] p-4 sm:p-5 shadow-2xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#D9E0E5] pb-3">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-600">
                   Detailed State & Sector Drill-Down
                 </span>
-                <p className="text-xs text-[#66736D] mt-0.5">
+                <p className="text-xs text-[#66737D] mt-0.5">
                   Scope inherited from overview: {activeChips.length > 0 ? activeChips.map(c => `${c.label}: ${c.value}`).join(' · ') : 'National Aggregate (All criteria)'}
                 </p>
               </div>
 
               <button
                 onClick={() => { setSelectedState(null); setSelectedSector(null); syncUrl(appliedFilters, null, null); }}
-                className="px-3 py-1.5 rounded-lg border border-[#DDD9D0] hover:bg-[#FAF8F5] text-xs font-semibold text-[#26312D] transition flex items-center gap-1.5 self-start sm:self-auto"
+                className="px-3 py-1.5 rounded-xs border border-[#D9E0E5] hover:bg-[#F6F7F8] text-xs font-semibold text-[#25313B] transition flex items-center gap-1.5 self-start sm:self-auto"
               >
                 <ArrowLeft className="w-3.5 h-3.5" /> Back to Overview
               </button>
@@ -886,13 +886,13 @@ export const StateAnalytics: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* State Selector */}
               <div>
-                <label className="block text-[11px] font-semibold text-[#26312D] mb-1">
+                <label className="block text-[11px] font-semibold text-[#25313B] mb-1">
                   Selected State / UT
                 </label>
                 <select
                   value={selectedState}
                   onChange={(e) => handleSelectState(e.target.value)}
-                  className="w-full bg-white border border-[#DDD9D0] rounded-lg px-3 py-2 text-xs text-[#26312D] font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
+                  className="w-full bg-white border border-[#D9E0E5] rounded-xs px-3 py-2 text-xs text-[#25313B] font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
                 >
                   {(meta?.states && meta.states.length > 0
                     ? meta.states
@@ -910,13 +910,13 @@ export const StateAnalytics: React.FC = () => {
 
               {/* Sector Selector */}
               <div>
-                <label className="block text-[11px] font-semibold text-[#26312D] mb-1">
+                <label className="block text-[11px] font-semibold text-[#25313B] mb-1">
                   Infrastructure Sector
                 </label>
                 <select
                   value={selectedSector || 'ALL'}
                   onChange={(e) => handleSelectSector(e.target.value)}
-                  className="w-full bg-white border border-[#DDD9D0] rounded-lg px-3 py-2 text-xs text-[#26312D] font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
+                  className="w-full bg-white border border-[#D9E0E5] rounded-xs px-3 py-2 text-xs text-[#25313B] font-medium focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 shadow-2xs"
                 >
                   <option value="ALL">All Sectors ({sectors.reduce((acc, s) => acc + s.project_count, 0)})</option>
                   {sectors.map(sec => (
@@ -929,7 +929,7 @@ export const StateAnalytics: React.FC = () => {
 
               {/* Scoped Entity Summary Pill */}
               <div className="flex flex-col justify-end">
-                <div className="p-2 rounded-lg bg-emerald-50/70 border border-emerald-100 text-xs text-emerald-900 flex items-center justify-between">
+                <div className="p-2 rounded-xs bg-emerald-50/70 border border-emerald-100 text-xs text-emerald-900 flex items-center justify-between">
                   <span className="font-semibold">Matching Regional Projects:</span>
                   <span className="font-mono font-bold text-sm text-emerald-700">
                     {selectedSector 
@@ -942,24 +942,24 @@ export const StateAnalytics: React.FC = () => {
           </div>
 
           {/* Project Cohort Table inheriting overview filters */}
-          <div className="bg-white border border-[#DDD9D0] rounded-xl overflow-hidden shadow-2xs">
-            <div className="p-4 bg-[#FAF8F5] border-b border-[#DDD9D0] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="bg-white border border-[#D9E0E5] rounded-xs overflow-hidden shadow-2xs">
+            <div className="p-4 bg-[#F6F7F8] border-b border-[#D9E0E5] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#26312D]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#25313B]">
                   Project Cohort: {selectedState} {selectedSector ? `→ ${selectedSector}` : ''}
                 </span>
-                <p className="text-[11px] text-[#66736D] mt-0.5">
+                <p className="text-[11px] text-[#66737D] mt-0.5">
                   Displaying projects satisfying inherited overview filters
                 </p>
               </div>
-              <span className="text-xs text-[#66736D] font-mono">
+              <span className="text-xs text-[#66737D] font-mono">
                 {projects.length} displayed on page {page}
               </span>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#26312D]">
-                <thead className="bg-[#FAF8F5]/70 border-b border-[#DDD9D0] uppercase text-[11px] font-semibold text-[#66736D]">
+              <table className="w-full text-left text-xs text-[#25313B]">
+                <thead className="bg-[#F6F7F8]/70 border-b border-[#D9E0E5] uppercase text-[11px] font-semibold text-[#66737D]">
                   <tr>
                     <th className="px-4 py-2.5">Project ID</th>
                     <th className="px-4 py-2.5">Project Name</th>
@@ -975,31 +975,31 @@ export const StateAnalytics: React.FC = () => {
                 <tbody className="divide-y divide-slate-100">
                   {loadingDrilldown ? (
                     <tr>
-                      <td colSpan={9} className="text-center py-12 text-[#8C9893]">
+                      <td colSpan={9} className="text-center py-12 text-[#66737D]">
                         Loading state project cohort...
                       </td>
                     </tr>
                   ) : projects.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="text-center py-12 text-[#8C9893]">
+                      <td colSpan={9} className="text-center py-12 text-[#66737D]">
                         No projects found under this state/sector matching the applied filters.
                       </td>
                     </tr>
                   ) : (
                     projects.map((p) => (
-                      <tr key={p.projectId} className="hover:bg-[#FAF8F5]/80 transition">
-                        <td className="px-4 py-2.5 font-mono text-[#66736D]">{p.projectId}</td>
-                        <td className="px-4 py-2.5 font-medium text-[#173F35] max-w-xs truncate" title={p.projectName}>
+                      <tr key={p.projectId} className="hover:bg-[#F6F7F8]/80 transition">
+                        <td className="px-4 py-2.5 font-mono text-[#66737D]">{p.projectId}</td>
+                        <td className="px-4 py-2.5 font-medium text-[#156586] hover:text-[#123F63] max-w-xs truncate" title={p.projectName}>
                           {p.projectName}
                         </td>
-                        <td className="px-4 py-2.5 text-[#66736D] truncate max-w-[150px]">{p.agencyName}</td>
-                        <td className="px-4 py-2.5 text-[#66736D]">{p.sectorName}</td>
-                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-[#173F35]">
+                        <td className="px-4 py-2.5 text-[#66737D] truncate max-w-[150px]">{p.agencyName}</td>
+                        <td className="px-4 py-2.5 text-[#66737D]">{p.sectorName}</td>
+                        <td className="px-4 py-2.5 text-right font-mono font-semibold text-[#156586]">
                           ₹{p.latestRevisedCostCr.toLocaleString()} Cr
                         </td>
-                        <td className="px-4 py-2.5 text-right font-mono text-[#26312D]">{p.physicalProgressPct}%</td>
+                        <td className="px-4 py-2.5 text-right font-mono text-[#25313B]">{p.physicalProgressPct}%</td>
                         <td className="px-4 py-2.5 text-right font-mono">
-                          <span className={p.scheduleSlippageMonths > 0 ? 'text-amber-600 font-semibold' : 'text-[#66736D]'}>
+                          <span className={p.scheduleSlippageMonths > 0 ? 'text-amber-600 font-semibold' : 'text-[#66737D]'}>
                             {p.scheduleSlippageMonths}
                           </span>
                         </td>

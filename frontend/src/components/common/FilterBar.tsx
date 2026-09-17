@@ -33,16 +33,16 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   statesList = []
 }) => {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-lg p-3 mb-4 flex flex-wrap items-center gap-3">
+    <div className="bg-[#FFFFFF] border border-[#D9E0E5] rounded-xs p-3.5 sm:p-4 mb-5 flex flex-wrap items-center gap-3.5 shadow-xs">
       {/* Search */}
-      <div className="relative flex-1 min-w-[220px]">
-        <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+      <div className="relative flex-1 min-w-[240px]">
+        <Search className="w-4.5 h-4.5 text-[#66737D] absolute left-3.5 top-2.5" />
         <input
           type="text"
           placeholder="Search projects by name or code..."
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full bg-slate-950 border border-slate-800 rounded pl-9 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+          className="w-full bg-[#F6F7F8] border border-[#D9E0E5] rounded-xs pl-10 pr-3.5 py-2 text-sm text-[#25313B] placeholder-[#66737D] focus:outline-none focus:border-[#187A9E]"
         />
       </div>
 
@@ -51,7 +51,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <select
           value={sector || ''}
           onChange={(e) => onSectorChange(e.target.value)}
-          className="bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500"
+          className="bg-[#F6F7F8] border border-[#D9E0E5] rounded-xs px-3 py-2 text-sm text-[#25313B] focus:outline-none focus:border-[#187A9E] font-medium"
         >
           <option value="">All Sectors</option>
           {sectorsList.map((s) => (
@@ -65,7 +65,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <select
           value={state || ''}
           onChange={(e) => onStateChange(e.target.value)}
-          className="bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500"
+          className="bg-[#F6F7F8] border border-[#D9E0E5] rounded-xs px-3 py-2 text-sm text-[#25313B] focus:outline-none focus:border-[#187A9E] font-medium"
         >
           <option value="">All States / UTs</option>
           {statesList.map((st) => (
@@ -79,7 +79,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <select
           value={riskBand || ''}
           onChange={(e) => onRiskBandChange(e.target.value)}
-          className="bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500"
+          className="bg-[#F6F7F8] border border-[#D9E0E5] rounded-xs px-3 py-2 text-sm text-[#25313B] focus:outline-none focus:border-[#187A9E] font-medium"
         >
           <option value="">All Risk Bands</option>
           <option value="CRITICAL">Critical</option>
@@ -94,7 +94,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         <select
           value={severity || ''}
           onChange={(e) => onSeverityChange(e.target.value)}
-          className="bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-blue-500"
+          className="bg-[#F6F7F8] border border-[#D9E0E5] rounded-xs px-3 py-2 text-sm text-[#25313B] focus:outline-none focus:border-[#187A9E] font-medium"
         >
           <option value="">All Severities</option>
           <option value="CRITICAL">Critical</option>
@@ -108,10 +108,10 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       {onReset && (
         <button
           onClick={onReset}
-          className="p-1.5 text-slate-400 hover:text-slate-200 bg-slate-800 rounded border border-slate-700 hover:bg-slate-700 transition"
+          className="p-2 text-[#66737D] hover:text-[#187A9E] bg-[#F6F7F8] rounded-xs border border-[#D9E0E5] hover:bg-[#EBF6FA] transition cursor-pointer"
           title="Reset Filters"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-4.5 h-4.5" />
         </button>
       )}
     </div>
